@@ -4,23 +4,33 @@ This folder is the single source of truth for both runtimes. The Python and the 
 
 ## fixtures/
 
-One YAML file per language and rule family, for example `en/clean-markdown.yaml`. Each file holds a list of cases:
+One YAML file per language and rule family, for example `en/clean-markdown.yaml`. A file sets defaults (`rule`, `locale`, `profile`) and holds a list of cases:
 
 ```yaml
-rule: clean.markdown        # the rule family under test
+rule: clean.markdown
 locale: en-US
 cases:
-  - id: bold-and-code
+  - id: bold-and-inline-code
     input: "**Step 1:** run `npm install`"
-    expect: "Step 1: run npm install"
-  - id: heading
-    input: "## Pricing\nTwo plans."
-    expect: "Pricing. Two plans."
-    note: a heading ends with a full stop so TTS pauses after it
+    expect: "Step 1: run npm install."
+    note: a block that ends without punctuation gets a full stop
 ```
 
-Optional keys per case: `provider` and `model` when the expected output depends on a profile, `stream` as a list of chunks when the input arrives as a token stream, and `skip` with a reason while a case is known to fail.
+`rule` picks what the runner calls and what `expect` is:
+
+| rule | runs | expect |
+| --- | --- | --- |
+| `clean.*` | the clean stage only | string |
+| `chunk.sentences` | sentence splitting | list of sentences |
+| `chunk.stream` | the streaming segmenter over `stream` (a list of pushes), then flush | list of sentences |
+| `chunk.pack` | split then pack under `limit` (`unit` chars or bytes) | list of chunks |
+| `pipeline` | the whole pipeline with `profile` | the compiled text |
+| `pipeline.chunks` | the whole pipeline with `profile` and `limit` | list of chunks |
+
+Optional keys per case: `rule` and `locale` (override the file), `profile` (a profile id), `model` (for per-model limits), `limit`, `unit`, `options` (clean options as a map), `stream`, `max_buffer`, `note`, and `skip` with a reason while a case is known to fail.
+
+Expected strings are exact. Blocks are separated by `\n` in cleaned text; chunks are joined with a space.
 
 ## profiles/
 
-One YAML file per provider model family, for example `elevenlabs-v2.yaml`. A profile states which intents the model accepts (pause, emphasis, spell-out, say-as, phoneme), how each is rendered, the request character limit, and the escaping rules. The schema is defined in `profiles/README.md` once the first three profiles exist.
+One YAML file per provider model family. See `profiles/README.md` for the schema. Every number in a profile carries a `sources` link and a `verified` date.

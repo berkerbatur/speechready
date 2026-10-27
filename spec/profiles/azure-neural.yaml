@@ -1,0 +1,24 @@
+id: azure-neural
+provider: azure
+models: [neural, hd]
+default: true
+syntax: ssml
+escape: xml
+audio_tags: false
+limit:
+  unit: chars
+  max: 8000
+intents:
+  pause: {render: '<break time="{ms}ms" />', min_ms: 0, max_ms: 20000}
+  spell: {render: '<say-as interpret-as="characters">{text}</say-as>'}
+  emphasis: {render: '<emphasis level="strong">{text}</emphasis>'}
+notes: >
+  Output is the SSML body: text with break, say-as and emphasis elements, with
+  & < > escaped. The caller wraps it in <speak> and <voice>, since the voice
+  name is theirs to choose. Azure caps audio at 10 minutes per request and the
+  WebSocket SSML message at 64 KB; 8,000 characters stays well inside both at
+  normal speaking rates. HD voices support a subset of SSML; check the HD page.
+sources:
+  - https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-synthesis-markup-structure
+  - https://learn.microsoft.com/en-us/azure/ai-services/speech-service/speech-services-quotas-and-limits
+verified: "2026-10-28"

@@ -1,0 +1,39 @@
+rule: chunk.sentences
+locale: en-US
+cases:
+  - id: two-sentences
+    input: "Hello there. How are you?"
+    expect: ["Hello there.", "How are you?"]
+  - id: abbreviation-title
+    input: "Dr. Smith arrived. He sat."
+    expect: ["Dr. Smith arrived.", "He sat."]
+  - id: decimal-number
+    input: "Pi is 3.14 roughly. Yes."
+    expect: ["Pi is 3.14 roughly.", "Yes."]
+  - id: initials
+    input: "J. R. R. Tolkien wrote it. True."
+    expect: ["J. R. R. Tolkien wrote it.", "True."]
+  - id: eg-followed-by-lowercase
+    input: "Use fruit, e.g. apples. Then stop."
+    expect: ["Use fruit, e.g. apples.", "Then stop."]
+  - id: closing-quote-after-stop
+    input: "He said \"Go.\" Then left."
+    expect: ["He said \"Go.\"", "Then left."]
+  - id: ellipsis
+    input: "Wait… What?"
+    expect: ["Wait…", "What?"]
+  - id: newline-is-a-hard-boundary
+    input: "First line\nsecond line"
+    expect: ["First line", "second line"]
+  - id: digit-then-lowercase-is-not-a-boundary
+    input: "version 2. beta is out"
+    expect: ["version 2. beta is out"]
+  - id: number-then-capital
+    input: "It costs 5. Then more."
+    expect: ["It costs 5.", "Then more."]
+  - id: question-exclamation
+    input: "Really?! Yes!"
+    expect: ["Really?!", "Yes!"]
+  - id: dotted-country
+    input: "Born in the U.S. in 1990. Moved."
+    expect: ["Born in the U.S. in 1990.", "Moved."]

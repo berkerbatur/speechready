@@ -1,0 +1,26 @@
+id: elevenlabs-v3
+provider: elevenlabs
+models: [eleven_v3, eleven_v3_conversational, eleven_v4, eleven_v4_turbo]
+default: false
+syntax: plain
+escape: none
+audio_tags: true
+limit:
+  unit: chars
+  max: 5000
+  per_model:
+    eleven_v4: 10000
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+notes: >
+  v3 and v4 do not accept SSML break tags. Pacing comes from punctuation and
+  audio tags such as [short pause]; unknown bracket tags made of words pass
+  through for these models. Limits: eleven_v3 5,000 characters, eleven_v4
+  10,000; the conversational and turbo variants list none, so they take the
+  5,000 default until verified.
+sources:
+  - https://elevenlabs.io/docs/product/prompting/pauses
+  - https://elevenlabs.io/docs/overview/models
+verified: "2026-10-27"

@@ -1,0 +1,55 @@
+rule: pipeline
+locale: en-US
+cases:
+  - id: elevenlabs-v2-break-tag
+    profile: elevenlabs-v2
+    input: "Hold on. [pause 1.5s] Alright."
+    expect: "Hold on. <break time=\"1.5s\" /> Alright."
+  - id: elevenlabs-v2-caps-at-three-seconds
+    profile: elevenlabs-v2
+    input: "Go. [pause 5s] Now."
+    expect: "Go. <break time=\"3s\" /> Now."
+  - id: elevenlabs-v3-uses-punctuation
+    profile: elevenlabs-v3
+    input: "Hold on. [pause 1.5s] Alright."
+    expect: "Hold on.\nAlright."
+  - id: openai-short-pause-is-a-comma
+    profile: openai-tts
+    input: "Yes [pause 200ms] indeed."
+    expect: "Yes, indeed."
+  - id: openai-medium-pause-is-an-ellipsis
+    profile: openai-tts
+    input: "Well [pause 800ms] maybe."
+    expect: "Well... maybe."
+  - id: plain-default-pause
+    profile: plain
+    input: "One [pause] two."
+    expect: "One... two."
+  - id: pause-at-start-is-dropped
+    profile: plain
+    input: "[pause 2s] Go."
+    expect: "Go."
+  - id: ssml-break-input-is-recompiled
+    profile: azure-neural
+    input: "Hi <break time=\"500ms\"/> there."
+    expect: "Hi <break time=\"500ms\" /> there."
+  - id: ssml-break-input-on-openai-becomes-punctuation
+    profile: openai-tts
+    input: "Hi <break time=\"500ms\"/> there."
+    expect: "Hi... there."
+  - id: azure-escapes-xml
+    profile: azure-neural
+    input: "Tom & Jerry <3 you."
+    expect: "Tom &amp; Jerry &lt;3 you."
+  - id: unknown-tag-dropped-on-openai
+    profile: openai-tts
+    input: "Sure [laughs] okay."
+    expect: "Sure okay."
+  - id: unknown-tag-passes-on-elevenlabs-v3
+    profile: elevenlabs-v3
+    input: "Sure [laughs] okay."
+    expect: "Sure [laughs] okay."
+  - id: citation-marker-dropped-on-elevenlabs-v3
+    profile: elevenlabs-v3
+    input: "Fact [1] here."
+    expect: "Fact here."

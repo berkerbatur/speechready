@@ -1,0 +1,19 @@
+rule: chunk.stream
+locale: en-US
+cases:
+  - id: sentences-released-as-confirmed
+    stream: ["Hello th", "ere. How ", "are you? Fi", "ne."]
+    expect: ["Hello there.", "How are you?", "Fine."]
+  - id: abbreviation-split-across-tokens
+    stream: ["Dr", ". Smith", " is here. Ok", "."]
+    expect: ["Dr. Smith is here.", "Ok."]
+  - id: decimal-split-across-tokens
+    stream: ["Pi is 3", ".14 today. Yes", "."]
+    expect: ["Pi is 3.14 today.", "Yes."]
+  - id: newline-releases-immediately
+    stream: ["First\nSecond"]
+    expect: ["First", "Second"]
+  - id: max-buffer-releases-at-clause
+    stream: ["one, two, three, four, five, six, seven"]
+    max_buffer: 20
+    expect: ["one, two, three,", "four, five, six, seven"]

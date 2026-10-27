@@ -1,0 +1,19 @@
+id: plain
+provider: plain
+models: []
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: chars
+  max: null
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+notes: >
+  Provider-neutral output. Pauses become punctuation, spell-outs become spaced
+  characters, emphasis is dropped. No request limit, so one chunk.
+sources: []
+verified: "2026-10-27"

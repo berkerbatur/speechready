@@ -1,0 +1,15 @@
+rule: chunk.sentences
+locale: tr-TR
+cases:
+  - id: abbreviation-vb
+    input: "Elma, armut vb. meyveler ucuz. Sebzeler pahalı."
+    expect: ["Elma, armut vb. meyveler ucuz.", "Sebzeler pahalı."]
+  - id: ordinal-number
+    input: "3. madde önemli. Oku."
+    expect: ["3. madde önemli.", "Oku."]
+  - id: dotted-capital-i
+    input: "Geldi. İstanbul güzel."
+    expect: ["Geldi.", "İstanbul güzel."]
+  - id: doctor
+    input: "Dr. Ayşe geldi. Hoş geldin."
+    expect: ["Dr. Ayşe geldi.", "Hoş geldin."]

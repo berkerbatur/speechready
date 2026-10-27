@@ -3,11 +3,62 @@ locale: en-US
 cases:
   - id: bold-and-inline-code
     input: "**Step 1:** run `npm install`"
-    expect: "Step 1: run npm install"
+    expect: "Step 1: run npm install."
+    note: a block that ends without punctuation gets a full stop
   - id: heading-gets-a-stop
     input: "## Pricing\nTwo plans."
-    expect: "Pricing. Two plans."
-    note: a heading ends with a full stop so the model pauses after it
+    expect: "Pricing.\nTwo plans."
+    note: every block becomes one line; a heading ends with a full stop so the model pauses after it
   - id: bullet-list
     input: "- apples\n- pears"
-    expect: "apples. pears."
+    expect: "apples.\npears."
+  - id: numbered-list
+    input: "1. Open the app\n2. Tap **Settings**"
+    expect: "Open the app.\nTap Settings."
+  - id: task-list
+    input: "- [x] done\n- [ ] todo"
+    expect: "done.\ntodo."
+  - id: link-keeps-text
+    input: "See [the docs](https://example.com/docs) for details."
+    expect: "See the docs for details."
+  - id: image-becomes-alt-text
+    input: "![A cat on a mat](cat.png)"
+    expect: "A cat on a mat."
+  - id: code-fence-dropped
+    input: "Run this:\n```bash\nnpm i\n```\nThen restart."
+    expect: "Run this:\nThen restart."
+  - id: code-fence-kept
+    input: "Run this:\n```bash\nnpm i\n```\nThen restart."
+    options: {code_blocks: keep}
+    expect: "Run this:\nnpm i.\nThen restart."
+  - id: table-rows-read-as-lists
+    input: "| Plan | Price |\n|---|---|\n| Basic | $5 |"
+    expect: "Plan, Price.\nBasic, $5."
+  - id: table-dropped
+    input: "Intro\n| Plan | Price |\n|---|---|\n| Basic | $5 |"
+    options: {tables: drop}
+    expect: "Intro."
+  - id: blockquote
+    input: "> Be brief."
+    expect: "Be brief."
+  - id: horizontal-rule
+    input: "Intro\n\n---\n\nOutro"
+    expect: "Intro.\nOutro."
+  - id: hard-wrap-joined
+    input: "This is one\nsentence."
+    expect: "This is one sentence."
+  - id: strikethrough-and-escape
+    input: "~~old~~ new \\*literal\\*"
+    expect: "old new *literal*."
+  - id: html-tags
+    input: "Hello <b>world</b><br>"
+    expect: "Hello world."
+  - id: reasoning-block-stripped
+    input: "<think>secret plan</think>Answer."
+    expect: "Answer."
+  - id: underscores-in-identifiers-kept
+    input: "Use snake_case_names here."
+    expect: "Use snake_case_names here."
+  - id: trailing-dash-not-terminated
+    input: "Loading -"
+    expect: "Loading -"
