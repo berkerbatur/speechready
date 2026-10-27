@@ -1,0 +1,19 @@
+rule: pipeline
+locale: en-US
+cases:
+  - id: clean-then-verbalize-then-compile
+    profile: elevenlabs-v2
+    input: "**Support:** call +90 532 123 45 67 [pause 1s] or pay $4.50 at https://pay.example.com/now"
+    expect: "Support: call plus nine zero, five three two, one two three, four five, six seven <break time=\"1s\" /> or pay four dollars and fifty cents at pay.example.com."
+  - id: spell-intent-protects-an-identifier
+    profile: plain
+    input: "Code [spell AB12X9] and code AB12X9."
+    expect: "Code A B 1 2 X 9 and code A B one two X nine."
+  - id: chunks-count-after-verbalizing
+    rule: pipeline.chunks
+    profile: openai-tts
+    limit: 70
+    input: "Pay $5. Then call 555-123-4567."
+    expect:
+      - "Pay five dollars."
+      - "Then call five five five, one two three, four five six seven."

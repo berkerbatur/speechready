@@ -1,0 +1,49 @@
+rule: verbalize.en
+locale: en-US
+cases:
+  - id: iso-date
+    input: "Due 2026-03-04."
+    expect: "Due March fourth, twenty twenty-six."
+  - id: slash-date-us
+    input: "Due 03/04/2026."
+    expect: "Due March fourth, twenty twenty-six."
+  - id: slash-date-uk
+    locale: en-GB
+    input: "Due 03/04/2026."
+    expect: "Due April third, twenty twenty-six."
+  - id: dotted-date
+    input: "Due 27.10.2026."
+    expect: "Due October twenty-seventh, twenty twenty-six."
+  - id: invalid-date-untouched
+    input: "Ratio 13/40/2026."
+    expect: "Ratio 13/40/2026."
+  - id: year-in-context
+    input: "Founded in 1999 and sold in 2005."
+    expect: "Founded in nineteen ninety-nine and sold in two thousand five."
+  - id: year-oh
+    input: "Built in 1905."
+    expect: "Built in nineteen oh five."
+  - id: year-round
+    input: "Since 2000 and by 1900."
+    expect: "Since two thousand and by nineteen hundred."
+  - id: quantity-not-a-year
+    input: "We shipped 1999 units."
+    expect: "We shipped 1999 units."
+  - id: decade
+    input: "Music of the 1990s and the 2010s."
+    expect: "Music of the nineteen nineties and the twenty tens."
+  - id: time-24h
+    input: "Meet at 14:30 or 09:05."
+    expect: "Meet at 2:30 PM or 9:05 AM."
+  - id: time-12h-untouched
+    input: "Meet at 2:30 pm or 9:05."
+    expect: "Meet at 2:30 pm or 9:05."
+  - id: identifier-spelled
+    input: "Code AB12X9 and ticket ABC-1234."
+    expect: "Code A B one two X nine and ticket ABC one two three four."
+  - id: pronounceable-id-kept
+    input: "COVID-19 and GPT-4 and 4K and MP3."
+    expect: "COVID nineteen and G P T four and 4K and MP3."
+  - id: license-plate
+    input: "Plate 34ABC123 seen."
+    expect: "Plate three four ABC one two three seen."

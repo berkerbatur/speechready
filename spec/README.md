@@ -21,6 +21,7 @@ cases:
 | rule | runs | expect |
 | --- | --- | --- |
 | `clean.*` | the clean stage only | string |
+| `verbalize.*` | the verbalize stage only, for `locale` | string |
 | `chunk.sentences` | sentence splitting | list of sentences |
 | `chunk.stream` | the streaming segmenter over `stream` (a list of pushes), then flush | list of sentences |
 | `chunk.pack` | split then pack under `limit` (`unit` chars or bytes) | list of chunks |
