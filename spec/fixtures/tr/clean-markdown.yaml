@@ -1,0 +1,9 @@
+rule: clean.markdown
+locale: tr-TR
+cases:
+  - id: bold-and-inline-code
+    input: "**Adım 1:** `npm install` çalıştırın"
+    expect: "Adım 1: npm install çalıştırın"
+  - id: heading-gets-a-stop
+    input: "## Fiyatlar\nİki plan var."
+    expect: "Fiyatlar. İki plan var."

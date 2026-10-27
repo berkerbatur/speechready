@@ -1,0 +1,13 @@
+rule: clean.markdown
+locale: en-US
+cases:
+  - id: bold-and-inline-code
+    input: "**Step 1:** run `npm install`"
+    expect: "Step 1: run npm install"
+  - id: heading-gets-a-stop
+    input: "## Pricing\nTwo plans."
+    expect: "Pricing. Two plans."
+    note: a heading ends with a full stop so the model pauses after it
+  - id: bullet-list
+    input: "- apples\n- pears"
+    expect: "apples. pears."
