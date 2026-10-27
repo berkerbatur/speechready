@@ -59,6 +59,17 @@ def _render_em(text: str, spec: dict) -> str:
     return render.format(text=text)
 
 
+def _render_phoneme(intent: Intent, profile: Profile) -> str:
+    """Phoneme tag where the provider takes one, else the respelling, else the word."""
+    esc = _escape_xml if profile.escape == "xml" else (lambda t: t)
+    spec = profile.intents.get("phoneme", {})
+    if intent.ipa and spec.get("render"):
+        return spec["render"].format(text=esc(intent.text), ipa=esc(intent.ipa))
+    if intent.say:
+        return esc(intent.say)
+    return esc(intent.text)
+
+
 def compile_text(text: str, intents: list[Intent], profile: Profile, recorder: Recorder | None = None) -> str:
     rec = recorder or Recorder()
     out: list[str] = []
@@ -79,6 +90,9 @@ def compile_text(text: str, intents: list[Intent], profile: Profile, recorder: R
             if out and rendered.startswith((",", ".")) and prev.endswith(" "):
                 out[-1] = out[-1].rstrip(" ")
             rec.add(STAGE, "compile.pause", f"[pause {intent.ms}ms]", rendered, f"pause rendered for {profile.id}")
+        elif intent.kind == "phoneme":
+            rendered = _render_phoneme(intent, profile)
+            rec.add(STAGE, "compile.phoneme", intent.text, rendered, f"pronunciation rendered for {profile.id}")
         elif intent.kind == "spell":
             spec = profile.intents.get("spell", {})
             body = _escape_xml(intent.text) if profile.escape == "xml" else intent.text

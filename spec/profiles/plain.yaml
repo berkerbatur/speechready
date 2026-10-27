@@ -12,6 +12,7 @@ intents:
   pause: {render: punctuation}
   spell: {render: spaced}
   emphasis: {render: "{text}"}
+lexicon: {format: none}
 notes: >
   Provider-neutral output. Pauses become punctuation, spell-outs become spaced
   characters, emphasis is dropped. No request limit, so one chunk.

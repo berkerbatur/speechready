@@ -26,6 +26,8 @@ class Profile:
     limit_per_model: dict[str, int]
     intents: dict[str, dict]
     audio_tags: bool
+    lexicon_format: str = "none"  # pls | google | none: how a lexicon is uploaded to this provider
+    lexicon_alphabet: str = "ipa"
     default: bool = False
     notes: str = ""
     sources: tuple[str, ...] = ()
@@ -63,6 +65,8 @@ def _from_dict(data: dict) -> Profile:
         limit_per_model=dict(limit.get("per_model") or {}),
         intents=dict(data.get("intents") or {}),
         audio_tags=bool(data.get("audio_tags", False)),
+        lexicon_format=str((data.get("lexicon") or {}).get("format", "none")),
+        lexicon_alphabet=str((data.get("lexicon") or {}).get("alphabet", "ipa")),
         default=bool(data.get("default", False)),
         notes=data.get("notes", ""),
         sources=tuple(data.get("sources") or ()),

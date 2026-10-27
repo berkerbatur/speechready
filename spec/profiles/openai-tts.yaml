@@ -12,6 +12,7 @@ intents:
   pause: {render: punctuation}
   spell: {render: spaced}
   emphasis: {render: "{text}"}
+lexicon: {format: none}
 notes: >
   No SSML. Tone is steered with the separate `instructions` request parameter,
   which does not work with tts-1 or tts-1-hd. The input is capped at 4,096

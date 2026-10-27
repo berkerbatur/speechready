@@ -10,7 +10,7 @@ It is deterministic and makes no network calls. Every rewrite is reported back a
 2. **Verbalizes only the ambiguous tokens**: phone numbers, IDs, dates in a stated locale, years, currency decimals, units, ranges and acronyms from a lexicon. Ordinary numbers are left to the model, which reads them well.
 3. **Compiles** pacing intents such as a pause or emphasis into each vendor's own syntax: an SSML break where the model accepts it, punctuation where it does not, the vendor's tag elsewhere. Escapes SSML characters where needed.
 4. **Chunks** at sentence and clause boundaries under the model's character limit, on whole strings and on streaming token feeds.
-5. **Exports one lexicon** to each vendor's pronunciation format.
+5. **Applies one pronunciation lexicon** everywhere: phoneme tags where the vendor takes them, respellings elsewhere, and exports it as PLS (ElevenLabs, Azure, Polly) or Google custom pronunciations.
 
 English and Turkish ship with full rule sets. Other languages get the language-independent stages plus a labelled number fallback, and each new language is one rules file plus one fixture file.
 
@@ -30,7 +30,7 @@ The same call with `provider="openai"` renders the pause as punctuation and chun
 
 ## Status
 
-Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. The Python package on `main` has all four stages, the streaming segmenter, English and Turkish verbalization rules, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI and Azure. The lexicon export and the JavaScript port are next; nothing ships to the registries before the evaluation in the plan is run.
+Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. The Python package on `main` has all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI and Azure. The JavaScript port is next; nothing ships to the registries before the evaluation in the plan is run.
 
 ## Layout
 

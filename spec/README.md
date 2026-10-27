@@ -27,8 +27,9 @@ cases:
 | `chunk.pack` | split then pack under `limit` (`unit` chars or bytes) | list of chunks |
 | `pipeline` | the whole pipeline with `profile` | the compiled text |
 | `pipeline.chunks` | the whole pipeline with `profile` and `limit` | list of chunks |
+| `lexicon.export` | export the case's `lexicon` entries in `format` (pls, google, json) | string |
 
-Optional keys per case: `rule` and `locale` (override the file), `profile` (a profile id), `model` (for per-model limits), `limit`, `unit`, `options` (clean options as a map), `stream`, `max_buffer`, `note`, and `skip` with a reason while a case is known to fail.
+Optional keys per case: `rule` and `locale` (override the file), `profile` (a profile id), `model` (for per-model limits), `limit`, `unit`, `options` (clean options as a map), `lexicon` (a list of entries), `format`, `stream`, `max_buffer`, `note`, and `skip` with a reason while a case is known to fail.
 
 Expected strings are exact. Blocks are separated by `\n` in cleaned text; chunks are joined with a space.
 

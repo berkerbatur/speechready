@@ -15,6 +15,7 @@ intents:
   pause: {render: '<break time="{s}s" />', min_ms: 100, max_ms: 3000}
   spell: {render: spaced}
   emphasis: {render: "{text}"}
+lexicon: {format: pls, alphabet: ipa}
 notes: >
   Models before v3 accept the SSML break tag and nothing else from SSML. Pauses
   are capped at 3 seconds; the docs warn that many breaks in one request can
