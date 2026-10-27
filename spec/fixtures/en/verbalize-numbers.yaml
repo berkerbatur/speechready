@@ -1,0 +1,90 @@
+rule: verbalize.en
+locale: en-US
+cases:
+  - id: phone-international
+    input: "Call +90 532 123 45 67 now."
+    expect: "Call plus nine zero, five three two, one two three, four five, six seven now."
+  - id: phone-us-parentheses
+    input: "Call (555) 123-4567."
+    expect: "Call five five five, one two three, four five six seven."
+  - id: phone-us-dashes
+    input: "Fax 555-123-4567 today."
+    expect: "Fax five five five, one two three, four five six seven today."
+  - id: long-digit-string
+    input: "Order 4821993021 shipped."
+    expect: "Order four eight two one nine nine three zero two one shipped."
+  - id: ordinary-numbers-untouched
+    input: "We sold 1,250 units and 42 returned."
+    expect: "We sold 1,250 units and 42 returned."
+  - id: decimal-untouched
+    input: "Pi is 3.14159 roughly."
+    expect: "Pi is 3.14159 roughly."
+  - id: currency-dollars-cents
+    input: "It costs $4.50 today."
+    expect: "It costs four dollars and fifty cents today."
+  - id: currency-one-dollar
+    input: "Just $1."
+    expect: "Just one dollar."
+  - id: currency-cents-only
+    input: "Only $0.99!"
+    expect: "Only ninety-nine cents!"
+  - id: currency-thousands
+    input: "Budget: $3,000."
+    expect: "Budget: three thousand dollars."
+  - id: currency-million-suffix
+    input: "Raised $1.2M in 2024."
+    expect: "Raised one point two million dollars in twenty twenty-four."
+  - id: currency-euro-and-pounds
+    input: "€20 or £3.99."
+    expect: "twenty euros or three pounds and ninety-nine pence."
+  - id: currency-range
+    input: "Plans cost $5-$10 a month."
+    expect: "Plans cost five to ten dollars a month."
+  - id: currency-code
+    input: "Pay 20 USD."
+    expect: "Pay twenty dollars."
+  - id: percent-suffix
+    input: "Up 20% this year."
+    expect: "Up 20 percent this year."
+  - id: percent-prefix
+    input: "Up %20 this year."
+    expect: "Up 20 percent this year."
+  - id: percent-range
+    input: "Between 5-10% of users."
+    expect: "Between 5 to 10 percent of users."
+  - id: units
+    input: "Drive 5 km at 100 km/h with 1 kg of luggage."
+    expect: "Drive 5 kilometers at 100 kilometers per hour with 1 kilogram of luggage."
+  - id: units-attached
+    input: "It is 25°C and the file is 2GB."
+    expect: "It is 25 degrees Celsius and the file is 2 gigabytes."
+  - id: fraction
+    input: "Add 1/2 cup and 3/4 teaspoon."
+    expect: "Add one half cup and three quarters teaspoon."
+  - id: range
+    input: "Takes 5-10 minutes, pages 10–12."
+    expect: "Takes 5 to 10 minutes, pages 10 to 12."
+  - id: range-of-years
+    input: "From 1990-1995 sales grew."
+    expect: "From 1990 to 1995 sales grew."
+  - id: ordinal
+    input: "The 21st century, 3rd place, 102nd floor."
+    expect: "The twenty-first century, third place, one hundred second floor."
+  - id: phone-toll-free-with-leading-one
+    input: "Call 1-800-555-0199."
+    expect: "Call one, eight zero zero, five five five, zero one nine nine."
+  - id: phone-does-not-cross-a-sentence
+    input: "Call 555 123 4567. 1999 was a good year."
+    expect: "Call five five five, one two three, four five six seven. 1999 was a good year."
+  - id: number-sign
+    input: "Order #4821 shipped."
+    expect: "Order number 4821 shipped."
+  - id: leading-minus
+    input: "It was -5°C, range 10-12."
+    expect: "It was minus 5 degrees Celsius, range 10 to 12."
+  - id: time-range
+    input: "Open 09:00-17:30 daily."
+    expect: "Open 9:00 AM to 5:30 PM daily."
+  - id: isbn-and-ip-untouched
+    input: "ISBN 978-3-16-148410-0 and IP 192.168.1.1."
+    expect: "ISBN 978-3-16-148410-0 and IP 192.168.1.1."

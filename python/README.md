@@ -24,6 +24,8 @@ for change in result.changes:
     print(change.rule, repr(change.before), "->", repr(change.after))
 ```
 
+The verbalize stage rewrites only what models misread: phone numbers and long digit strings (digit by digit), numeric dates in the locale's order, 24-hour times, currency amounts, percent and unit abbreviations, small fractions, number ranges, years in context, decades, ordinals, and identifiers such as `AB12X9`. Ordinary numbers, decimals and pronounceable names like `COVID-19` are left alone. English rules ship now; Turkish rules follow.
+
 Inline intents in the input: `[pause 500ms]`, `[pause 1.5s]`, `[spell AB12]`, `[em really]`. An SSML `<break time="..."/>` you already have is read as a pause intent and re-rendered for the target.
 
 `provider` and `model` pick a profile from `spec/profiles`; with neither, the `plain` profile renders pauses as punctuation and returns one chunk. Pass `profile=load_profile("azure-neural")` to pick one directly, `limit=` to override the request limit, and `options=CleanOptions(...)` to change how markdown, code, tables, URLs, emails and emoji are handled.
