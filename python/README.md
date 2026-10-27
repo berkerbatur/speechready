@@ -24,7 +24,9 @@ for change in result.changes:
     print(change.rule, repr(change.before), "->", repr(change.after))
 ```
 
-The verbalize stage rewrites only what models misread: phone numbers and long digit strings (digit by digit), numeric dates in the locale's order, 24-hour times, currency amounts, percent and unit abbreviations, small fractions, number ranges, years in context, decades, ordinals, and identifiers such as `AB12X9`. Ordinary numbers, decimals and pronounceable names like `COVID-19` are left alone. English rules ship now; Turkish rules follow.
+The verbalize stage rewrites only what models misread: phone numbers and long digit strings (digit by digit), numeric dates in the locale's order, 24-hour times, currency amounts, percent and unit abbreviations, small fractions, number ranges, years in context, decades, ordinals, and identifiers such as `AB12X9`. Ordinary numbers, decimals and pronounceable names like `COVID-19` are left alone.
+
+Turkish (`locale="tr-TR"`) adds what foreign models get wrong in Turkish: suffixes on numerals and abbreviations are joined to the spoken word with vowel harmony and buffer consonants (`3'te` → üçte, `1990'da` → bin dokuz yüz doksanda, `100 TL'ye` → yüz liraya, `1/4'ü` → çeyreği), `%50` → yüzde elli, dotted thousands `1.250` → bin iki yüz elli, decimal commas `3,14` → üç virgül on dört, `3. madde` → üçüncü madde, dates `27.10.2026` → yirmi yedi Ekim iki bin yirmi altı, and abbreviations such as `vb.`, `Dr.`, `Üniv.`, `Cad.` read in full.
 
 Inline intents in the input: `[pause 500ms]`, `[pause 1.5s]`, `[spell AB12]`, `[em really]`. An SSML `<break time="..."/>` you already have is read as a pause intent and re-rendered for the target.
 

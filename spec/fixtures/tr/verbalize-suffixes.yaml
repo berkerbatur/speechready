@@ -1,0 +1,54 @@
+rule: verbalize.tr
+locale: tr-TR
+cases:
+  - id: locative-suffix
+    input: "Toplantı 3'te başlıyor."
+    expect: "Toplantı üçte başlıyor."
+  - id: ablative-suffix
+    input: "5'ten sonra gel."
+    expect: "beşten sonra gel."
+  - id: year-with-suffix
+    input: "1990'da doğdu, 2024'te mezun oldu."
+    expect: "bin dokuz yüz doksanda doğdu, iki bin yirmi dörtte mezun oldu."
+  - id: softening-dort
+    input: "4'ü geldi, 4'te başla."
+    expect: "dördü geldi, dörtte başla."
+  - id: possessive-suffix
+    input: "7'si burada, 100'ün yarısı."
+    expect: "yedisi burada, yüzün yarısı."
+  - id: decade
+    input: "1990'lar harikaydı."
+    expect: "bin dokuz yüz doksanlar harikaydı."
+  - id: curly-apostrophe
+    input: "2026’da görüşürüz."
+    expect: "iki bin yirmi altıda görüşürüz."
+  - id: ordinal-with-suffix
+    input: "2'nci kat ve 21'inci yüzyıl."
+    expect: "ikinci kat ve yirmi birinci yüzyıl."
+  - id: ordinal-with-dot
+    input: "3. madde ve 4. bölüm önemli."
+    expect: "üçüncü madde ve dördüncü bölüm önemli."
+  - id: dot-before-capital-is-a-sentence-end
+    input: "Puan 3. Sonra bitti."
+    expect: "Puan 3. Sonra bitti."
+  - id: percent-prefix
+    input: "Fiyatlar %50 arttı."
+    expect: "Fiyatlar yüzde elli arttı."
+  - id: percent-with-suffix
+    input: "Katılımcıların %20'si geldi."
+    expect: "Katılımcıların yüzde yirmisi geldi."
+  - id: percent-decimal
+    input: "Oran %3,5 oldu."
+    expect: "Oran yüzde üç virgül beş oldu."
+  - id: thousands-with-dot
+    input: "Salon 1.250 kişilik."
+    expect: "Salon bin iki yüz elli kişilik."
+  - id: decimal-comma
+    input: "Pi yaklaşık 3,14 eder."
+    expect: "Pi yaklaşık üç virgül on dört eder."
+  - id: decimal-comma-with-suffix
+    input: "Notu 4,5'ti."
+    expect: "Notu dört virgül beşti."
+  - id: plain-numbers-untouched
+    input: "Sınıfta 25 öğrenci ve 3 öğretmen var."
+    expect: "Sınıfta 25 öğrenci ve 3 öğretmen var."

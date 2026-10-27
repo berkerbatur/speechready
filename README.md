@@ -30,7 +30,7 @@ The same call with `provider="openai"` renders the pause as punctuation and chun
 
 ## Status
 
-Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. The Python package on `main` has all four stages, the streaming segmenter, English verbalization rules, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI and Azure. Turkish verbalization, the lexicon export and the JavaScript port are next; nothing ships to the registries before the evaluation in the plan is run.
+Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. The Python package on `main` has all four stages, the streaming segmenter, English and Turkish verbalization rules, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI and Azure. The lexicon export and the JavaScript port are next; nothing ships to the registries before the evaluation in the plan is run.
 
 ## Layout
 

@@ -13,3 +13,6 @@ cases:
   - id: doctor
     input: "Dr. Ayşe geldi. Hoş geldin."
     expect: ["Dr. Ayşe geldi.", "Hoş geldin."]
+  - id: university-abbreviation-not-a-boundary
+    input: "İstanbul Üniv. Tıp Fak. öğrencisi. Geldi."
+    expect: ["İstanbul Üniv. Tıp Fak. öğrencisi.", "Geldi."]
