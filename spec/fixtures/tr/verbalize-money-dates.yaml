@@ -1,0 +1,78 @@
+rule: verbalize.tr
+locale: tr-TR
+cases:
+  - id: lira-symbol
+    input: "Fiyat ₺50."
+    expect: "Fiyat elli lira."
+  - id: lira-code-with-kurus
+    input: "Toplam 4,50 TL tuttu."
+    expect: "Toplam dört lira elli kuruş tuttu."
+  - id: lira-thousands
+    input: "Kira 12.500 TL oldu."
+    expect: "Kira on iki bin beş yüz lira oldu."
+  - id: lira-with-suffix
+    input: "100 TL'ye aldım."
+    expect: "yüz liraya aldım."
+  - id: dollars-and-euros
+    input: "$5 ve €20 ödedim."
+    expect: "beş dolar ve yirmi avro ödedim."
+  - id: date-dotted
+    input: "Toplantı 27.10.2026 tarihinde."
+    expect: "Toplantı yirmi yedi Ekim iki bin yirmi altı tarihinde."
+  - id: date-with-suffix
+    input: "27.10.2026'da görüşürüz."
+    expect: "yirmi yedi Ekim iki bin yirmi altıda görüşürüz."
+  - id: date-slash
+    input: "Son gün 1/5/2026."
+    expect: "Son gün bir Mayıs iki bin yirmi altı."
+  - id: date-iso
+    input: "Teslim 2026-03-04."
+    expect: "Teslim dört Mart iki bin yirmi altı."
+  - id: time
+    input: "Saat 14:30 ve 09:05."
+    expect: "Saat on dört otuz ve dokuz sıfır beş."
+  - id: phone
+    input: "Ara: 0532 123 45 67."
+    expect: "Ara: sıfır beş üç iki, bir iki üç, dört beş, altı yedi."
+  - id: phone-international
+    input: "+90 212 555 00 11 numaralı hat."
+    expect: "artı dokuz sıfır, iki bir iki, beş beş beş, sıfır sıfır, bir bir numaralı hat."
+  - id: units
+    input: "5 km yürüdük, hız 100 km/sa, sıcaklık 25°C."
+    expect: "5 kilometre yürüdük, hız saatte 100 kilometre, sıcaklık 25 derece."
+  - id: fractions
+    input: "1/2 ekmek, 3/4 litre, 1/4 saat."
+    expect: "yarım ekmek, dörtte üç litre, çeyrek saat."
+  - id: range
+    input: "5-10 dakika sürer."
+    expect: "5 ila 10 dakika sürer."
+  - id: abbreviations
+    input: "Dr. Ayşe, Prof. Can vb. kişiler geldi, bkz. sayfa 3."
+    expect: "Doktor Ayşe, Profesör Can ve benzeri kişiler geldi, bakınız sayfa 3."
+  - id: identifier
+    input: "Plaka 34ABC123 ve uçuş TK1923."
+    expect: "Plaka üç dört ABC bir iki üç ve uçuş T K bir dokuz iki üç."
+  - id: unit-with-suffix
+    input: "Gecikme 120 ms'den 45 ms'ye düştü; 5 km'yi koştu."
+    expect: "Gecikme 120 milisaniyeden 45 milisaniyeye düştü; 5 kilometreyi koştu."
+  - id: fraction-with-suffix
+    input: "1/2'si geldi, 1/4'ü kaldı."
+    expect: "yarımı geldi, çeyreği kaldı."
+  - id: time-range-and-suffix
+    input: "09:00-17:30 arası açık; uçuş 23:59'da."
+    expect: "dokuz sıfır sıfır ile on yedi otuz arası açık; uçuş yirmi üç elli dokuzda."
+  - id: currency-after-amount
+    input: "Gelir 2,5 milyar $ oldu, 20 €'ya sattı."
+    expect: "Gelir iki virgül beş milyar dolar oldu, yirmi avroya sattı."
+  - id: leading-minus
+    input: "Dışarısı -5°C."
+    expect: "Dışarısı eksi 5 derece."
+  - id: university-abbreviations
+    input: "İstanbul Üniv. Tıp Fak. Hürriyet Cad. No. 5."
+    expect: "İstanbul Üniversitesi Tıp Fakültesi Hürriyet Caddesi numara 5."
+  - id: distributive-suffix
+    input: "3'er 3'er sayın, 10'ar kişi."
+    expect: "üçer üçer sayın, onar kişi."
+  - id: phone-with-suffix
+    input: "0850 222 33 44'ü arayın."
+    expect: "sıfır sekiz beş sıfır, iki iki iki, üç üç, dört dördü arayın."

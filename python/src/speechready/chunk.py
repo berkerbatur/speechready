@@ -27,7 +27,7 @@ _ABBREVIATIONS: dict[str, frozenset[str]] = {
     "tr": frozenset(
         """dr prof doç yrd av sn vb vs vd örn bkz yy t.c no sok cad apt mah alb yzb bşk müh
         oca şub mar nis haz tem ağu eyl eki kas ara ltd şti a.ş san tic dk sa sn bk ör
-        hz sf s c çev der haz""".split()
+        hz sf s c çev der haz üniv fak böl hst bul uzm öğr yrd tel""".split()
     ),
 }
 
