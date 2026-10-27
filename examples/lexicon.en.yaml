@@ -1,0 +1,18 @@
+# A speechready lexicon: how words are pronounced. Load it with Lexicon.load() or
+# pass the path as prepare(..., lexicon="examples/lexicon.en.yaml").
+#
+# Each entry has one or more of:
+#   ipa:   an IPA transcription; becomes a phoneme tag on providers that accept
+#          one (Azure, Google, Polly) and goes into exported lexicon files
+#   say:   a respelling that replaces the word in the text; works everywhere
+#   spell: true to read the word letter by letter
+#   case_sensitive: true to match the exact casing only
+locale: en-US
+entries:
+  - {word: Nginx, ipa: "ˈɛndʒɪnˈɛks", say: "engine X"}
+  - {word: PostgreSQL, say: "postgres Q L"}
+  - {word: SQL, say: sequel}
+  - {word: GIF, say: jif, case_sensitive: true}
+  - {word: CLI, spell: true}
+  - {word: kubectl, say: "kube control"}
+  - {word: Berker, ipa: "bɛɾˈcɛɾ"}

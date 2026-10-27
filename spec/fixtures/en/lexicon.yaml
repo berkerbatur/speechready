@@ -1,0 +1,59 @@
+rule: pipeline
+locale: en-US
+cases:
+  - id: ipa-becomes-phoneme-tag-on-azure
+    profile: azure-neural
+    lexicon:
+      - {word: Nginx, ipa: "ˈɛndʒɪnˈɛks", say: "engine X"}
+    input: "Restart Nginx now."
+    expect: "Restart <phoneme alphabet=\"ipa\" ph=\"ˈɛndʒɪnˈɛks\">Nginx</phoneme> now."
+  - id: say-fallback-where-no-phoneme-tag
+    profile: openai-tts
+    lexicon:
+      - {word: Nginx, ipa: "ˈɛndʒɪnˈɛks", say: "engine X"}
+    input: "Restart Nginx now."
+    expect: "Restart engine X now."
+  - id: ipa-only-entry-leaves-word-where-no-phoneme-tag
+    profile: elevenlabs-v2
+    lexicon:
+      - {word: Nginx, ipa: "ˈɛndʒɪnˈɛks"}
+    input: "Restart Nginx now."
+    expect: "Restart Nginx now."
+  - id: spell-entry
+    profile: plain
+    lexicon:
+      - {word: CLI, spell: true}
+    input: "Use the CLI tool."
+    expect: "Use the C L I tool."
+  - id: alias-entry-case-insensitive
+    profile: plain
+    lexicon:
+      - {word: SQL, say: sequel}
+    input: "Run sql and SQL."
+    expect: "Run sequel and sequel."
+  - id: case-sensitive-entry
+    profile: plain
+    lexicon:
+      - {word: GIF, say: jif, case_sensitive: true}
+    input: "A GIF or a gif."
+    expect: "A jif or a gif."
+  - id: whole-words-only
+    profile: plain
+    lexicon:
+      - {word: Go, say: "go language"}
+    input: "Go to the Go docs. Gopher."
+    expect: "go language to the go language docs. Gopher."
+  - id: lexicon-wins-over-identifier-spelling
+    profile: plain
+    lexicon:
+      - {word: GPT4O, say: "G P T four O"}
+    input: "Model GPT4O is fast."
+    expect: "Model G P T four O is fast."
+  - id: inline-ipa-tag
+    profile: azure-neural
+    input: "Meet [ipa Berker bɛɾˈcɛɾ] today & co."
+    expect: "Meet <phoneme alphabet=\"ipa\" ph=\"bɛɾˈcɛɾ\">Berker</phoneme> today &amp; co."
+  - id: inline-ipa-tag-falls-back-to-word
+    profile: openai-tts
+    input: "Meet [ipa Berker bɛɾˈcɛɾ] today."
+    expect: "Meet Berker today."

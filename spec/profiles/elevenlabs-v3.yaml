@@ -14,6 +14,7 @@ intents:
   pause: {render: punctuation}
   spell: {render: spaced}
   emphasis: {render: "{text}"}
+lexicon: {format: pls, alphabet: ipa}
 notes: >
   v3 and v4 do not accept SSML break tags. Pacing comes from punctuation and
   audio tags such as [short pause]; unknown bracket tags made of words pass

@@ -12,6 +12,8 @@ intents:
   pause: {render: '<break time="{ms}ms" />', min_ms: 0, max_ms: 20000}
   spell: {render: '<say-as interpret-as="characters">{text}</say-as>'}
   emphasis: {render: '<emphasis level="strong">{text}</emphasis>'}
+  phoneme: {render: '<phoneme alphabet="ipa" ph="{ipa}">{text}</phoneme>'}
+lexicon: {format: pls, alphabet: ipa}
 notes: >
   Output is the SSML body: text with break, say-as and emphasis elements, with
   & < > escaped. The caller wraps it in <speak> and <voice>, since the voice

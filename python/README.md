@@ -32,6 +32,24 @@ Inline intents in the input: `[pause 500ms]`, `[pause 1.5s]`, `[spell AB12]`, `[
 
 `provider` and `model` pick a profile from `spec/profiles`; with neither, the `plain` profile renders pauses as punctuation and returns one chunk. Pass `profile=load_profile("azure-neural")` to pick one directly, `limit=` to override the request limit, and `options=CleanOptions(...)` to change how markdown, code, tables, URLs, emails and emoji are handled.
 
+Pronunciation lexicon, one file for every vendor:
+
+```python
+from speechready import Lexicon, prepare, load_profile
+
+lex = Lexicon.load("examples/lexicon.en.yaml")      # entries with ipa, say or spell
+prepare("Restart Nginx.", provider="azure", lexicon=lex).text
+# 'Restart <phoneme alphabet="ipa" ph="ˈɛndʒɪnˈɛks">Nginx</phoneme>.'
+prepare("Restart Nginx.", provider="openai", lexicon=lex).text
+# 'Restart engine X.'            (no phoneme tags on OpenAI, so the respelling is used)
+
+lex.to_pls()                                         # PLS XML for ElevenLabs, Azure and Polly uploads
+lex.to_google_json()                                 # Google Cloud TTS custom pronunciations
+lex.export_for(load_profile("elevenlabs-v2"))        # the right one for a profile, or None
+```
+
+An inline `[ipa Nginx ˈɛndʒɪnˈɛks]` tag does the same for one word without a file.
+
 Streaming:
 
 ```python

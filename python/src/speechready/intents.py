@@ -15,7 +15,7 @@ SENTINEL_OPEN = ""
 SENTINEL_CLOSE = ""
 
 _INTENT_TAG = re.compile(
-    r"\[(?P<kind>pause|spell|em)(?:\s+(?P<arg>[^\]]*?))?\s*\](?!\()",
+    r"\[(?P<kind>pause|spell|em|ipa)(?:\s+(?P<arg>[^\]]*?))?\s*\](?!\()",
     re.IGNORECASE,
 )
 _SSML_BREAK = re.compile(
@@ -30,9 +30,11 @@ DEFAULT_PAUSE_MS = 500
 
 @dataclass(frozen=True)
 class Intent:
-    kind: str  # pause | spell | em
+    kind: str  # pause | spell | em | phoneme
     ms: int = 0  # pause only
-    text: str = ""  # spell and em
+    text: str = ""  # spell, em and phoneme: the words as written
+    ipa: str = ""  # phoneme: IPA transcription
+    say: str = ""  # phoneme: respelling fallback for providers without phoneme tags
 
 
 def parse_duration_ms(value: str | None) -> int:
@@ -73,6 +75,11 @@ def extract(text: str, intents: list[Intent] | None = None) -> tuple[str, list[I
             return _add(Intent("pause", ms=parse_duration_ms(arg)))
         if not arg:
             return ""
+        if kind == "ipa":
+            word, _, transcription = arg.partition(" ")
+            if not transcription:
+                return word
+            return _add(Intent("phoneme", text=word, ipa=transcription.strip()))
         return _add(Intent(kind, text=arg))
 
     text = _SSML_BREAK.sub(_ssml, text)

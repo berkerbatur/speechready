@@ -1,0 +1,9 @@
+rule: pipeline
+locale: tr-TR
+cases:
+  - id: alias-keeps-the-suffix
+    profile: plain
+    lexicon:
+      - {word: Nginx, say: "encin eks"}
+    input: "Nginx'i yeniden başlat."
+    expect: "encin eks'i yeniden başlat."

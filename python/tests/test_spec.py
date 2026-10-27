@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from speechready import CleanOptions, Segmenter, clean, load_profile, pack, prepare, split_sentences
+from speechready import CleanOptions, Lexicon, Segmenter, clean, load_profile, pack, prepare, split_sentences
 from speechready.verbalize import verbalize
 
 SPEC = Path(__file__).resolve().parents[2] / "spec" / "fixtures"
@@ -24,6 +24,9 @@ def _run(doc: dict, case: dict):
     opts = CleanOptions(**case["options"]) if "options" in case else None
     if rule.startswith("clean"):
         return clean(case["input"], opts)
+    lexicon = Lexicon.from_entries(case["lexicon"], locale) if "lexicon" in case else None
+    if rule == "lexicon.export":
+        return lexicon.export(case["format"], case.get("alphabet", "ipa"))
     if rule.startswith("verbalize"):
         return verbalize(case["input"], locale)
     if rule == "chunk.sentences":
@@ -39,7 +42,7 @@ def _run(doc: dict, case: dict):
         return out
     profile = load_profile(case.get("profile", doc.get("profile", "plain")))
     result = prepare(case["input"], profile=profile, model=case.get("model"), locale=locale,
-                     limit=case.get("limit"), options=opts)
+                     limit=case.get("limit"), options=opts, lexicon=lexicon)
     if rule == "pipeline.chunks":
         return result.chunks
     return result.text

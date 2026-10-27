@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from .changes import Change, Recorder
 from .chunk import pack, split_sentences
 from .clean import CleanOptions, clean
 from .compile import compile_text
 from .intents import Intent, extract, SENTINEL_CLOSE, SENTINEL_OPEN
+from .lexicon import Lexicon
 import re
 from .profiles import Profile, resolve_profile
 from .verbalize import verbalize
@@ -35,18 +37,25 @@ def prepare(
     locale: str = "en-US",
     limit: int | None = None,
     options: CleanOptions | None = None,
+    lexicon: Lexicon | str | None = None,
 ) -> Prepared:
     """Prepare `text` for the given provider and model.
 
     Returns the full compiled text, the request-sized chunks, and every change made.
     `limit` overrides the profile's request limit (None = use the profile's).
+    `lexicon` is a Lexicon or a path to a lexicon file; its words are pronounced as it says.
     """
+    lex = Lexicon.load(lexicon) if isinstance(lexicon, (str, Path)) else lexicon
     prof = profile or resolve_profile(provider, model)
     rec = Recorder()
 
     work, intents = extract(text)
     work = clean(work, options, rec)
     work, intents = extract(work, intents)
+    if lex:
+        before = work
+        work = lex.apply(work, intents)
+        rec.add("lexicon", "lexicon.apply", before, work, "lexicon words marked for pronunciation")
     work = verbalize(work, locale, rec)
     work = compile_text(work, intents, prof, rec)
 
@@ -62,6 +71,8 @@ _SENTINEL = re.compile(f"{SENTINEL_OPEN}(\\d+){SENTINEL_CLOSE}")
 def _intent_tag(intent: Intent) -> str:
     if intent.kind == "pause":
         return f"[pause {intent.ms}ms]"
+    if intent.kind == "phoneme":
+        return f"[ipa {intent.text} {intent.ipa or intent.say}]"
     return f"[{intent.kind} {intent.text}]"
 
 
