@@ -1,0 +1,11 @@
+locale: en-US
+cls: control/prose
+cases:
+  - {id: weather, input: "The weather tomorrow will be cloudy with a chance of rain in the afternoon."}
+  - {id: recipe, input: "Whisk the eggs with the sugar until pale, then fold in the flour gently."}
+  - {id: support, input: "Thanks for reaching out. I have reset your password and sent a new link to your inbox."}
+  - {id: story, input: "She closed the book, turned off the lamp, and listened to the rain for a while."}
+  - {id: meeting, input: "Let's move the planning meeting to Thursday so everyone can attend."}
+  - {id: directions, input: "Turn left at the second light, and the pharmacy is on your right next to the bakery."}
+  - {id: numbers-easy, input: "We have 12 chairs, 3 tables and about 40 guests coming on Saturday."}
+  - {id: question, input: "Would you like me to book the earlier train or the one after lunch?"}

@@ -1,0 +1,14 @@
+locale: tr-TR
+cls: llm/markdown
+cases:
+  - id: asistan-adimlar
+    input: |
+      Şöyle düzeltebilirsiniz:
+
+      1. **Servisi durdurun**: `sudo systemctl stop nginx`
+      2. `worker_connections` değerini 2048'e çıkarın
+      3. Yeniden başlatıp https://durum.example.com/saglik adresini kontrol edin 🚀
+    intended: "Şöyle düzeltebilirsiniz: Servisi durdurun: sudo systemctl stop nginx. worker_connections değerini iki bin kırk sekize çıkarın. Yeniden başlatıp durum.example.com adresini kontrol edin."
+  - id: asistan-ozet
+    input: "## Özet\n\nSiparişiniz **#48219930** 02.11.2026'da kargoya verilecek. %10 indirimle 1.250,50 TL ödediniz. Sorular için 0850 222 33 44'ü arayın."
+    intended: "Özet. Siparişiniz numara dört sekiz iki bir dokuz dokuz üç sıfır iki Kasım iki bin yirmi altıda kargoya verilecek. yüzde on indirimle bin iki yüz elli lira elli kuruş ödediniz. Sorular için sıfır sekiz beş sıfır, iki iki iki, üç üç, dört dördü arayın."

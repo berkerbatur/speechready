@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "speechready-eval"
+version = "0.1.0"
+description = "Evaluation harness for speechready: synthesize raw vs preprocessed text per provider, round-trip through STT, score misreads, render a before/after page."
+requires-python = ">=3.10"
+dependencies = ["speechready", "pyyaml>=6", "httpx>=0.27"]
+
+[project.optional-dependencies]
+whisper = ["faster-whisper>=1.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["speechready_eval"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

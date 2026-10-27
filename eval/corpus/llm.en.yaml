@@ -1,0 +1,21 @@
+locale: en-US
+cls: llm/markdown
+cases:
+  - id: assistant-steps
+    input: |
+      Here's how to fix it:
+
+      1. **Stop the service** with `sudo systemctl stop nginx`
+      2. Edit `/etc/nginx/nginx.conf` and raise `worker_connections` to 2048
+      3. Restart and check https://status.example.com/health 🚀
+    intended: "Here's how to fix it: Stop the service with sudo systemctl stop nginx. Edit /etc/nginx/nginx.conf and raise worker_connections to 2048. Restart and check status.example.com."
+  - id: assistant-table
+    input: |
+      | Plan | Price | Seats |
+      |---|---|---|
+      | Basic | $5/mo | 1 |
+      | Team | $20/mo | 5 |
+    intended: "Plan, Price, Seats. Basic, five dollars per month, 1. Team, twenty dollars per month, 5."
+  - id: assistant-summary
+    input: "## Summary\n\nYour order **#48219930** ships on 2026-11-02. Track it at https://track.example.com/48219930 or call +1 (415) 555-0132."
+    intended: "Summary. Your order number four eight two one nine nine three zero ships on November second, twenty twenty-six. Track it at track.example.com or call plus one, four one five, five five five, zero one three two."

@@ -25,3 +25,6 @@ npm-debug.log*
 .env
 .env.*
 *.local
+
+# Evaluation outputs (audio, transcripts, pages)
+eval/out/

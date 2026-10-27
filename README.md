@@ -39,6 +39,7 @@ Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https:/
 | `spec/` | The shared fixture corpus and provider profiles. Both runtimes must pass every fixture. |
 | `python/` | The Python package. |
 | `js/` | The JavaScript package. |
+| `eval/` | The evaluation harness: raw vs preprocessed audio per provider, STT round trip, before/after page. |
 
 ## Licence
 
