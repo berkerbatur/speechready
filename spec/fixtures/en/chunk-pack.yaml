@@ -1,0 +1,20 @@
+rule: chunk.pack
+locale: en-US
+cases:
+  - id: packs-under-limit
+    input: "One two. Three four. Five six."
+    limit: 20
+    expect: ["One two. Three four.", "Five six."]
+  - id: splits-long-sentence-at-clauses
+    input: "alpha, beta, gamma, delta"
+    limit: 12
+    expect: ["alpha, beta,", "gamma, delta"]
+  - id: no-limit-is-one-chunk
+    input: "Go. Stop."
+    limit: null
+    expect: ["Go. Stop."]
+  - id: bytes-unit-counts-utf8
+    input: "Çay iç. Çay iç."
+    limit: 9
+    unit: bytes
+    expect: ["Çay iç.", "Çay iç."]

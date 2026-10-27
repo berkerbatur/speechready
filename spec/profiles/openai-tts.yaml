@@ -1,0 +1,23 @@
+id: openai-tts
+provider: openai
+models: [gpt-4o-mini-tts, gpt-4o-mini-tts-2025-12-15, tts-1, tts-1-hd]
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: chars
+  max: 4096
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+notes: >
+  No SSML. Tone is steered with the separate `instructions` request parameter,
+  which does not work with tts-1 or tts-1-hd. The input is capped at 4,096
+  characters. OpenAI has announced that these models shut down on 6 January
+  2027 in favour of the Realtime API, so this profile is maintained until then.
+sources:
+  - https://developers.openai.com/api/docs/api-reference/audio/createSpeech
+  - https://developers.openai.com/api/docs/guides/text-to-speech
+verified: "2026-10-28"

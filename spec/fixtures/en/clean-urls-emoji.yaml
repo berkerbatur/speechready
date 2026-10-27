@@ -1,0 +1,40 @@
+rule: clean.urls
+locale: en-US
+cases:
+  - id: url-to-domain
+    input: "Read more at https://docs.example.com/v2/auth?x=1 today."
+    expect: "Read more at docs.example.com today."
+  - id: url-dropped
+    input: "Read https://example.com now"
+    options: {urls: drop}
+    expect: "Read now."
+  - id: url-kept
+    input: "Read https://example.com/a now"
+    options: {urls: keep}
+    expect: "Read https://example.com/a now."
+  - id: www-url
+    input: "Go to www.example.org/path"
+    expect: "Go to example.org."
+  - id: email-kept
+    input: "Mail me at ali@example.com."
+    expect: "Mail me at ali@example.com."
+  - id: email-dropped
+    input: "Mail me at ali@example.com please."
+    options: {emails: drop}
+    expect: "Mail me at please."
+  - id: emoji-dropped
+    input: "Done ✅ → next 🎉"
+    expect: "Done next."
+  - id: emoji-kept
+    input: "Hi 👋"
+    options: {emoji: keep}
+    expect: "Hi 👋."
+  - id: invisible-characters
+    input: "Zero​width and non breaking."
+    expect: "Zerowidth and non breaking."
+  - id: smart-quotes-kept
+    input: "She said “hi”."
+    expect: "She said “hi”."
+  - id: degree-and-trademark-kept
+    input: "It is 25°C and Acme™ agrees."
+    expect: "It is 25°C and Acme™ agrees."

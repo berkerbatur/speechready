@@ -1,0 +1,18 @@
+rule: pipeline.chunks
+locale: en-US
+profile: openai-tts
+cases:
+  - id: llm-answer-with-markdown
+    limit: 60
+    input: |
+      Here's what I found:
+
+      ## Summary
+      1. **Install** with `pip install speechready`.
+      2. Read the docs at https://speechready.dev/docs.
+
+      > Note: this is a *preview* 🚀
+    expect:
+      - "Here's what I found: Summary."
+      - "Install with pip install speechready."
+      - "Read the docs at speechready.dev. Note: this is a preview."

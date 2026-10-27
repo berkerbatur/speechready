@@ -14,9 +14,23 @@ It is deterministic and makes no network calls. Every rewrite is reported back a
 
 English and Turkish ship with full rule sets. Other languages get the language-independent stages plus a labelled number fallback, and each new language is one rules file plus one fixture file.
 
+## Quick look
+
+```python
+from speechready import prepare
+
+r = prepare("**Step 1:** run `npm install`. [pause 1s] Then read https://example.com/docs.",
+            provider="elevenlabs", model="eleven_multilingual_v2")
+r.text      # 'Step 1: run npm install. <break time="1s" /> Then read example.com.'
+r.chunks    # the same text split under the model's request limit
+r.changes   # every rewrite: rule, before, after, note
+```
+
+The same call with `provider="openai"` renders the pause as punctuation and chunks at 4,096 characters; with `provider="azure"` it renders SSML with `&`, `<` and `>` escaped. Switching vendors is one argument.
+
 ## Status
 
-Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. The first working release is in progress.
+Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. The Python package on `main` has the clean, compile and chunk stages, the streaming segmenter, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI and Azure. The verbalize stage (numbers, dates, phone numbers, acronyms) and the JavaScript port are next; nothing ships to the registries before the evaluation in the plan is run.
 
 ## Layout
 

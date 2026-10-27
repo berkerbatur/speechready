@@ -1,0 +1,28 @@
+rule: pipeline
+locale: en-US
+cases:
+  - id: spell-spaced
+    profile: plain
+    input: "Code [spell AB12] now."
+    expect: "Code A B 1 2 now."
+  - id: spell-azure-say-as
+    profile: azure-neural
+    input: "Code [spell AB12] now."
+    expect: "Code <say-as interpret-as=\"characters\">AB12</say-as> now."
+  - id: emphasis-azure
+    profile: azure-neural
+    input: "This is [em really] good."
+    expect: "This is <emphasis level=\"strong\">really</emphasis> good."
+  - id: emphasis-dropped-on-plain
+    profile: plain
+    input: "This is [em really] good."
+    expect: "This is really good."
+  - id: markdown-emphasis-as-intent
+    profile: azure-neural
+    options: {emphasis: intent}
+    input: "This is **really** good."
+    expect: "This is <emphasis level=\"strong\">really</emphasis> good."
+  - id: markdown-emphasis-stripped-by-default
+    profile: azure-neural
+    input: "This is **really** good."
+    expect: "This is really good."
