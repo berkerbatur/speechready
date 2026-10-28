@@ -121,6 +121,7 @@ def _blocks(text: str, opts: CleanOptions, rec: Recorder) -> list[str]:
     blocks: list[str] = []
     para: list[str] = []
     in_fence = False
+    last_was_list = False
     fence_lines: list[str] = []
     lines = text.split("\n")
 
@@ -189,8 +190,17 @@ def _blocks(text: str, opts: CleanOptions, rec: Recorder) -> list[str]:
             rec.add(STAGE, "clean.markdown.table", line, row, "table row read as a comma list")
             continue
         li = _LIST.match(line)
+        if li and li.group(2)[:-1].isdigit() and li.group(2)[:-1] != "1" and not last_was_list:
+            # "3. madde" at the start of a text is an ordinal, not a list that begins at three:
+            # a numbered item counts as a list only when it starts at 1, continues a list,
+            # or is followed by another numbered item.
+            nxt = next((l for l in lines[i + 1 :] if l.strip()), "")
+            m2 = _LIST.match(nxt)
+            if not (m2 and m2.group(2)[:-1].isdigit()):
+                li = None
         if li:
             flush()
+            last_was_list = True
             item = li.group(3)
             task = _TASK.match(item)
             if task:
@@ -199,6 +209,7 @@ def _blocks(text: str, opts: CleanOptions, rec: Recorder) -> list[str]:
             rec.add(STAGE, "clean.markdown.list", line, item, "list marker removed")
             continue
         para.append(line)
+        last_was_list = False
     flush()
     if in_fence and fence_lines:
         # unterminated fence: treat as dropped code

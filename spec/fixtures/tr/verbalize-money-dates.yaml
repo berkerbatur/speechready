@@ -76,3 +76,6 @@ cases:
   - id: phone-with-suffix
     input: "0850 222 33 44'ü arayın."
     expect: "sıfır sekiz beş sıfır, iki iki iki, üç üç, dört dördü arayın."
+  - id: number-sign-reads-numara
+    input: "Sipariş #48219930 hazır."
+    expect: "Sipariş numara dört sekiz iki bir dokuz dokuz üç sıfır hazır."

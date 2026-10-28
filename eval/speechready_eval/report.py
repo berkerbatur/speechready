@@ -21,7 +21,7 @@ MISREAD = 0.2
 
 def load() -> list[dict]:
     """Latest row per key, errors dropped, restricted to lines still in the corpus."""
-    from . import corpus
+    from . import corpus, metrics
 
     ids = {l.id for l in corpus.build()}
     path = OUT / "results.jsonl"
@@ -29,7 +29,14 @@ def load() -> list[dict]:
     latest: dict[str, dict] = {}
     for r in rows:
         latest[r["key"]] = r  # last write wins
-    return [r for r in latest.values() if "error" not in r and r["id"] in ids]
+    out = []
+    for r in latest.values():
+        if "error" in r or r["id"] not in ids:
+            continue
+        r["wer"] = round(metrics.wer(r["intended"], r["transcript"], r["locale"]), 4)  # rescore with the current metric
+        r["misread"] = r["wer"] > MISREAD
+        out.append(r)
+    return out
 
 
 def pairs(rows: list[dict]) -> list[tuple[dict, dict]]:

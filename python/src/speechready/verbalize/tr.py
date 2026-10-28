@@ -206,6 +206,7 @@ RULES: list[Rule] = [
         _digit_groups,
         "digit groups read digit by digit with a pause between groups",
     ),
+    Rule("verbalize.number_sign", re.compile(r"#(?=\d)"), lambda m, loc: "numara ", "number sign read as a word"),
     Rule("verbalize.digits.long", re.compile(r"(?<![\w.,])\d{7,}(?![\w]|[.,]\d)"), lambda m, loc: digits(m.group(0)), "long digit string read digit by digit"),
     Rule("verbalize.time.range", re.compile(r"\b([01]?\d|2[0-3]):([0-5]\d)\s?[-–]\s?([01]?\d|2[0-3]):([0-5]\d)\b"), _time_range, "time range read with 'ile'"),
     Rule("verbalize.time", re.compile(rf"\b([01]?\d|2[0-3]):([0-5]\d)\b(?!:){_SUFFIX}"), _time, "clock time read as hours and minutes"),

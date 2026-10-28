@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 import threading
 import time
@@ -62,6 +63,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--stt", default="whisper", choices=["whisper", "openai"])
     ap.add_argument("--limit", type=int, default=None, help="first N corpus lines per locale")
     ap.add_argument("--dry-run", action="store_true", help="print what would be synthesized and exit")
+    ap.add_argument("--redo", default=None, help="regex on line ids whose processed variant is re-synthesized (after a library change)")
     args = ap.parse_args(argv)
 
     locales = tuple(args.locales.split(","))
@@ -88,6 +90,13 @@ def main(argv: list[str] | None = None) -> int:
     done = _load_done(results)
 
     jobs = [(line, v) for line in lines for v in voices if v.locale == line.locale]
+    if args.redo:
+        pat = re.compile(args.redo)
+        redo = {_key(line.id, v, "processed") for line, v in jobs if pat.search(line.id)}
+        for k in redo:
+            (OUT / "audio" / f"{k}.mp3").unlink(missing_ok=True)
+        done -= redo
+        print(f"redoing {len(redo)} processed variants", file=sys.stderr)
     print(f"{len(lines)} lines x {len(voices)} voices -> {len(jobs)} line/voice pairs, {len(done)} variants already done", file=sys.stderr)
     if args.dry_run:
         for line, v in jobs[:10]:
