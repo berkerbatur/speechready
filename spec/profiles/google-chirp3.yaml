@@ -1,0 +1,28 @@
+id: google-chirp3
+provider: google
+models: [chirp3-hd, chirp-hd, gemini-tts]
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: bytes
+  max: 5000
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+lexicon: {format: google, alphabet: ipa}
+notes: >
+  Chirp 3 HD takes plain text in `input.text`; SSML on these voices is a
+  preview that works only for synchronous requests, so this profile stays
+  plain. Pauses can be steered with `[pause]`, `[pause short]` and
+  `[pause long]`, but only in the `input.markup` field, never in `text`, so
+  the profile renders pauses as punctuation and leaves markup to callers
+  who use that field. Pronunciations go in the request's
+  `custom_pronunciations` list (IPA or X-SAMPA), which is what the google
+  lexicon export produces. The request body is capped at 5,000 bytes.
+sources:
+  - https://docs.cloud.google.com/text-to-speech/docs/chirp3-hd
+  - https://docs.cloud.google.com/text-to-speech/quotas
+verified: "2026-10-29"

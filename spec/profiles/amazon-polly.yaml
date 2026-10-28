@@ -1,0 +1,32 @@
+id: amazon-polly
+provider: polly
+models: [neural, generative, long-form, standard]
+default: true
+syntax: ssml
+escape: xml
+audio_tags: false
+limit:
+  unit: chars
+  max: 3000
+intents:
+  pause: {render: '<break time="{ms}ms"/>', min_ms: 0, max_ms: 10000}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+  phoneme: {render: '<phoneme alphabet="ipa" ph="{ipa}">{text}</phoneme>'}
+lexicon: {format: pls, alphabet: ipa}
+notes: >
+  Output is the SSML body for `TextType=ssml`; the caller wraps it in
+  <speak>. SynthesizeSpeech takes at most 3,000 billed characters (6,000
+  including tags); the profile counts everything, so 3,000 is safe. <break>
+  caps at 10 seconds. <emphasis> is unavailable on neural, long-form and
+  generative voices, so emphasis is rendered as plain text. <say-as
+  interpret-as="characters"> silently switches a neural voice to its
+  standard counterpart for that sentence, so spelling is rendered as spaced
+  characters instead. <phoneme> with IPA is supported (partially on
+  generative). Lexicons are uploaded as PLS with PutLexicon.
+sources:
+  - https://docs.aws.amazon.com/polly/latest/dg/API_SynthesizeSpeech.html
+  - https://docs.aws.amazon.com/polly/latest/dg/supportedtags.html
+  - https://docs.aws.amazon.com/polly/latest/dg/break-tag.html
+  - https://docs.aws.amazon.com/polly/latest/dg/say-as-tag.html
+verified: "2026-10-29"
