@@ -11,6 +11,8 @@ from pathlib import Path
 
 import yaml
 
+from speechready import prepare
+
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / "spec" / "fixtures"
 EXTRA = ROOT / "eval" / "corpus"
@@ -46,6 +48,9 @@ def from_fixtures(locales: tuple[str, ...] = ("en", "tr")) -> list[Line]:
                     continue  # option-dependent expectations are skipped: the eval runs with default options
                 expect = case["expect"]
                 intended = " ".join(expect) if isinstance(expect, list) else expect
+                if path.stem.startswith("clean-"):
+                    # a clean-stage expectation still goes through verbalize in the pipeline ("25°C" -> "25 degrees Celsius")
+                    intended = prepare(intended, locale=case.get("locale", locale)).text
                 lines.append(Line(f"{lang}/{path.stem}/{case['id']}", case.get("locale", locale), _cls(path.stem, case["id"]), case["input"], intended))
     return lines
 

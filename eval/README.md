@@ -36,7 +36,13 @@ Results accumulate in `eval/out/results.jsonl`; a rerun skips finished variants,
 
 Raw text is sent as plain text everywhere. Processed text is sent the way its profile says: an SSML body wrapped in `<speak>` for Azure, Polly and Google's classic voices, plain text for the rest.
 
-Scoring: word error rate after lowercasing, stripping punctuation and markup, and expanding digits to words. Because an STT engine may write `555` for speech that said "five five five", the hypothesis is expanded both ways and the better score counts. A line is a misread when WER is above 0.2.
+Scoring: word error rate against the intended words. The transcript is normalized the way STT engines write speech: punctuation and markup stripped, symbols turned into words (`+`, `%`, `$`, `TL`), glued letters and digits split (`AB12X9`), and every digit run tried as a cardinal, digit by digit, a year or an ordinal, with the best combination counting; as one more candidate the whole transcript goes through speechready's own verbalizer. These allowances only lower the score and apply to both sides equally. A line is a misread when WER is above 0.2. Expected texts from the clean-stage fixtures are passed through the pipeline first, since the eval runs the whole pipeline.
+
+```
+python -m speechready_eval.report            # summary.md: per provider, per class, per rule family; index.html: every pair with audio
+python -m speechready_eval.showcase          # out/showcase/: the clearest fixes per voice with their audio, publishable
+python -m speechready_eval.run --redo REGEX  # re-synthesize the processed variant of lines a library change affected
+```
 
 ## What success looks like
 

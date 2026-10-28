@@ -241,6 +241,8 @@ def _time_range(m: re.Match[str], locale: str) -> str | None:
     return f"{m.group(1)} to {m.group(2)}"
 
 
+_PER = {"mo": "month", "month": "month", "yr": "year", "year": "year", "hr": "hour", "hour": "hour", "min": "minute", "minute": "minute", "day": "day", "week": "week", "wk": "week"}
+
 RULES: list[Rule] = [
     Rule("verbalize.date.iso", re.compile(r"\b(\d{4})-(\d{2})-(\d{2})\b"), _date_iso, "ISO date read as month, day, year"),
     Rule("verbalize.date.slash", re.compile(r"\b(\d{1,2})/(\d{1,2})/(\d{2}|\d{4})\b"), _date_slash, "numeric date read in the locale's order"),
@@ -251,6 +253,7 @@ RULES: list[Rule] = [
         _digit_groups,
         "digit groups read digit by digit with a pause between groups",
     ),
+    Rule("verbalize.number_sign", re.compile(r"#(?=\d)"), lambda m, loc: "number ", "number sign read as a word"),
     Rule("verbalize.digits.long", re.compile(r"(?<![\w.,])\d{7,}(?![\w]|[.,]\d)"), _long_digits, "long digit string read digit by digit"),
     Rule("verbalize.time.range", re.compile(r"\b(\d{1,2}:\d{2})\s?[-–]\s?(\d{1,2}:\d{2})\b"), _time_range, "time range read with 'to'"),
     Rule("verbalize.time", re.compile(r"\b([01]?\d|2[0-3]):([0-5]\d)\b(?!:)(?:\s?(am|pm|AM|PM|a\.m\.|p\.m\.))?"), _time, "24-hour time read as 12-hour"),
@@ -262,6 +265,12 @@ RULES: list[Rule] = [
         "currency amount read as words",
     ),
     Rule("verbalize.currency.code", re.compile(r"(?<![\w.])(\d[\d,]*)(?:\.(\d{1,2}))?\s?(USD|EUR|GBP|TRY|TL)\b"), _currency_code, "currency code read as words"),
+    Rule(
+        "verbalize.per",
+        re.compile(r"\b(dollars?|cents?|euros?|pounds?|\d)/(mo|month|yr|year|hr|hour|min|minute|day|week|wk)\b"),
+        lambda m, loc: f"{m.group(1)} per {_PER[m.group(2)]}",
+        "slash before a period read as 'per'",
+    ),
     Rule("verbalize.percent", re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)\s?%|%\s?(\d+(?:\.\d+)?)"), lambda m, loc: f"{m.group(1) or m.group(2)} percent", "percent sign read as a word"),
     Rule("verbalize.unit", re.compile(rf"(?<![\w.])(\d+(?:\.\d+)?)\s?({_UNIT_ALTERNATION})(?![\w/])"), _unit, "unit abbreviation read as a word"),
     Rule("verbalize.fraction", re.compile(r"(?<![\d/])([1-9])/([2-9]|10)(?![\d/])"), _fraction, "fraction read as words"),
@@ -269,7 +278,6 @@ RULES: list[Rule] = [
     Rule("verbalize.year", re.compile(r"\b(in|In|since|Since|by|from|until|till|before|after|during|circa|year|est\.|©)\s+(1[1-9]\d\d|20\d\d)\b(?![\w.,]?\d)"), _year_in_context, "year read as a year"),
     Rule("verbalize.decade", re.compile(r"\b(1[1-9]\d0|20\d0)s\b"), _decade, "decade read as a year"),
     Rule("verbalize.ordinal", re.compile(r"\b(\d{1,4})(?:st|nd|rd|th)\b"), _ordinal, "ordinal read as words"),
-    Rule("verbalize.number_sign", re.compile(r"#(?=\d)"), lambda m, loc: "number ", "number sign read as a word"),
     Rule("verbalize.minus", re.compile(r"(?<![\w.)\-–])[-–](?=\d)"), lambda m, loc: "minus ", "leading minus read as a word"),
     Rule("verbalize.alnum", re.compile(r"\b(?=[A-Z0-9-]*\d)(?=[A-Z0-9-]*[A-Z])[A-Z0-9]+(?:-[A-Z0-9]+)*\b"), _alnum, "identifier spelled out"),
 ]

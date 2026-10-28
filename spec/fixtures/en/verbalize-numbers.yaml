@@ -88,3 +88,6 @@ cases:
   - id: isbn-and-ip-untouched
     input: "ISBN 978-3-16-148410-0 and IP 192.168.1.1."
     expect: "ISBN 978-3-16-148410-0 and IP 192.168.1.1."
+  - id: per-period-after-currency
+    input: "Plans start at $5/mo or $48/yr."
+    expect: "Plans start at five dollars per month or forty-eight dollars per year."
