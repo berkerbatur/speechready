@@ -30,7 +30,7 @@ def normalize(text: str, locale: str = "en-US", digits_mode: str = "cardinal") -
     mod = _num_words(locale)
     text = unicodedata.normalize("NFC", text)
     text = _TAG.sub(" ", text)
-    text = text.replace("-", " ").replace("’", "'")
+    text = text.replace("-", " ").replace("_", " ").replace("’", "'")
     if _lang(locale) == "tr":
         text = re.sub(r"(?<=\d)\.(?=\d{3}\b)", "", text)  # 1.250 -> 1250
         text = re.sub(r"(?<=\d),(?=\d)", " virgül ", text)  # 3,14 -> 3 virgül 14

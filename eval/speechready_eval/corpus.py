@@ -42,8 +42,8 @@ def from_fixtures(locales: tuple[str, ...] = ("en", "tr")) -> list[Line]:
             doc = yaml.safe_load(path.read_text(encoding="utf-8"))
             locale = doc.get("locale", "en-US")
             for case in doc.get("cases", []):
-                if case.get("skip") or "lexicon" in case or "stream" in case or not isinstance(case.get("input"), str):
-                    continue
+                if case.get("skip") or "lexicon" in case or "stream" in case or "options" in case or not isinstance(case.get("input"), str):
+                    continue  # option-dependent expectations are skipped: the eval runs with default options
                 expect = case["expect"]
                 intended = " ".join(expect) if isinstance(expect, list) else expect
                 lines.append(Line(f"{lang}/{path.stem}/{case['id']}", case.get("locale", locale), _cls(path.stem, case["id"]), case["input"], intended))
