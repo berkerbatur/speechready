@@ -15,4 +15,4 @@ cases:
     expect: "3. madde önemli."
   - id: numbered-list-not-starting-at-one
     input: "3. elma\n4. armut"
-    expect: "elma.\narmut."
+    expect: "3. elma.\n4. armut."

@@ -33,10 +33,10 @@ cases:
     expect: "Saat on dört otuz ve dokuz sıfır beş."
   - id: phone
     input: "Ara: 0532 123 45 67."
-    expect: "Ara: sıfır beş üç iki, bir iki üç, dört beş, altı yedi."
+    expect: "Ara: sıfır beş yüz otuz iki, yüz yirmi üç, kırk beş, altmış yedi."
   - id: phone-international
     input: "+90 212 555 00 11 numaralı hat."
-    expect: "artı dokuz sıfır, iki bir iki, beş beş beş, sıfır sıfır, bir bir numaralı hat."
+    expect: "artı doksan, iki yüz on iki, beş yüz elli beş, sıfır sıfır, on bir numaralı hat."
   - id: units
     input: "5 km yürüdük, hız 100 km/sa, sıcaklık 25°C."
     expect: "5 kilometre yürüdük, hız saatte 100 kilometre, sıcaklık 25 derece."
@@ -75,7 +75,18 @@ cases:
     expect: "üçer üçer sayın, onar kişi."
   - id: phone-with-suffix
     input: "0850 222 33 44'ü arayın."
-    expect: "sıfır sekiz beş sıfır, iki iki iki, üç üç, dört dördü arayın."
+    expect: "sıfır sekiz yüz elli, iki yüz yirmi iki, otuz üç, kırk dördü arayın."
   - id: number-sign-reads-numara
     input: "Sipariş #48219930 hazır."
     expect: "Sipariş numara dört sekiz iki bir dokuz dokuz üç sıfır hazır."
+  - id: fraction-as-division-on-request
+    options: {fractions: division}
+    input: "1/2 ekmek, 3/4 litre."
+    expect: "bir bölü iki ekmek, üç bölü dört litre."
+  - id: foreign-acronym-lowercase
+    input: "npm install ve css dosyası, 5 km yol."
+    expect: "en pi em install ve si es es dosyası, 5 kilometre yol."
+  - id: foreign-acronym-off-on-request
+    options: {foreign_acronyms: false}
+    input: "npm install çalıştırın."
+    expect: "npm install çalıştırın."

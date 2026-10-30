@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-from . import Rule
+from . import Rule, option
 from .numbers_en import cardinal, decimal, digits, ordinal, year
 
 _MONTHS = [
@@ -179,7 +179,11 @@ _FRACTIONS = {2: ("half", "halves"), 3: ("third", "thirds"), 4: ("quarter", "qua
 
 def _fraction(m: re.Match[str], locale: str) -> str | None:
     num, den = int(m.group(1)), int(m.group(2))
-    if den not in _FRACTIONS or num >= den:
+    if num >= den:
+        return None
+    if option("fractions", "spoken") == "division":
+        return f"{cardinal(num)} over {cardinal(den)}"
+    if den not in _FRACTIONS:
         return None
     one, many = _FRACTIONS[den]
     return f"{cardinal(num)} {one if num == 1 else many}"

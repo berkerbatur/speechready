@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .changes import Change, Recorder
 from .chunk import pack, split_sentences
-from .clean import CleanOptions, clean
+from .clean import Options, clean
 from .compile import compile_text
 from .intents import Intent, extract, SENTINEL_CLOSE, SENTINEL_OPEN
 from .lexicon import Lexicon
@@ -36,7 +36,7 @@ def prepare(
     profile: Profile | None = None,
     locale: str = "en-US",
     limit: int | None = None,
-    options: CleanOptions | None = None,
+    options: Options | None = None,
     lexicon: Lexicon | str | None = None,
 ) -> Prepared:
     """Prepare `text` for the given provider and model.
@@ -56,7 +56,7 @@ def prepare(
         before = work
         work = lex.apply(work, intents)
         rec.add("lexicon", "lexicon.apply", before, work, "lexicon words marked for pronunciation")
-    work = verbalize(work, locale, rec)
+    work = verbalize(work, locale, rec, options)
     work = compile_text(work, intents, prof, rec)
 
     max_size = limit if limit is not None else prof.limit_for(model)

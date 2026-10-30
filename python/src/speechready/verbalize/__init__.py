@@ -9,6 +9,7 @@ Sentinels from the intent stage are never touched.
 from __future__ import annotations
 
 import re
+from contextvars import ContextVar
 from dataclasses import dataclass
 from typing import Callable
 
@@ -45,11 +46,28 @@ def _rules_for(locale: str) -> list[Rule]:
     return []
 
 
-def verbalize(text: str, locale: str = "en-US", recorder: Recorder | None = None) -> str:
+_OPTIONS: ContextVar[object | None] = ContextVar("speechready_verbalize_options", default=None)
+
+
+def option(name: str, default):
+    """Read a field of the Options the current verbalize() call runs with."""
+    opts = _OPTIONS.get()
+    return getattr(opts, name, default) if opts is not None else default
+
+
+def verbalize(text: str, locale: str = "en-US", recorder: Recorder | None = None, options: object | None = None) -> str:
     rec = recorder or Recorder()
     rules = _rules_for(locale)
     if not rules:
         return text
+    token = _OPTIONS.set(options)
+    try:
+        return _verbalize(text, rules, locale, rec)
+    finally:
+        _OPTIONS.reset(token)
+
+
+def _verbalize(text: str, rules: list[Rule], locale: str, rec: Recorder) -> str:
     parts = _SENTINEL.split(text)
     sentinels = _SENTINEL.findall(text)
     out = []

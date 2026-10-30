@@ -91,3 +91,7 @@ cases:
   - id: per-period-after-currency
     input: "Plans start at $5/mo or $48/yr."
     expect: "Plans start at five dollars per month or forty-eight dollars per year."
+  - id: fraction-as-division-on-request
+    options: {fractions: division}
+    input: "Add 1/2 cup."
+    expect: "Add one over two cup."

@@ -30,7 +30,28 @@ Turkish (`locale="tr-TR"`) adds what foreign models get wrong in Turkish: suffix
 
 Inline intents in the input: `[pause 500ms]`, `[pause 1.5s]`, `[spell AB12]`, `[em really]`. An SSML `<break time="..."/>` you already have is read as a pause intent and re-rendered for the target.
 
-`provider` and `model` pick a profile from `spec/profiles`; with neither, the `plain` profile renders pauses as punctuation and returns one chunk. Pass `profile=load_profile("azure-neural")` to pick one directly, `limit=` to override the request limit, and `options=CleanOptions(...)` to change how markdown, code, tables, URLs, emails and emoji are handled.
+`provider` and `model` pick a profile from `spec/profiles`; with neither, the `plain` profile renders pauses as punctuation and returns one chunk. Pass `profile=load_profile("azure-neural")` to pick one directly and `limit=` to override the request limit.
+
+Everything a caller may want to decide differently is an `Options` field, and the defaults are what the evaluation ran with:
+
+```python
+from speechready import Options, prepare
+
+prepare(text, provider="openai", options=Options(
+    code_blocks="keep",        # drop (default) | keep: read fenced code aloud
+    tables="rows",             # rows (default, each row a comma list) | drop
+    urls="domain",             # domain (default) | drop | keep
+    emails="keep",             # keep (default) | drop
+    emoji="drop",              # drop (default) | keep
+    emphasis="strip",          # strip (default) | intent: **bold** becomes an emphasis intent
+    list_numbers="keep",       # keep (default, "1. Open the app") | drop
+    fractions="spoken",        # spoken (default: "one half", "yarım") | division ("one over two", "bir bölü iki")
+    foreign_acronyms=True,     # Turkish: npm, css, sql read with English letter names (en pi em)
+    terminal_punctuation=".",  # added to a block that ends without one
+))
+```
+
+Phone numbers follow each language's habit: English reads digit by digit with a pause between groups, Turkish reads each group as a number (`0532 123 45 67` → sıfır beş yüz otuz iki, yüz yirmi üç, kırk beş, altmış yedi).
 
 Pronunciation lexicon, one file for every vendor:
 

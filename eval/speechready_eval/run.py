@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--stt", default="whisper", choices=["whisper", "openai"])
     ap.add_argument("--limit", type=int, default=None, help="first N corpus lines per locale")
     ap.add_argument("--dry-run", action="store_true", help="print what would be synthesized and exit")
-    ap.add_argument("--redo", default=None, help="regex on line ids whose processed variant is re-synthesized (after a library change)")
+    ap.add_argument("--redo", default=None, help="'changed' re-synthesizes every processed variant whose text the library now renders differently; otherwise a regex on line ids")
     args = ap.parse_args(argv)
 
     locales = tuple(args.locales.split(","))
@@ -90,9 +90,25 @@ def main(argv: list[str] | None = None) -> int:
     done = _load_done(results)
 
     jobs = [(line, v) for line in lines for v in voices if v.locale == line.locale]
-    if args.redo:
+    if args.redo == "changed":
+        stored: dict[str, str] = {}
+        if results.exists():
+            for l in results.read_text(encoding="utf-8").splitlines():
+                if l.strip():
+                    r = json.loads(l)
+                    if r.get("variant") == "processed":
+                        stored[r["key"]] = r["text"]
+        redo = set()
+        for line, v in jobs:
+            k = _key(line.id, v, "processed")
+            if k in stored and stored[k] != prepare(line.raw, provider=v.provider, model=v.model, locale=line.locale).text:
+                redo.add(k)
+    elif args.redo:
         pat = re.compile(args.redo)
         redo = {_key(line.id, v, "processed") for line, v in jobs if pat.search(line.id)}
+    else:
+        redo = set()
+    if redo:
         for k in redo:
             (OUT / "audio" / f"{k}.mp3").unlink(missing_ok=True)
         done -= redo
