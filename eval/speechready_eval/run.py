@@ -36,7 +36,12 @@ def _key(line_id: str, voice: synth.Voice, variant: str) -> str:
 def _load_done(path: Path) -> set[str]:
     if not path.exists():
         return set()
-    return {json.loads(l)["key"] for l in path.read_text(encoding="utf-8").splitlines() if l.strip()}
+    done: set[str] = set()
+    for l in path.read_text(encoding="utf-8").splitlines():
+        if l.strip():
+            r = json.loads(l)
+            (done.discard if "error" in r else done.add)(r["key"])  # last write wins; an error is retried next run
+    return done
 
 
 def _one(line: corpus.Line, v: synth.Voice, variant: str, text: str, processed, stt: str) -> dict:
