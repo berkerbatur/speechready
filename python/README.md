@@ -3,8 +3,10 @@
 Prepare text for text-to-speech. See the [repository README](https://github.com/berkerbatur/speechready) for the project overview.
 
 ```
-pip install speechready
+pip install "speechready @ git+https://github.com/berkerbatur/speechready#subdirectory=python"
 ```
+
+(`pip install speechready` still gives the 0.0.1 name placeholder until the first release.) Try it without installing at [berkerbatur.github.io/speechready/play](https://berkerbatur.github.io/speechready/play/).
 
 ## Usage
 
@@ -38,7 +40,8 @@ Everything a caller may want to decide differently is an `Options` field, and th
 from speechready import Options, prepare
 
 prepare(text, provider="openai", options=Options(
-    code_blocks="keep",        # drop (default) | keep: read fenced code aloud
+    code_blocks="keep",        # drop (default) | keep: read fenced code aloud | mention: one sentence stands in for it
+    code_block_mention=None,   # what `mention` says; None = "See the code block." / "Kod bloğuna bakın."
     tables="rows",             # rows (default, each row a comma list) | drop
     urls="domain",             # domain (default) | drop | keep
     emails="keep",             # keep (default) | drop

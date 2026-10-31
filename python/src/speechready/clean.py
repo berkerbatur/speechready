@@ -23,7 +23,8 @@ class Options:
     """Everything a caller can change about how text is prepared. Defaults are what the evaluation ran with."""
 
     # clean stage
-    code_blocks: str = "drop"  # drop | keep
+    code_blocks: str = "drop"  # drop | keep | mention (one spoken sentence stands in for the block)
+    code_block_mention: str | None = None  # the sentence `mention` speaks; None = the locale's default
     tables: str = "rows"  # rows | drop
     urls: str = "domain"  # domain | drop | keep
     emails: str = "keep"  # keep | drop
@@ -40,6 +41,9 @@ class Options:
 
 
 CleanOptions = Options  # the earlier name
+
+# what `code_blocks="mention"` says in place of a fenced block, by language
+_MENTION = {"en": "See the code block.", "tr": "Kod bloğuna bakın."}
 
 
 _TERMINAL = ".!?…:;,"
@@ -86,14 +90,16 @@ _EMOJI = re.compile(
 )
 
 
-def clean(text: str, options: Options | None = None, recorder: Recorder | None = None) -> str:
-    """Run the clean stage on `text`; returns the cleaned text and records changes."""
+def clean(text: str, options: Options | None = None, recorder: Recorder | None = None, locale: str = "en-US") -> str:
+    """Run the clean stage on `text`; returns the cleaned text and records changes.
+
+    `locale` only picks the sentence that `Options(code_blocks="mention")` speaks."""
     opts = options or Options()
     rec = recorder or Recorder()
 
     text = _unicode(text, rec)
     text = _strip_reasoning(text, opts, rec)
-    blocks = _blocks(text, opts, rec)
+    blocks = _blocks(text, opts, rec, locale)
     lines = [_inline(block, opts, rec) for block in blocks]
     lines = [_terminate(line, opts, rec) for line in lines if line.strip()]
     return "\n".join(lines)
@@ -126,7 +132,7 @@ def _strip_reasoning(text: str, opts: CleanOptions, rec: Recorder) -> str:
 # --- block level ---------------------------------------------------------------
 
 
-def _blocks(text: str, opts: CleanOptions, rec: Recorder) -> list[str]:
+def _blocks(text: str, opts: CleanOptions, rec: Recorder, locale: str = "en-US") -> list[str]:
     """Split markdown into blocks: one string per heading, paragraph, list item, table row."""
     blocks: list[str] = []
     para: list[str] = []
@@ -149,6 +155,10 @@ def _blocks(text: str, opts: CleanOptions, rec: Recorder) -> list[str]:
                 if opts.code_blocks == "keep":
                     blocks.extend(s for s in fence_lines if s.strip())
                     rec.add(STAGE, "clean.markdown.code_block", f"```\n{body}\n```", body, "kept code block as plain lines")
+                elif opts.code_blocks == "mention":
+                    said = opts.code_block_mention or _MENTION.get(locale.split("-")[0].lower(), _MENTION["en"])
+                    blocks.append(said)
+                    rec.add(STAGE, "clean.markdown.code_block", f"```\n{body}\n```", said, "code block replaced by a mention")
                 else:
                     rec.add(STAGE, "clean.markdown.code_block", f"```\n{body}\n```", "", "dropped code block")
                 fence_lines = []

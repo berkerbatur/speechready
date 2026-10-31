@@ -50,7 +50,7 @@ def prepare(
     rec = Recorder()
 
     work, intents = extract(text)
-    work = clean(work, options, rec)
+    work = clean(work, options, rec, locale)
     work, intents = extract(work, intents)
     if lex:
         before = work

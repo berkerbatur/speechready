@@ -40,7 +40,7 @@ Scoring: word error rate against the intended words. The transcript is normalize
 
 ```
 python -m speechready_eval.report            # summary.md: per provider, per class, per rule family; index.html: every pair with audio
-python -m speechready_eval.showcase          # out/showcase/: the clearest fixes per voice with their audio, publishable
+python -m speechready_eval.showcase --site ../docs   # out/showcase/ plus a standalone copy in docs/, which GitHub Pages serves
 python -m speechready_eval.run --redo REGEX  # re-synthesize the processed variant of lines a library change affected
 ```
 
