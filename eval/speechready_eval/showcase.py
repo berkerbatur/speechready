@@ -60,7 +60,9 @@ def main(argv=None) -> int:
     ps = report.pairs(report.load())
     chosen = pick(ps, args.per_voice)
     SHOW.mkdir(parents=True, exist_ok=True)
-    (SHOW / "audio").mkdir(exist_ok=True)
+    if (SHOW / "audio").exists():
+        shutil.rmtree(SHOW / "audio")  # start clean so an earlier selection's files do not ride along
+    (SHOW / "audio").mkdir()
     for a, b in chosen:
         for r in (a, b):
             shutil.copyfile(OUT / "audio" / r["audio"], SHOW / "audio" / r["audio"])
