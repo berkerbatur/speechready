@@ -64,11 +64,17 @@ The packages on PyPI and npm are still name placeholders. Install the Python pac
 pip install "speechready @ git+https://github.com/berkerbatur/speechready#subdirectory=python"
 ```
 
+The JavaScript package is not on npm yet either; build it from the repository:
+
+```
+git clone https://github.com/berkerbatur/speechready && cd speechready/js && npm ci && npm run build && npm link
+```
+
 Everything a caller may want to decide differently is an `Options` field (code blocks dropped, kept or replaced by one spoken sentence; list numbers kept or dropped; fractions spoken or read as a division; URLs reduced to their domain, dropped or kept). The defaults are what the evaluation above ran with. See `python/README.md`.
 
 ## Status
 
-Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. The Python package on `main` has all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram, and it has been through the evaluation above. The JavaScript port against the same fixtures is next, then the first release to both registries.
+Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. Both packages on `main` have all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram. The Python package has been through the evaluation above; the TypeScript package passes the same 210 fixtures, so it produces the same text. The first release to both registries is next.
 
 ## Layout
 
@@ -76,7 +82,7 @@ Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https:/
 | --- | --- |
 | `spec/` | The shared fixture corpus and provider profiles. Both runtimes must pass every fixture. |
 | `python/` | The Python package. |
-| `js/` | The JavaScript package. |
+| `js/` | The TypeScript package, compiled to ESM with type declarations. Same API, same fixtures. |
 | `eval/` | The evaluation harness: raw vs preprocessed audio per provider, STT round trip, before/after page. |
 | `docs/` | The GitHub Pages site: the listening page written by the harness, and the browser playground. |
 
