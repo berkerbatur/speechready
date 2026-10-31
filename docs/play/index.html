@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>speechready Playground</title>
+<meta name="description" content="Paste text, pick a voice provider, and see what speechready would send to it. The Python package runs in your browser.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f6f7f4; --surface:#ffffff; --fg:#1b1f1d; --muted:#5d665f; --line:#d9ded8;
+  --accent:#1f6f8b; --accent-ink:#ffffff; --good:#2b8a4b; --good-bg:#e7f4ea; --bad:#b4433a; --bad-bg:#f8e9e7;
+  --code-bg:#eef1ed;
+  --display:"Bricolage Grotesque","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#141716; --surface:#1d2120; --fg:#e9ece8; --muted:#9aa49d; --line:#2f3634;
+  --accent:#6fb6cf; --accent-ink:#0f1a1e; --good:#6ccc8a; --good-bg:#1a2d21; --bad:#f08a80; --bad-bg:#35201e; --code-bg:#242927; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-family:var(--display);font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0 0 8px;text-wrap:balance}
+h2{font-family:var(--display);font-size:18px;margin:0 0 8px}
+.lede{color:var(--muted);max-width:65ch;margin:0 0 20px}
+.lede a,.foot a{color:var(--accent)}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+textarea,pre.out{width:100%;min-height:260px;font-family:var(--mono);font-size:14px;line-height:1.5;border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--code-bg);color:var(--fg);resize:vertical;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.controls{display:flex;flex-wrap:wrap;gap:12px 16px;margin:16px 0;align-items:end}
+.controls label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+select,input[type=text]{font:inherit;font-size:15px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:140px}
+.status{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px;min-height:24px}
+.status.err{color:var(--bad)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.2s infinite}
+.dot.ok{background:var(--good);animation:none}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+.chunks{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.chunk{font-family:var(--mono);font-size:13px;background:var(--code-bg);border-left:3px solid var(--accent);padding:8px 10px;border-radius:0 8px 8px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.tablewrap{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.rule{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap}
+td code{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+.del{color:var(--bad);background:var(--bad-bg)}
+.ins{color:var(--good);background:var(--good-bg)}
+.meta{font-size:13px;color:var(--muted);margin-top:8px}
+.foot{color:var(--muted);font-size:14px;margin-top:32px;max-width:70ch}
+.samples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.samples button{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.samples button:hover{border-color:var(--accent)}
+</style>
+
+<div class="wrap">
+  <h1>What would the voice get?</h1>
+  <p class="lede">Paste what your app is about to send to text-to-speech. The right side is what <code>speechready.prepare</code> hands the provider instead, with every rewrite listed. The Python package runs here in your browser; nothing you type leaves the page. <a href="../">Hear the difference on real voices.</a></p>
+
+  <div class="controls">
+    <label>Language
+      <select id="locale">
+        <option value="en-US">English</option>
+        <option value="tr-TR">Türkçe</option>
+      </select>
+    </label>
+    <label>Provider
+      <select id="provider">
+        <option value="">none (plain text)</option>
+        <option value="elevenlabs">ElevenLabs</option>
+        <option value="openai">OpenAI</option>
+        <option value="azure">Azure AI Speech</option>
+        <option value="google">Google Cloud TTS</option>
+        <option value="polly">Amazon Polly</option>
+        <option value="cartesia">Cartesia</option>
+        <option value="deepgram">Deepgram</option>
+      </select>
+    </label>
+    <label>Model <span class="meta" style="margin:0">(optional)</span>
+      <input type="text" id="model" placeholder="provider default" size="18">
+    </label>
+    <label>Code blocks
+      <select id="code_blocks">
+        <option value="drop">drop</option>
+        <option value="mention">mention</option>
+        <option value="keep">keep</option>
+      </select>
+    </label>
+    <label>List numbers
+      <select id="list_numbers">
+        <option value="keep">keep</option>
+        <option value="drop">drop</option>
+      </select>
+    </label>
+    <label>Fractions
+      <select id="fractions">
+        <option value="spoken">spoken</option>
+        <option value="division">division</option>
+      </select>
+    </label>
+    <label>URLs
+      <select id="urls">
+        <option value="domain">domain</option>
+        <option value="drop">drop</option>
+        <option value="keep">keep</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="grid">
+    <section class="panel">
+      <div class="eyebrow">As your app wrote it</div>
+      <div class="samples" id="samples"></div>
+      <textarea id="input" spellcheck="false"></textarea>
+    </section>
+    <section class="panel">
+      <div class="eyebrow">What speechready sends</div>
+      <div class="status" id="status"><span class="dot"></span><span>Loading the Python runtime (about 10 MB, cached after the first visit)…</span></div>
+      <pre class="out" id="output"></pre>
+      <div class="meta" id="profile"></div>
+    </section>
+  </div>
+
+  <section class="panel" style="margin-top:20px">
+    <h2>Chunks</h2>
+    <p class="meta" style="margin:0 0 4px">Split at sentence and clause boundaries under the model's request limit. Each line is one request.</p>
+    <div class="chunks" id="chunks"></div>
+  </section>
+
+  <section class="panel" style="margin-top:20px">
+    <h2>Every rewrite</h2>
+    <div class="tablewrap"><table id="changes"><thead><tr><th>Rule</th><th>Before</th><th>After</th><th>Why</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <p class="foot">
+    Source and fixtures: <a href="https://github.com/berkerbatur/speechready">github.com/berkerbatur/speechready</a>. Install the same code with
+    <code>pip install "speechready @ git+https://github.com/berkerbatur/speechready#subdirectory=python"</code>.
+    Built from commit <span id="commit">…</span>.
+  </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+<script>
+const SAMPLES = {
+  "en-US": {
+    "LLM answer": "Here's what I found:\n\n## Summary\n1. **Install** with `pip install speechready`.\n2. Read the docs at https://speechready.dev/docs.\n\n> Note: this is a *preview* 🚀",
+    "Numbers": "Call 555-0142 before 6/12/2026. Your order #A7X9Q2 ships in 2-3 days; the total is $5.50/mo (approx. 1/2 of last year).",
+    "Code": "Run this:\n```bash\nnpm i speechready\n```\nThen restart the agent. It listens on port 8080.",
+    "Pauses": "Let me check that for you. [pause 800ms] Yes, the meeting is at 14:30 on Tuesday. [em Please] be on time.",
+  },
+  "tr-TR": {
+    "Asistan özeti": "Özetle:\n\n## Sonuç\n1. **Kurulum** için `pip install speechready` çalıştırın.\n2. Belgeler https://speechready.dev/docs adresinde.\n\n> Not: bu bir *önizleme* 🚀",
+    "Sayılar": "Beni 0532 123 45 67 numarasından arayın. Toplam 1.250,50 TL, %20 indirimle 27.10.2026'da teslim. 3. madde 1/4'ü kapsar.",
+    "Kod": "Şunu çalıştırın:\n```bash\nnpm i speechready\n```\nSonra css dosyasını yeniden başlatın.",
+    "Duraklar": "Hemen bakıyorum. [pause 800ms] Evet, toplantı Salı 14:30'da. [em Lütfen] geç kalmayın.",
+  },
+};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let runner = null;
+let timer = null;
+
+function renderSamples() {
+  const loc = $('locale').value;
+  $('samples').innerHTML = Object.keys(SAMPLES[loc]).map(k => `<button type="button" data-k="${esc(k)}">${esc(k)}</button>`).join('');
+  $('samples').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { $('input').value = SAMPLES[loc][b.dataset.k]; schedule(); }));
+}
+
+function setStatus(text, cls) {
+  $('status').className = 'status' + (cls ? ' ' + cls : '');
+  $('status').innerHTML = cls === 'ok' ? `<span class="dot ok"></span><span>${esc(text)}</span>` : `<span class="dot"></span><span>${esc(text)}</span>`;
+}
+
+function schedule() { clearTimeout(timer); timer = setTimeout(run, 150); }
+
+function run() {
+  if (!runner) return;
+  const options = {
+    code_blocks: $('code_blocks').value, list_numbers: $('list_numbers').value,
+    fractions: $('fractions').value, urls: $('urls').value,
+  };
+  let res;
+  try {
+    res = JSON.parse(runner($('input').value, $('provider').value, $('model').value.trim(), $('locale').value, JSON.stringify(options)));
+  } catch (e) {
+    setStatus(String(e).split('\n').slice(-2).join(' '), 'err');
+    return;
+  }
+  if (res.error) { setStatus(res.error, 'err'); return; }
+  setStatus(`${res.changes.length} rewrite${res.changes.length === 1 ? '' : 's'}, ${res.chunks.length} chunk${res.chunks.length === 1 ? '' : 's'}`, 'ok');
+  $('output').textContent = res.text;
+  $('profile').textContent = `Profile ${res.profile.id}: ${res.profile.syntax} output, ` + (res.profile.limit ? `${res.profile.limit} ${res.profile.unit} per request` : 'no request limit') + '.';
+  $('chunks').innerHTML = res.chunks.map(c => `<div class="chunk">${esc(c)}</div>`).join('') || '<div class="meta">Nothing to send.</div>';
+  const rows = res.changes.map(c => `<tr><td class="rule">${esc(c.rule)}</td><td><code class="del">${esc(c.before) || '&nbsp;'}</code></td><td><code class="ins">${esc(c.after) || '&nbsp;'}</code></td><td>${esc(c.note)}</td></tr>`);
+  $('changes').querySelector('tbody').innerHTML = rows.join('') || '<tr><td colspan="4" class="meta">No rewrites: the text was already safe to speak.</td></tr>';
+}
+
+const PY = `
+import json, traceback
+from speechready import Options, prepare
+
+def run(text, provider, model, locale, options_json):
+    try:
+        opts = Options(**json.loads(options_json))
+        r = prepare(text, provider=provider or None, model=model or None, locale=locale, options=opts)
+        p = r.profile
+        return json.dumps({
+            "text": r.text, "chunks": list(r.chunks),
+            "changes": [{"rule": c.rule, "before": c.before, "after": c.after, "note": c.note} for c in r.changes],
+            "profile": {"id": p.id, "syntax": p.syntax, "limit": p.limit_for(model or None), "unit": p.limit_unit},
+        }, ensure_ascii=False)
+    except Exception as exc:
+        return json.dumps({"error": f"{type(exc).__name__}: {exc}"})
+run
+`;
+
+async function boot() {
+  renderSamples();
+  $('input').value = SAMPLES['en-US']['LLM answer'];
+  ['locale', 'provider', 'code_blocks', 'list_numbers', 'fractions', 'urls'].forEach(id => $(id).addEventListener('change', () => { if (id === 'locale') { renderSamples(); $('input').value = Object.values(SAMPLES[$('locale').value])[0]; } schedule(); }));
+  $('model').addEventListener('input', schedule);
+  $('input').addEventListener('input', schedule);
+  try {
+    fetch('commit.txt').then(r => r.ok ? r.text() : '').then(t => { $('commit').textContent = (t || 'main').trim(); }).catch(() => {});
+    const pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/' });
+    setStatus('Installing speechready…');
+    await pyodide.loadPackage(['pyyaml', 'micropip']);
+    const wheel = (await (await fetch('wheel.txt')).text()).trim();
+    if (!wheel) throw new Error('wheel.txt is empty; the Pages build did not ship the package');
+    await pyodide.pyimport('micropip').install(new URL(wheel, location.href).href);
+    runner = pyodide.runPython(PY);
+    run();
+  } catch (e) {
+    setStatus('Could not start: ' + String(e).split('\n')[0], 'err');
+  }
+}
+boot();
+</script>
+</html>

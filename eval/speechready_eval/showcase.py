@@ -5,6 +5,8 @@
 Writes eval/out/showcase/index.html plus the audio it references, small enough
 to publish as a page. Examples are the pairs where the raw text was misread and
 the processed text was heard right, spread across providers and locales.
+`--site docs` also writes a standalone copy (full HTML document) into that
+folder, which is what GitHub Pages serves.
 """
 
 from __future__ import annotations
@@ -27,6 +29,14 @@ PROVIDER_NAMES = {
 }
 
 
+# The page is written for a host that wraps it in a document; GitHub Pages serves it as is.
+STANDALONE_HEAD = (
+    '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n'
+    '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+    '<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'
+)
+
+
 def pick(ps, per_voice: int):
     by_voice = defaultdict(list)
     for a, b in ps:
@@ -45,6 +55,7 @@ def pick(ps, per_voice: int):
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--per-voice", type=int, default=3)
+    ap.add_argument("--site", default=None, help="also write a standalone copy (page + audio) into this folder")
     args = ap.parse_args(argv)
     ps = report.pairs(report.load())
     chosen = pick(ps, args.per_voice)
@@ -69,8 +80,16 @@ def main(argv=None) -> int:
     (SHOW / "data.json").write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     template = (Path(__file__).with_name("showcase.html")).read_text(encoding="utf-8")
     payload = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
-    (SHOW / "index.html").write_text(template.replace("/*DATA*/", payload), encoding="utf-8")
+    page = template.replace("/*DATA*/", payload)
+    (SHOW / "index.html").write_text(page, encoding="utf-8")
     print(f"{len(chosen)} pairs, {sum(f.stat().st_size for f in (SHOW / 'audio').iterdir()) / 1e6:.1f} MB of audio -> {SHOW}")
+    if args.site:
+        site = Path(args.site)
+        if (site / "audio").exists():
+            shutil.rmtree(site / "audio")
+        shutil.copytree(SHOW / "audio", site / "audio")
+        (site / "index.html").write_text(STANDALONE_HEAD + page, encoding="utf-8")
+        print(f"standalone copy -> {site}")
     return 0
 
 

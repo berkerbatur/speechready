@@ -3,8 +3,10 @@
 Prepare text for text-to-speech. See the [repository README](https://github.com/berkerbatur/speechready) for the project overview.
 
 ```
-pip install speechready
+pip install "speechready @ git+https://github.com/berkerbatur/speechready#subdirectory=python"
 ```
+
+(`pip install speechready` still gives the 0.0.1 name placeholder until the first release.) Try it without installing at [berkerbatur.github.io/speechready/play](https://berkerbatur.github.io/speechready/play/).
 
 ## Usage
 
