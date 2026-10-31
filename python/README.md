@@ -38,7 +38,8 @@ Everything a caller may want to decide differently is an `Options` field, and th
 from speechready import Options, prepare
 
 prepare(text, provider="openai", options=Options(
-    code_blocks="keep",        # drop (default) | keep: read fenced code aloud
+    code_blocks="keep",        # drop (default) | keep: read fenced code aloud | mention: one sentence stands in for it
+    code_block_mention=None,   # what `mention` says; None = "See the code block." / "Kod bloğuna bakın."
     tables="rows",             # rows (default, each row a comma list) | drop
     urls="domain",             # domain (default) | drop | keep
     emails="keep",             # keep (default) | drop

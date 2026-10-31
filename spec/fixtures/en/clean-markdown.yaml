@@ -35,6 +35,15 @@ cases:
     input: "Run this:\n```bash\nnpm i\n```\nThen restart."
     options: {code_blocks: keep}
     expect: "Run this:\nnpm i.\nThen restart."
+  - id: code-fence-mentioned
+    input: "Run this:\n```bash\nnpm i\n```\nThen restart."
+    options: {code_blocks: mention}
+    expect: "Run this:\nSee the code block.\nThen restart."
+    note: one sentence stands in for the block, so the listener knows something was skipped
+  - id: code-fence-mentioned-custom
+    input: "Run this:\n```bash\nnpm i\n```\nThen restart."
+    options: {code_blocks: mention, code_block_mention: "I've put the command on your screen."}
+    expect: "Run this:\nI've put the command on your screen.\nThen restart."
   - id: table-rows-read-as-lists
     input: "| Plan | Price |\n|---|---|\n| Basic | $5 |"
     expect: "Plan, Price.\nBasic, $5."

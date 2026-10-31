@@ -4,6 +4,10 @@ cases:
   - id: bold-and-inline-code
     input: "**Adım 1:** `npm install` çalıştırın"
     expect: "Adım 1: npm install çalıştırın."
+  - id: code-fence-mentioned
+    input: "Şunu çalıştırın:\n```bash\nnpm i\n```\nSonra yeniden başlatın."
+    options: {code_blocks: mention}
+    expect: "Şunu çalıştırın:\nKod bloğuna bakın.\nSonra yeniden başlatın."
   - id: heading-gets-a-stop
     input: "## Fiyatlar\nİki plan var."
     expect: "Fiyatlar.\nİki plan var."

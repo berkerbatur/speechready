@@ -23,7 +23,7 @@ def _run(doc: dict, case: dict):
     locale = case.get("locale", doc.get("locale", "en-US"))
     opts = CleanOptions(**case["options"]) if "options" in case else None
     if rule.startswith("clean"):
-        return clean(case["input"], opts)
+        return clean(case["input"], opts, locale=locale)
     lexicon = Lexicon.from_entries(case["lexicon"], locale) if "lexicon" in case else None
     if rule == "lexicon.export":
         return lexicon.export(case["format"], case.get("alphabet", "ipa"))
