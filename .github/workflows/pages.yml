@@ -34,6 +34,8 @@ jobs:
           basename _site/play/*.whl > _site/play/wheel.txt
           git rev-parse --short HEAD > _site/play/commit.txt
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true  # creates the Pages site on the first run if the repository has none yet
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
