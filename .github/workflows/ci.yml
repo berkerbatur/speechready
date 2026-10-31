@@ -17,8 +17,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m pip install -e "python[dev]"
-      - run: pytest python
+      - run: python -m pip install -e "python[dev]" -e eval
+      - run: pytest python eval
 
   js:
     name: js

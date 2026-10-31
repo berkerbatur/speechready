@@ -7,7 +7,7 @@ no network calls, every rewrite reported as a Change.
 
 from .changes import Change
 from .chunk import Segmenter, pack, split_sentences
-from .clean import CleanOptions, clean
+from .clean import CleanOptions, Options, clean
 from .lexicon import Entry, Lexicon
 from .pipeline import Prepared, prepare
 from .profiles import Profile, list_profiles, load_profile, resolve_profile
@@ -17,6 +17,7 @@ __version__ = "0.1.0.dev0"
 __all__ = [
     "Change",
     "CleanOptions",
+    "Options",
     "Entry",
     "Lexicon",
     "Prepared",

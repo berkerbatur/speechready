@@ -1,0 +1,161 @@
+<title>speechready Listening Room</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a results strip on top, then before/after cards in one column; the card is the unit. */
+:root{
+  --bg:#f6f7f4; --surface:#ffffff; --fg:#1b1f1d; --muted:#5d665f; --line:#d9ded8;
+  --accent:#1f6f8b; --accent-ink:#ffffff; --good:#2b8a4b; --good-bg:#e7f4ea; --bad:#b4433a; --bad-bg:#f8e9e7;
+  --code-bg:#eef1ed;
+  --display:"Bricolage Grotesque","Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141716; --surface:#1d2120; --fg:#e9ece8; --muted:#9aa49d; --line:#2f3634;
+  --accent:#6fb6cf; --accent-ink:#0f1a1e; --good:#6ccc8a; --good-bg:#1a2d21; --bad:#f08a80; --bad-bg:#35201e; --code-bg:#242927; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141716; --surface:#1d2120; --fg:#e9ece8; --muted:#9aa49d; --line:#2f3634;
+  --accent:#6fb6cf; --accent-ink:#0f1a1e; --good:#6ccc8a; --good-bg:#1a2d21; --bad:#f08a80; --bad-bg:#35201e; --code-bg:#242927; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;margin:0;
+  padding-block:2rem 4rem;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:2rem}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:clamp(2rem,5vw,3rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.35rem;font-weight:700}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.lede{font-size:1.1rem;max-width:62ch;color:var(--fg);margin:0}
+.lede small, .note{color:var(--muted)}
+.hero{display:flex;flex-direction:column;gap:.75rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.25rem}
+.stat .big{font-family:var(--display);font-size:2rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.stat .big .arrow{color:var(--muted);font-weight:500;font-size:1.2rem;margin:0 .35rem}
+.stat .big .after{color:var(--good)}
+.stat .label{color:var(--muted);font-size:.9rem}
+table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:.45rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.num{text-align:right}
+.bar{display:inline-block;height:.55rem;border-radius:3px;vertical-align:middle}
+.bar.raw{background:var(--bad)} .bar.proc{background:var(--good)}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:.5rem 1rem}
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:.3rem .8rem;font:inherit;font-size:.9rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip:focus-visible,audio:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{color:var(--muted);font-size:.9rem;margin-left:auto}
+.cards{display:flex;flex-direction:column;gap:1.25rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:1.1rem 1.25rem;display:flex;flex-direction:column;gap:.9rem}
+.card header{display:flex;flex-wrap:wrap;gap:.4rem .9rem;align-items:baseline}
+.card header .who{font-family:var(--display);font-weight:700;font-size:1.05rem}
+.card header .meta{color:var(--muted);font-size:.85rem;font-family:var(--mono)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:720px){.cols{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:.55rem;min-width:0;border-radius:8px;padding:.85rem;border:1px solid var(--line)}
+.side.raw{border-color:color-mix(in srgb,var(--bad) 45%,var(--line))} .side.proc{border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+.side h3{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-family:var(--body);font-weight:600;display:flex;justify-content:space-between;gap:.5rem}
+.side.raw h3{color:var(--bad)} .side.proc h3{color:var(--good)}
+.side pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:var(--mono);font-size:.85rem;line-height:1.45;background:var(--code-bg);padding:.6rem .7rem;border-radius:6px}
+.side audio{width:100%;height:36px}
+.heard{font-size:.92rem;margin:0}
+.heard b{font-weight:600;color:var(--muted)}
+.wer{font-family:var(--mono);font-size:.78rem;padding:.1rem .45rem;border-radius:4px;font-variant-numeric:tabular-nums}
+.side.raw .wer{background:var(--bad-bg);color:var(--bad)} .side.proc .wer{background:var(--good-bg);color:var(--good)}
+.rules{display:flex;flex-wrap:wrap;gap:.35rem}
+.rules span{font-family:var(--mono);font-size:.74rem;color:var(--muted);background:var(--code-bg);padding:.1rem .45rem;border-radius:4px}
+.intended{color:var(--muted);font-size:.9rem;margin:0}
+footer{color:var(--muted);font-size:.9rem;max-width:70ch}
+footer a{color:var(--accent)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+</style>
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">speechready · evaluation, October 2026</div>
+    <h1>What the voice actually said</h1>
+    <p class="lede">Every line below was sent to a text-to-speech provider twice: as the app wrote it, and after <code>speechready.prepare</code>. Both recordings were transcribed back to text. A misread is a transcript that differs from the intended words by more than a fifth.</p>
+    <p class="note" id="corpus-note"></p>
+  </section>
+
+  <section>
+    <div class="eyebrow">Misread lines, before → after</div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section>
+    <h2>Per voice</h2>
+    <div class="tablewrap"><table id="providers"><thead><tr><th>Provider</th><th>Model</th><th>Locale</th><th class="num">Lines</th><th>Misread as written</th><th>Misread with speechready</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section>
+    <h2>Listen</h2>
+    <p class="note">Three of the clearest fixes per voice. Press play on both sides. The transcript under each player is what a speech-to-text model heard.</p>
+    <div class="filters" id="filters"></div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <footer>
+    Source, fixtures and the full evaluation harness: <a href="https://github.com/berkerbatur/speechready">github.com/berkerbatur/speechready</a>. Scores forgive how a transcription model writes numbers, symbols and identifiers; the same allowance applies to both sides. Transcription by OpenAI gpt-4o-transcribe.
+  </footer>
+</div>
+<script id="data" type="application/json">/*DATA*/</script>
+<script>
+const D = JSON.parse(document.getElementById('data').textContent);
+const pct = (x, n) => n ? Math.round(100 * x / n) + '%' : '–';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LOC = {'en-US':'English', 'tr-TR':'Turkish', 'all':'Both languages'};
+
+// stats
+const statsEl = document.getElementById('stats');
+for (const key of ['all','en-US','tr-TR']) {
+  const s = D.overall[key]; if (!s) continue;
+  statsEl.insertAdjacentHTML('beforeend', `<div class="stat"><div class="big"><span>${pct(s.raw_misreads, s.n)}</span><span class="arrow">→</span><span class="after">${pct(s.proc_misreads, s.n)}</span></div><div class="label">${LOC[key]} · ${s.n} line/voice pairs</div></div>`);
+}
+const voices = new Set(D.stats.map(s => s.provider + s.model + s.locale)).size;
+document.getElementById('corpus-note').textContent = `${D.overall.all.n} line/voice pairs across ${voices} voices from ${new Set(D.stats.map(s=>s.provider)).size} providers, English and Turkish.`;
+
+// table
+const tb = document.querySelector('#providers tbody');
+for (const s of D.stats) {
+  const w = x => Math.round(100 * x / s.n);
+  tb.insertAdjacentHTML('beforeend', `<tr><td>${esc(s.providerName)}</td><td><code>${esc(s.model)}</code></td><td>${LOC[s.locale] || s.locale}</td><td class="num">${s.n}</td>
+    <td><span class="bar raw" style="width:${w(s.raw_misreads)}px"></span> ${s.raw_misreads} <small>(${pct(s.raw_misreads,s.n)})</small></td>
+    <td><span class="bar proc" style="width:${w(s.proc_misreads)}px"></span> ${s.proc_misreads} <small>(${pct(s.proc_misreads,s.n)})</small></td></tr>`);
+}
+
+// filters + cards
+const providers = [...new Set(D.pairs.map(p => p.provider))];
+const state = { provider: '', locale: '' };
+const f = document.getElementById('filters');
+const chip = (label, group, value) => `<button class="chip" type="button" data-group="${group}" data-value="${esc(value)}" aria-pressed="${value===''}">${esc(label)}</button>`;
+f.innerHTML = chip('All providers','provider','') + providers.map(p => chip(D.pairs.find(x=>x.provider===p).providerName,'provider',p)).join('')
+  + chip('Both languages','locale','') + chip('English','locale','en-US') + chip('Turkish','locale','tr-TR') + '<span class="count" id="count"></span>';
+f.addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  state[b.dataset.group] = b.dataset.value;
+  f.querySelectorAll(`.chip[data-group="${b.dataset.group}"]`).forEach(c => c.setAttribute('aria-pressed', c === b));
+  render();
+});
+const cards = document.getElementById('cards');
+function render() {
+  let n = 0;
+  cards.querySelectorAll('.card').forEach(c => {
+    const show = (!state.provider || c.dataset.provider === state.provider) && (!state.locale || c.dataset.locale === state.locale);
+    c.hidden = !show; if (show) n++;
+  });
+  document.getElementById('count').textContent = `${n} of ${D.pairs.length}`;
+}
+cards.innerHTML = D.pairs.map(p => `<article class="card" data-provider="${esc(p.provider)}" data-locale="${esc(p.locale)}">
+  <header><span class="who">${esc(p.providerName)}</span><span class="meta">${esc(p.model)} · ${esc(p.voice)} · ${LOC[p.locale]}</span></header>
+  <div class="cols">
+    <div class="side raw"><h3>As written <span class="wer">WER ${p.raw.wer.toFixed(2)}</span></h3><pre>${esc(p.raw.text)}</pre><audio controls preload="none" src="audio/${p.raw.audio}"></audio><p class="heard"><b>heard:</b> ${esc(p.raw.heard)}</p></div>
+    <div class="side proc"><h3>With speechready <span class="wer">WER ${p.processed.wer.toFixed(2)}</span></h3><pre>${esc(p.processed.text)}</pre><audio controls preload="none" src="audio/${p.processed.audio}"></audio><p class="heard"><b>heard:</b> ${esc(p.processed.heard)}</p>
+      <div class="rules">${p.processed.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div></div>
+  </div>
+  <p class="intended"><b>intended:</b> ${esc(p.intended)}</p>
+</article>`).join('');
+render();
+document.addEventListener('play', e => { document.querySelectorAll('audio').forEach(a => { if (a !== e.target) a.pause(); }); }, true);
+</script>

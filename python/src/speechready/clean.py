@@ -19,17 +19,27 @@ STAGE = "clean"
 
 
 @dataclass(frozen=True)
-class CleanOptions:
+class Options:
+    """Everything a caller can change about how text is prepared. Defaults are what the evaluation ran with."""
+
+    # clean stage
     code_blocks: str = "drop"  # drop | keep
     tables: str = "rows"  # rows | drop
     urls: str = "domain"  # domain | drop | keep
     emails: str = "keep"  # keep | drop
     emoji: str = "drop"  # drop | keep
     emphasis: str = "strip"  # strip | intent
+    list_numbers: str = "keep"  # keep ("1. Open the app") | drop ("Open the app")
     strip_tags: tuple[str, ...] = ("think", "thinking", "reasoning")
     terminal_punctuation: str = "."
     html: str = "strip"  # strip | keep
+    # verbalize stage
+    fractions: str = "spoken"  # spoken ("one half", "yarım") | division ("one over two", "bir bölü iki")
+    foreign_acronyms: bool = True  # Turkish: lowercase vowel-less tokens like npm, css read with English letter names
     extra: dict = field(default_factory=dict)
+
+
+CleanOptions = Options  # the earlier name
 
 
 _TERMINAL = ".!?…:;,"
@@ -76,9 +86,9 @@ _EMOJI = re.compile(
 )
 
 
-def clean(text: str, options: CleanOptions | None = None, recorder: Recorder | None = None) -> str:
+def clean(text: str, options: Options | None = None, recorder: Recorder | None = None) -> str:
     """Run the clean stage on `text`; returns the cleaned text and records changes."""
-    opts = options or CleanOptions()
+    opts = options or Options()
     rec = recorder or Recorder()
 
     text = _unicode(text, rec)
@@ -121,6 +131,7 @@ def _blocks(text: str, opts: CleanOptions, rec: Recorder) -> list[str]:
     blocks: list[str] = []
     para: list[str] = []
     in_fence = False
+    last_was_list = False
     fence_lines: list[str] = []
     lines = text.split("\n")
 
@@ -189,16 +200,31 @@ def _blocks(text: str, opts: CleanOptions, rec: Recorder) -> list[str]:
             rec.add(STAGE, "clean.markdown.table", line, row, "table row read as a comma list")
             continue
         li = _LIST.match(line)
+        if li and li.group(2)[:-1].isdigit() and li.group(2)[:-1] != "1" and not last_was_list:
+            # "3. madde" at the start of a text is an ordinal, not a list that begins at three:
+            # a numbered item counts as a list only when it starts at 1, continues a list,
+            # or is followed by another numbered item.
+            nxt = next((l for l in lines[i + 1 :] if l.strip()), "")
+            m2 = _LIST.match(nxt)
+            if not (m2 and m2.group(2)[:-1].isdigit()):
+                li = None
         if li:
             flush()
+            last_was_list = True
             item = li.group(3)
             task = _TASK.match(item)
             if task:
                 item = item[task.end() :]
+            marker = li.group(2)
+            if marker[:-1].isdigit() and opts.list_numbers == "keep":
+                item = f"{marker[:-1]}. {item}"
+                rec.add(STAGE, "clean.markdown.list", line, item, "numbered item kept with its number")
+            else:
+                rec.add(STAGE, "clean.markdown.list", line, item, "list marker removed")
             blocks.append(item)
-            rec.add(STAGE, "clean.markdown.list", line, item, "list marker removed")
             continue
         para.append(line)
+        last_was_list = False
     flush()
     if in_fence and fence_lines:
         # unterminated fence: treat as dropped code

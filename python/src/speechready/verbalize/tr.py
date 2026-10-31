@@ -10,13 +10,24 @@ from __future__ import annotations
 
 import re
 
-from . import Rule
+from . import Rule, option
 from .numbers_tr import attach, cardinal, decimal, digits, locative, ordinal, reharmonize
 
 _MONTHS = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
 _APOS = "['’]"
 _LOWER = "a-zçğıöşü"
 _UPPER = "A-ZÇĞİÖŞÜ"
+
+# English letter names as Turkish speakers say them, for foreign tech acronyms (npm, css, sql).
+_EN_LETTERS = dict(zip("abcdefghijklmnopqrstuvwxyz", ["ey", "bi", "si", "di", "i", "ef", "ci", "eyç", "ay", "cey", "key", "el", "em", "en", "o", "pi", "kyu", "ar", "es", "ti", "yu", "vi", "dabılyu", "eks", "vay", "zi"]))
+_UNIT_ABBREVIATIONS = {"km", "kg", "cm", "mm", "mg", "ml", "lt", "sn", "dk", "hz", "gr", "kw", "mb", "gb", "kb", "tb", "ms", "vb", "vs", "bkz", "yy", "tl", "krş", "tr", "st", "nr", "sk", "mh", "cd", "pk"}
+
+
+def _foreign_acronym(m: re.Match[str], locale: str) -> str | None:
+    word = m.group(0)
+    if not option("foreign_acronyms", True) or word in _UNIT_ABBREVIATIONS:
+        return None
+    return " ".join(_EN_LETTERS[ch] for ch in word)
 
 
 def _date_words(y: int, m: int, d: int, suffix: str = "") -> str | None:
@@ -35,13 +46,28 @@ def _date_iso(m: re.Match[str], locale: str) -> str | None:
     return _date_words(int(m.group(1)), int(m.group(2)), int(m.group(3)), m.group(4) or "")
 
 
+def _group_words(group: str) -> str:
+    """How Turkish speakers say one group of a phone number: 0532 -> sıfır beş yüz otuz iki, 00 -> sıfır sıfır, 45 -> kırk beş."""
+    words = []
+    if group.startswith("+"):
+        words.append("artı")
+        group = group[1:]
+    stripped = group.lstrip("0")
+    words.extend(["sıfır"] * (len(group) - len(stripped)))
+    if stripped:
+        words.append(cardinal(int(stripped)))
+    return " ".join(words)
+
+
 def _digit_groups(m: re.Match[str], locale: str) -> str | None:
     raw, suffix = m.group(1), m.group(2) or ""
     count = sum(ch.isdigit() for ch in raw)
     if count < 7 or count > 16:
         return None
     groups = [g for g in re.split(r"[\s.\-()]+", raw) if g]
-    return attach(", ".join(digits(g) for g in groups), suffix)
+    spoken = [_group_words(g) for g in groups]
+    spoken[-1] = attach(spoken[-1], suffix)
+    return ", ".join(spoken)
 
 
 def _time_words(hh: str, mm: str) -> str:
@@ -125,6 +151,8 @@ def _fraction(m: re.Match[str], locale: str) -> str | None:
     num, den, suffix = int(m.group(1)), int(m.group(2)), m.group(3) or ""
     if num >= den:
         return None
+    if option("fractions", "spoken") == "division":
+        return f"{cardinal(num)} bölü {attach(cardinal(den), suffix)}"
     if (num, den) in _FRACTION_NAMES:
         word = _FRACTION_NAMES[(num, den)]
         return attach(word, reharmonize(word, suffix))
@@ -206,6 +234,8 @@ RULES: list[Rule] = [
         _digit_groups,
         "digit groups read digit by digit with a pause between groups",
     ),
+    Rule("verbalize.number_sign", re.compile(r"#(?=\d)"), lambda m, loc: "numara ", "number sign read as a word"),
+    Rule("verbalize.acronym.foreign", re.compile(r"(?<![\w'’.])[bcdfghjklmnpqrstvwxyz]{2,5}(?![\w'’])"), _foreign_acronym, "lowercase foreign acronym read with English letter names"),
     Rule("verbalize.digits.long", re.compile(r"(?<![\w.,])\d{7,}(?![\w]|[.,]\d)"), lambda m, loc: digits(m.group(0)), "long digit string read digit by digit"),
     Rule("verbalize.time.range", re.compile(r"\b([01]?\d|2[0-3]):([0-5]\d)\s?[-–]\s?([01]?\d|2[0-3]):([0-5]\d)\b"), _time_range, "time range read with 'ile'"),
     Rule("verbalize.time", re.compile(rf"\b([01]?\d|2[0-3]):([0-5]\d)\b(?!:){_SUFFIX}"), _time, "clock time read as hours and minutes"),

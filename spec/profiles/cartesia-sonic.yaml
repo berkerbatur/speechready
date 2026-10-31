@@ -1,0 +1,32 @@
+id: cartesia-sonic
+provider: cartesia
+models: [sonic-3.6, sonic-3.5, sonic-3, sonic-latest, sonic-2, sonic-turbo]
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: chars
+  max: null
+intents:
+  pause: {render: '<break time="{ms}ms"/>', min_ms: 0}
+  spell: {render: '<spell>{text}</spell>'}
+  emphasis: {render: "{text}"}
+lexicon: {format: none}
+notes: >
+  Sonic takes plain text with a small set of SSML-like tags, not SSML:
+  <break time="500ms"/>, <spell>ABC123</spell>, and speed, volume and
+  emotion tags on sonic-3 and newer. Each tag counts as one character.
+  Cartesia publishes no per-request transcript limit; its own guidance for
+  agents is one sentence per request, which the streaming segmenter gives
+  you. Cartesia runs its own text normalizer (request field `normalization`,
+  default `auto`); its docs recommend pre-normalizing and setting
+  `normalization: off` when you need full control of the spoken form, which
+  is exactly what this library's output is for. Pronunciations are managed
+  server-side through `pronunciation_dict_id`, so there is no lexicon export.
+sources:
+  - https://docs.cartesia.ai/api-reference/tts/bytes
+  - https://docs.cartesia.ai/build-with-cartesia/capability-guides/ssml-tags
+  - https://docs.cartesia.ai/build-with-cartesia/capability-guides/text-normalization
+  - https://docs.cartesia.ai/build-with-cartesia/tts-models/latest
+verified: "2026-10-29"

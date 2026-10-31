@@ -28,7 +28,7 @@ def _run(doc: dict, case: dict):
     if rule == "lexicon.export":
         return lexicon.export(case["format"], case.get("alphabet", "ipa"))
     if rule.startswith("verbalize"):
-        return verbalize(case["input"], locale)
+        return verbalize(case["input"], locale, options=opts)
     if rule == "chunk.sentences":
         return split_sentences(case["input"], locale)
     if rule == "chunk.pack":

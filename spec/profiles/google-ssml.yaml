@@ -1,0 +1,28 @@
+id: google-ssml
+provider: google
+models: [neural2, wavenet, studio, standard, polyglot]
+default: false
+syntax: ssml
+escape: xml
+audio_tags: false
+limit:
+  unit: bytes
+  max: 5000
+intents:
+  pause: {render: '<break time="{ms}ms"/>', min_ms: 0}
+  spell: {render: '<say-as interpret-as="characters">{text}</say-as>'}
+  emphasis: {render: '<emphasis level="moderate">{text}</emphasis>'}
+  phoneme: {render: '<phoneme alphabet="ipa" ph="{ipa}">{text}</phoneme>'}
+lexicon: {format: none}
+notes: >
+  The classic voice families take full SSML in `input.ssml`. Output is the
+  body; the caller wraps it in <speak>. Studio voices ignore <emphasis>,
+  <mark>, <prosody pitch> and <lang>. Google documents no upper bound for
+  <break time>. The 5,000-byte cap counts the SSML tags too. There is no
+  lexicon upload for these voices, so lexicon entries are rendered inline as
+  <phoneme> tags.
+sources:
+  - https://docs.cloud.google.com/text-to-speech/docs/ssml
+  - https://docs.cloud.google.com/text-to-speech/docs/list-voices-and-types
+  - https://docs.cloud.google.com/text-to-speech/quotas
+verified: "2026-10-29"

@@ -75,6 +75,9 @@ def _is_boundary(text: str, m: re.Match[str], abbrs: frozenset[str]) -> bool:
     return False
 
 
+_LIST_MARKER = re.compile(r"\d{1,3}\.")
+
+
 def split_sentences(text: str, locale: str = "en-US") -> list[str]:
     """Split text into sentences. Newlines are hard boundaries. Empty sentences are dropped."""
     abbrs = _abbreviations(locale)
@@ -85,6 +88,8 @@ def split_sentences(text: str, locale: str = "en-US") -> list[str]:
             continue
         start = 0
         for m in _END.finditer(line):
+            if _LIST_MARKER.fullmatch(line[start : m.end()].strip()):
+                continue  # "1. Open the app": the number is the item's marker, not a sentence
             if _is_boundary(line, m, abbrs):
                 out.append(line[start : m.end("close")].strip())
                 start = m.end()

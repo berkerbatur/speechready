@@ -30,7 +30,7 @@ The same call with `provider="openai"` renders the pause as punctuation and chun
 
 ## Status
 
-Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. The Python package on `main` has all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI and Azure. The JavaScript port is next; nothing ships to the registries before the evaluation in the plan is run.
+Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. The Python package on `main` has all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram. The JavaScript port is next; nothing ships to the registries before the evaluation in the plan is run.
 
 ## Layout
 
@@ -39,6 +39,7 @@ Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https:/
 | `spec/` | The shared fixture corpus and provider profiles. Both runtimes must pass every fixture. |
 | `python/` | The Python package. |
 | `js/` | The JavaScript package. |
+| `eval/` | The evaluation harness: raw vs preprocessed audio per provider, STT round trip, before/after page. |
 
 ## Licence
 

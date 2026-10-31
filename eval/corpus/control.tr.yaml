@@ -1,0 +1,10 @@
+locale: tr-TR
+cls: control/prose
+cases:
+  - {id: hava, input: "Yarın hava öğleden sonra yağmur ihtimaliyle bulutlu olacak."}
+  - {id: tarif, input: "Yumurtaları şekerle köpürene kadar çırpın, sonra unu yavaşça ekleyin."}
+  - {id: destek, input: "Yazdığınız için teşekkürler. Şifrenizi sıfırladım ve yeni bağlantıyı e-postanıza gönderdim."}
+  - {id: hikaye, input: "Kitabı kapattı, lambayı söndürdü ve bir süre yağmuru dinledi."}
+  - {id: toplanti, input: "Planlama toplantısını herkes katılabilsin diye perşembeye alalım."}
+  - {id: sayilar-kolay, input: "Cumartesi 12 sandalye, 3 masa ve yaklaşık 40 misafir olacak."}
+  - {id: soru, input: "Erken treni mi yoksa öğleden sonrakini mi ayırtmamı istersiniz?"}

@@ -10,3 +10,9 @@ cases:
   - id: bullet-list
     input: "- elma\n- armut"
     expect: "elma.\narmut."
+  - id: lone-ordinal-is-not-a-list
+    input: "3. madde önemli."
+    expect: "3. madde önemli."
+  - id: numbered-list-not-starting-at-one
+    input: "3. elma\n4. armut"
+    expect: "3. elma.\n4. armut."

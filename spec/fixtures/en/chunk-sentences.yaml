@@ -37,3 +37,6 @@ cases:
   - id: dotted-country
     input: "Born in the U.S. in 1990. Moved."
     expect: ["Born in the U.S. in 1990.", "Moved."]
+  - id: list-number-stays-with-its-item
+    input: "1. Open the app.\n2. Tap Settings. Then wait."
+    expect: ["1. Open the app.", "2. Tap Settings.", "Then wait."]

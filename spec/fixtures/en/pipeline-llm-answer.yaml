@@ -14,5 +14,6 @@ cases:
       > Note: this is a *preview* 🚀
     expect:
       - "Here's what I found: Summary."
-      - "Install with pip install speechready."
-      - "Read the docs at speechready.dev. Note: this is a preview."
+      - "1. Install with pip install speechready."
+      - "2. Read the docs at speechready.dev."
+      - "Note: this is a preview."

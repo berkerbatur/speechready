@@ -1,0 +1,28 @@
+id: deepgram-aura
+provider: deepgram
+models: [aura-2, aura]
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: chars
+  max: 2000
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+lexicon: {format: none}
+notes: >
+  Plain text only: no SSML, no pause or pronunciation markup, prosody only
+  through the `speed` query parameter. Aura-2 covers English, Spanish,
+  German, French, Dutch, Italian and Japanese; no Turkish. The 2,000
+  character cap is the figure Deepgram's REST reference carried at the Aura
+  launch; the current pages state no number and their chunking guide works
+  in 100 to 200 character sentence pieces, so treat 2,000 as the ceiling
+  and stream sentences in practice.
+sources:
+  - https://developers.deepgram.com/reference/text-to-speech/speak-request
+  - https://developers.deepgram.com/docs/tts-models
+  - https://developers.deepgram.com/docs/text-chunking-for-tts-optimization
+verified: "2026-10-29"

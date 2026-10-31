@@ -47,3 +47,6 @@ cases:
   - id: license-plate
     input: "Plate 34ABC123 seen."
     expect: "Plate three four ABC one two three seen."
+  - id: number-sign-before-long-id
+    input: "Order #48219930 shipped."
+    expect: "Order number four eight two one nine nine three zero shipped."

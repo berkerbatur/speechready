@@ -1,0 +1,55 @@
+rule: pipeline
+locale: en-US
+cases:
+  - id: cartesia-break-tag
+    profile: cartesia-sonic
+    input: "Hold on. [pause 1.5s] Alright."
+    expect: "Hold on. <break time=\"1500ms\"/> Alright."
+  - id: cartesia-spell-tag
+    profile: cartesia-sonic
+    input: "Code [spell AB12] now."
+    expect: "Code <spell>AB12</spell> now."
+  - id: cartesia-no-escaping
+    profile: cartesia-sonic
+    input: "Tom & Jerry."
+    expect: "Tom & Jerry."
+  - id: polly-break-caps-at-ten-seconds
+    profile: amazon-polly
+    input: "Go. [pause 15s] Now."
+    expect: "Go. <break time=\"10000ms\"/> Now."
+  - id: polly-spell-is-spaced-not-say-as
+    profile: amazon-polly
+    input: "Code [spell AB12] now."
+    expect: "Code A B 1 2 now."
+  - id: polly-emphasis-is-plain
+    profile: amazon-polly
+    input: "This is [em really] good."
+    expect: "This is really good."
+  - id: polly-escapes-xml
+    profile: amazon-polly
+    input: "Tom & Jerry <3 you."
+    expect: "Tom &amp; Jerry &lt;3 you."
+  - id: google-ssml-say-as
+    profile: google-ssml
+    input: "Code [spell AB12] now."
+    expect: "Code <say-as interpret-as=\"characters\">AB12</say-as> now."
+  - id: google-ssml-emphasis-moderate
+    profile: google-ssml
+    input: "This is [em really] good."
+    expect: "This is <emphasis level=\"moderate\">really</emphasis> good."
+  - id: google-chirp3-pause-is-punctuation
+    profile: google-chirp3
+    input: "Yes [pause 200ms] indeed."
+    expect: "Yes, indeed."
+  - id: google-chirp3-ssml-break-input-becomes-punctuation
+    profile: google-chirp3
+    input: "Hi <break time=\"500ms\"/> there."
+    expect: "Hi... there."
+  - id: deepgram-pause-is-punctuation
+    profile: deepgram-aura
+    input: "Well [pause 800ms] maybe."
+    expect: "Well... maybe."
+  - id: deepgram-unknown-tag-dropped
+    profile: deepgram-aura
+    input: "Sure [laughs] okay."
+    expect: "Sure okay."

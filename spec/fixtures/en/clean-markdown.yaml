@@ -14,6 +14,10 @@ cases:
     expect: "apples.\npears."
   - id: numbered-list
     input: "1. Open the app\n2. Tap **Settings**"
+    expect: "1. Open the app.\n2. Tap Settings."
+  - id: numbered-list-numbers-dropped-on-request
+    options: {list_numbers: drop}
+    input: "1. Open the app\n2. Tap **Settings**"
     expect: "Open the app.\nTap Settings."
   - id: task-list
     input: "- [x] done\n- [ ] todo"
