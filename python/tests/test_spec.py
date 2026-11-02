@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from speechready import CleanOptions, Lexicon, Segmenter, clean, load_profile, pack, prepare, split_sentences
+from speechready import CleanOptions, Lexicon, Segmenter, clean, load_lexicon, load_profile, pack, prepare, split_sentences
 from speechready.verbalize import verbalize
 
 SPEC = Path(__file__).resolve().parents[2] / "spec" / "fixtures"
@@ -24,7 +24,9 @@ def _run(doc: dict, case: dict):
     opts = CleanOptions(**case["options"]) if "options" in case else None
     if rule.startswith("clean"):
         return clean(case["input"], opts, locale=locale)
-    lexicon = Lexicon.from_entries(case["lexicon"], locale) if "lexicon" in case else None
+    lexicon = None
+    if "lexicon" in case:
+        lexicon = load_lexicon(case["lexicon"]) if isinstance(case["lexicon"], str) else Lexicon.from_entries(case["lexicon"], locale)
     if rule == "lexicon.export":
         return lexicon.export(case["format"], case.get("alphabet", "ipa"))
     if rule.startswith("verbalize"):

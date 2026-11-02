@@ -74,9 +74,21 @@ lex.export_for(load_profile("elevenlabs-v2"))        # the right one for a profi
 
 An inline `[ipa Nginx ˈɛndʒɪnˈɛks]` tag does the same for one word without a file.
 
+One lexicon ships with the package: `tr-tech`, foreign tech acronyms and names as Turkish developers say them (`API` → ey pi ay, `SQL` → es kyu el, `JSON` → ceyson). In Turkish an apostrophe suffix is refitted to the spoken form, so `API'yi` becomes `ey pi ay'ı`.
+
+```python
+from speechready import load_lexicon, prepare
+
+prepare("API'yi JSON ile çağır.", locale="tr-TR", lexicon="tr-tech").text
+# "ey pi ay'ı ceyson ile çağır."
+lex = load_lexicon("tr-tech")                        # a Lexicon you can extend before passing it
+```
+
 ## Voice agents
 
 Two frameworks take a text transform between the LLM and the TTS. Both hooks are plain callables, so they need nothing beyond `speechready`:
+
+Complete runnable agents for both, with install lines and the flags each framework needs, are in [`examples/`](../examples/README.md).
 
 ```python
 # LiveKit Agents 1.8+: sentences are released as they are confirmed in the token stream

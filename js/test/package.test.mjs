@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { Lexicon, listProfiles, options, prepare, version } from "../dist/index.js";
+import { Lexicon, listLexicons, listProfiles, loadLexicon, options, prepare, version } from "../dist/index.js";
 
 test("version is set", () => {
   assert.ok(version);
@@ -25,6 +25,15 @@ test("prepare picks a profile from provider and model", () => {
 
 test("unknown option names are rejected", () => {
   assert.throws(() => options({ codeBlocks: "keep" }), /snake_case/);
+});
+
+test("bundled Turkish tech lexicon", () => {
+  assert.ok(listLexicons().includes("tr-tech"));
+  const lex = loadLexicon("tr-tech");
+  assert.equal(lex.locale, "tr-TR");
+  assert.ok(lex.entries.length > 50);
+  assert.equal(prepare("API'yi çağır.", { locale: "tr-TR", lexicon: "tr-tech" }).text, "ey pi ay'ı çağır.");
+  assert.equal(prepare("API'yi çağır.", { locale: "tr-TR", lexicon: lex }).text, "ey pi ay'ı çağır.");
 });
 
 test("lexicon export", () => {

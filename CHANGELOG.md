@@ -4,6 +4,10 @@ Both packages share one version number and one fixture corpus, so an entry here 
 
 ## Unreleased
 
+- **Bundled lexicon `tr-tech`:** foreign tech acronyms and names as Turkish developers say them, with English letter names (`API` → ey pi ay, `SQL` → es kyu el) and respellings (`JSON` → ceyson, `GitHub` → githab). `prepare(..., lexicon="tr-tech")` / `{ lexicon: "tr-tech" }`, or `load_lexicon` / `loadLexicon` for a copy to extend. Source of truth in `spec/lexicons`, bundled into both packages like the profiles.
+- **Lexicon, Turkish:** a respelled word's apostrophe suffix is refitted to the spoken form (`API'yi` → `ey pi ay'ı`, `GPU'yu` → `ci pi yu'yu`, `API'si` → `ey pi ay'ı`).
+- **Examples:** `examples/` has runnable LiveKit Agents (Python 1.8+, Node 1.9+) and Pipecat (1.15+) agents, checked against those versions' source, with the ElevenLabs SSML flag the break tags need.
+- **Fixed, JavaScript:** `speechready/livekit`'s `textTransform` now returns a `ReadableStream`, which is what `@livekit/agents` chains in `ttsTextTransforms`; 0.2.0 returned an async generator that the SDK could not consume. A `ReadableStream` or any async iterable is accepted as input.
 - **Evaluation scorer:** a Turkish acronym the speech-to-text wrote as letters (`NPM`) now matches the English letter names speechready writes out (`en pi em`); `25°C`, `™` and `&` are scored as the words every voice says; a Turkish `3.` before a lowercase word is the ordinal. These were scorer artefacts, not misreads, and they applied to both sides. Re-scored on the same recordings: misreads fell from 32% to 8% overall (English 29% to 7%, Turkish 37% to 10%), previously reported as 33% to 10%.
 
 ## 0.2.0 (2026-11-02)

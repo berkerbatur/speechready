@@ -7,3 +7,30 @@ cases:
       - {word: Nginx, say: "encin eks"}
     input: "Nginx'i yeniden başlat."
     expect: "encin eks'i yeniden başlat."
+  - id: alias-suffix-refitted-to-the-spoken-form
+    profile: plain
+    lexicon:
+      - {word: API, say: "ey pi ay"}
+    input: "API'yi çağır, API'si hazır."
+    expect: "ey pi ay'ı çağır, ey pi ay'ı hazır."
+  - id: alias-suffix-keeps-the-buffer-after-a-vowel
+    profile: plain
+    lexicon:
+      - {word: GPU, say: "ci pi yu"}
+    input: "GPU'yu kullan."
+    expect: "ci pi yu'yu kullan."
+  - id: bundled-tech-lexicon-by-name
+    profile: plain
+    lexicon: tr-tech
+    input: "API anahtarını JSON olarak kaydet ve GitHub'a gönder."
+    expect: "ey pi ay anahtarını ceyson olarak kaydet ve githab'a gönder."
+  - id: bundled-tech-lexicon-is-case-sensitive-where-a-turkish-word-collides
+    profile: plain
+    lexicon: tr-tech
+    input: "IT ekibi ve it."
+    expect: "ay ti ekibi ve it."
+  - id: bundled-tech-lexicon-on-ssml-provider-stays-plain-text
+    profile: azure-neural
+    lexicon: tr-tech
+    input: "URL'yi ve SQL sorgusunu kontrol et."
+    expect: "yu ar el'i ve es kyu el sorgusunu kontrol et."

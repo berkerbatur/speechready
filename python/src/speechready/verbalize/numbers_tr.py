@@ -89,6 +89,24 @@ def reharmonize(word: str, suffix: str) -> str:
     return "".join(two if ch in "ae" else four if ch in "ıiuü" else ch for ch in suffix)
 
 
+def respell_suffix(word: str, suffix: str) -> str:
+    """The suffix a writer attached to an abbreviation (API'yi), refitted to how the word is said (ey pi ay -> 'ı).
+
+    Harmony follows the last spoken word, and the buffer consonant follows whether it
+    ends in a vowel: GPU'yu -> ci pi yu'yu, API'si -> ey pi ay'ı.
+    """
+    if not suffix:
+        return suffix
+    last = word.rsplit(" ", 1)[-1]
+    suffix = reharmonize(last, suffix)
+    ends_in_vowel = last[-1] in _VOWELS
+    if suffix[0] in "sy" and len(suffix) > 1 and suffix[1] in _VOWELS and not ends_in_vowel:
+        suffix = suffix[1:]
+    elif suffix[0] in _VOWELS and ends_in_vowel:
+        suffix = "y" + suffix
+    return suffix
+
+
 def ordinal(n: int) -> str:
     """üçüncü, dördüncü, yirmi birinci."""
     words = cardinal(n)

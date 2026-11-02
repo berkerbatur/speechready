@@ -22,6 +22,9 @@ from xml.sax.saxutils import escape
 import yaml
 
 from .intents import SENTINEL_CLOSE, SENTINEL_OPEN, Intent
+from .verbalize.numbers_tr import respell_suffix
+
+_TR_SUFFIX = r"(?:(['’])([a-zçğıöşü]+))?"
 
 
 @dataclass(frozen=True)
@@ -71,13 +74,22 @@ class Lexicon:
         """Replace every lexicon word in `text` with an intent sentinel; appends to `intents`."""
         if not self.entries:
             return text
+        turkish = self.locale.split("-")[0].lower() == "tr"
         for entry in sorted(self.entries, key=lambda e: len(e.word), reverse=True):
             flags = 0 if entry.case_sensitive else re.IGNORECASE
-            pattern = re.compile(rf"(?<![\w{SENTINEL_OPEN}{SENTINEL_CLOSE}]){re.escape(entry.word)}(?![\w])", flags)
+            # In Turkish a respelled word's apostrophe suffix (API'yi) is refitted to the spoken form (ey pi ay'ı).
+            refit = turkish and bool(entry.say) and not entry.ipa
+            suffix = _TR_SUFFIX if refit else ""
+            pattern = re.compile(rf"(?<![\w{SENTINEL_OPEN}{SENTINEL_CLOSE}]){re.escape(entry.word)}{suffix}(?![\w])", flags)
 
-            def repl(m: re.Match[str], entry=entry) -> str:
-                intents.append(entry.intent(m.group(0)))
-                return f"{SENTINEL_OPEN}{len(intents) - 1}{SENTINEL_CLOSE}"
+            def repl(m: re.Match[str], entry=entry, refit=refit) -> str:
+                word = m.group(0)
+                tail = ""
+                if refit and m.group(2):
+                    word = word[: -len(m.group(1)) - len(m.group(2))]
+                    tail = m.group(1) + respell_suffix(entry.say, m.group(2))
+                intents.append(entry.intent(word))
+                return f"{SENTINEL_OPEN}{len(intents) - 1}{SENTINEL_CLOSE}{tail}"
 
             text = pattern.sub(repl, text)
         return text
