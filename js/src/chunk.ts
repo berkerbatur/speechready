@@ -95,10 +95,14 @@ export function splitSentences(text: string, locale = "en-US"): string[] {
  * whatever is left. A boundary is only confirmed once text after it arrives,
  * so a sentence is never cut at "Dr." or "3.14" because the stream paused there.
  */
+const FENCE = /^\s*(```|~~~)/u;
+
 export class Segmenter {
   locale: string;
   maxBuffer: number | null;
   private buffer = "";
+  /** Lines of an open fenced code block; released whole once the fence closes. */
+  private fence: string[] | null = null;
 
   constructor(init: { locale?: string; maxBuffer?: number | null } = {}) {
     this.locale = init.locale ?? "en-US";
@@ -113,8 +117,19 @@ export class Segmenter {
       if (nl < 0) break;
       const head = this.buffer.slice(0, nl);
       this.buffer = this.buffer.slice(nl + 1);
-      done.push(...splitSentences(head, this.locale));
+      if (this.fence !== null) {
+        this.fence.push(head);
+        if (FENCE.test(head)) {
+          done.push(this.fence.join("\n"));
+          this.fence = null;
+        }
+      } else if (FENCE.test(head)) {
+        this.fence = [head];
+      } else {
+        done.push(...splitSentences(head, this.locale));
+      }
     }
+    if (this.fence !== null) return done.filter((s) => s); // inside a fence: nothing is sentence-split
     const sentences = splitSentences(this.buffer, this.locale);
     if (sentences.length > 1) {
       done.push(...sentences.slice(0, -1));
@@ -135,6 +150,11 @@ export class Segmenter {
   flush(): string[] {
     const rest = this.buffer;
     this.buffer = "";
+    if (this.fence !== null) {
+      const block = [...this.fence, ...(rest ? [rest] : [])].join("\n");
+      this.fence = null;
+      return [block];
+    }
     return splitSentences(rest, this.locale);
   }
 }

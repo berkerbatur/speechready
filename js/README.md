@@ -57,6 +57,17 @@ for (const token of llmStream) {
 for (const sentence of seg.flush()) speak(sentence);
 ```
 
+For LiveKit Agents (Node), the same thing as a `ttsTextTransforms` entry; sentences are released as they are confirmed, and a fenced code block is handled as one piece:
+
+```js
+import { textTransform } from "speechready/livekit";
+
+const session = new voice.AgentSession({
+  ...,
+  ttsTextTransforms: [textTransform({ provider: "elevenlabs", model: "eleven_turbo_v2_5" })],
+});
+```
+
 Pronunciation lexicon, one file for every vendor:
 
 ```js

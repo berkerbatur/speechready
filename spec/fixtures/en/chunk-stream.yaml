@@ -17,3 +17,12 @@ cases:
     stream: ["one, two, three, four, five, six, seven"]
     max_buffer: 20
     expect: ["one, two, three,", "four, five, six, seven"]
+  - id: fenced-block-released-whole
+    stream: ["Run this:\n```bash\nnpm i x. Then\n", "echo hi\n```\nThen restart."]
+    expect: ["Run this:", "```bash\nnpm i x. Then\necho hi\n```", "Then restart."]
+  - id: fence-opening-split-across-tokens
+    stream: ["See:\n``", "`\nprint(1.5)\n`", "``\nDone. Bye."]
+    expect: ["See:", "```\nprint(1.5)\n```", "Done.", "Bye."]
+  - id: unclosed-fence-flushed-whole
+    stream: ["```\nfoo. bar\nbaz"]
+    expect: ["```\nfoo. bar\nbaz"]

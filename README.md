@@ -63,6 +63,8 @@ pip install speechready      # Python 3.10+, depends only on PyYAML
 npm install speechready      # Node 20+, ESM, no runtime dependencies
 ```
 
+In a voice agent, drop it between the LLM and the TTS: `speechready.integrations.livekit.text_transform(...)` goes in LiveKit's `tts_text_transforms`, `speechready.integrations.pipecat.text_transform(...)` in a Pipecat TTS service's `text_transforms`, and `speechready/livekit` does the same for LiveKit's Node SDK. See `python/README.md`.
+
 Everything a caller may want to decide differently is an `Options` field (code blocks dropped, kept or replaced by one spoken sentence; list numbers kept or dropped; fractions spoken or read as a division; URLs reduced to their domain, dropped or kept). The defaults are what the evaluation above ran with. See `python/README.md`.
 
 ## Status
