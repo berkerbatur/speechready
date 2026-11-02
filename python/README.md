@@ -74,7 +74,21 @@ lex.export_for(load_profile("elevenlabs-v2"))        # the right one for a profi
 
 An inline `[ipa Nginx ˈɛndʒɪnˈɛks]` tag does the same for one word without a file.
 
-Streaming:
+## Voice agents
+
+Two frameworks take a text transform between the LLM and the TTS. Both hooks are plain callables, so they need nothing beyond `speechready`:
+
+```python
+# LiveKit Agents 1.8+: sentences are released as they are confirmed in the token stream
+from speechready.integrations.livekit import text_transform
+session = AgentSession(..., tts_text_transforms=[text_transform(provider="elevenlabs", model="eleven_turbo_v2_5")])
+
+# Pipecat 1.14+: runs on each sentence the TTS service aggregates; register it on the TTS, not on LLMTextProcessor
+from speechready.integrations.pipecat import text_transform
+tts = ElevenLabsTTSService(..., text_transforms=[("*", text_transform(provider="elevenlabs", model="eleven_turbo_v2_5"))])
+```
+
+Both take the arguments of `prepare` (`provider`, `model`, `locale`, `options`, `lexicon`). Fenced code blocks that arrive over several tokens or pieces are held until the closing fence and handled as one block, so `code_blocks="drop"` and `"mention"` work in streams too. Any other framework can do the same with `Segmenter`:
 
 ```python
 from speechready import Segmenter

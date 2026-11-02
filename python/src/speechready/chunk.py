@@ -2,6 +2,8 @@
 
 Rules that keep prosody intact:
 - a newline is a hard boundary (blocks from the clean stage never merge);
+- a fenced code block (``` or ~~~ lines) is one piece and is released whole,
+  so the clean stage can drop or mention it instead of reading it line by line;
 - a sentence ends at . ! ? … followed by whitespace and then an uppercase
   letter, a digit, an opening quote or bracket, or a tag;
 - a known abbreviation, a single-letter initial, or a number before the full
@@ -99,6 +101,9 @@ def split_sentences(text: str, locale: str = "en-US") -> list[str]:
     return out
 
 
+_FENCE = re.compile(r"^\s*(```|~~~)")
+
+
 @dataclass
 class Segmenter:
     """Streaming sentence segmenter for LLM token feeds.
@@ -111,6 +116,7 @@ class Segmenter:
     locale: str = "en-US"
     max_buffer: int | None = None
     _buffer: str = field(default="", repr=False)
+    _fence: list[str] | None = field(default=None, repr=False)  # lines of an open fenced block
 
     def push(self, text: str) -> list[str]:
         self._buffer += text
@@ -120,7 +126,17 @@ class Segmenter:
             if nl < 0:
                 break
             head, self._buffer = self._buffer[:nl], self._buffer[nl + 1 :]
-            done.extend(split_sentences(head, self.locale))
+            if self._fence is not None:
+                self._fence.append(head)
+                if _FENCE.match(head):
+                    done.append("\n".join(self._fence))
+                    self._fence = None
+            elif _FENCE.match(head):
+                self._fence = [head]
+            else:
+                done.extend(split_sentences(head, self.locale))
+        if self._fence is not None:
+            return [s for s in done if s]  # inside a fence: nothing is sentence-split
         sentences = split_sentences(self._buffer, self.locale)
         if len(sentences) > 1:
             complete = sentences[:-1]
@@ -138,6 +154,10 @@ class Segmenter:
     def flush(self) -> list[str]:
         rest = self._buffer
         self._buffer = ""
+        if self._fence is not None:
+            block = "\n".join(self._fence + ([rest] if rest else []))
+            self._fence = None
+            return [block]
         return split_sentences(rest, self.locale)
 
 
