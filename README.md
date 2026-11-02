@@ -58,23 +58,20 @@ Every voice improved and the control prose did not regress. Cartesia's Turkish i
 
 ## Try it
 
-The packages on PyPI and npm are still name placeholders. Install the Python package from the repository:
-
 ```
-pip install "speechready @ git+https://github.com/berkerbatur/speechready#subdirectory=python"
-```
-
-The JavaScript package is not on npm yet either; build it from the repository:
-
-```
-git clone https://github.com/berkerbatur/speechready && cd speechready/js && npm ci && npm run build && npm link
+pip install speechready      # Python 3.10+, depends only on PyYAML
+npm install speechready      # Node 20+, ESM, no runtime dependencies
 ```
 
 Everything a caller may want to decide differently is an `Options` field (code blocks dropped, kept or replaced by one spoken sentence; list numbers kept or dropped; fractions spoken or read as a division; URLs reduced to their domain, dropped or kept). The defaults are what the evaluation above ran with. See `python/README.md`.
 
 ## Status
 
-Version 0.0.1 on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready) is a placeholder that reserves the name. Both packages on `main` have all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram. The Python package has been through the evaluation above; the TypeScript package passes the same 210 fixtures, so it produces the same text. The first release to both registries is next.
+Version 0.1.0 is on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready). Both packages have all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram. The Python package has been through the evaluation above; the TypeScript package passes the same 210 fixtures, so it produces the same text. Changes are listed in `CHANGELOG.md`. The public API may still move before 1.0; anything that does will be called out there.
+
+### Releasing
+
+Bump `__version__` in `python/src/speechready/__init__.py` and `version` in `js/package.json` to the same number, add the entry to `CHANGELOG.md`, merge, then publish a GitHub release tagged `vX.Y.Z`. The `release` workflow checks that the tag matches both versions, runs the tests, and publishes to PyPI and npm through trusted publishing, so no registry tokens are stored anywhere.
 
 ## Layout
 

@@ -1,0 +1,108 @@
+name: Release
+
+# Publishes the Python package to PyPI and the JavaScript package to npm when a
+# version tag is pushed (normally by publishing a GitHub release). Both registries
+# use trusted publishing: they accept this workflow's OIDC token, so the
+# repository holds no registry credentials.
+#
+# One-time setup on each registry (project settings, done once by the owner):
+#   PyPI  -> project speechready -> Publishing -> add GitHub publisher:
+#            owner berkerbatur, repository speechready, workflow release.yml, environment pypi
+#   npm   -> package speechready -> Settings -> Trusted publishing -> GitHub Actions:
+#            organization/user berkerbatur, repository speechready, workflow release.yml, environment npm
+#
+# Release steps: bump __version__ (python) and package.json version (js) to the same
+# number, add the CHANGELOG entry, merge, then `gh release create vX.Y.Z`.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: tag matches both packages, tests pass
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: js/package-lock.json
+      - id: v
+        name: Compare the tag with the package versions
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          py=$(python -c "import re,pathlib; print(re.search(r'__version__ = \"([^\"]+)\"', pathlib.Path('python/src/speechready/__init__.py').read_text()).group(1))")
+          js=$(node -p "require('./js/package.json').version")
+          echo "tag=$tag python=$py js=$js"
+          test "$tag" = "$py" && test "$tag" = "$js"
+          echo "version=$tag" >> "$GITHUB_OUTPUT"
+      - run: python -m pip install -e "python[dev]" -e eval
+      - run: pytest python eval
+      - run: npm ci && npm test
+        working-directory: js
+
+  pypi:
+    name: publish to PyPI
+    needs: check
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/speechready/${{ needs.check.outputs.version }}/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install build && python -m build --outdir dist python
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist
+
+  npm:
+    name: publish to npm
+    needs: check
+    runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/speechready/v/${{ needs.check.outputs.version }}
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"   # ships npm 11.5+, which trusted publishing needs
+          registry-url: https://registry.npmjs.org
+          cache: npm
+          cache-dependency-path: js/package-lock.json
+      - run: npm ci
+        working-directory: js
+      - run: npm publish --access public
+        working-directory: js
+
+  release-notes:
+    name: GitHub release
+    needs: [check, pypi, npm]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create the release if the tag was pushed without one
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 && exit 0
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes

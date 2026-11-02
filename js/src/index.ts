@@ -19,4 +19,4 @@ export { verbalize } from "./verbalize/index.js";
 import "./verbalize/en.js";
 import "./verbalize/tr.js";
 
-export const version = "0.1.0-dev.0";
+export { version } from "./version.js";

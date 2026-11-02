@@ -1,6 +1,6 @@
 {
   "name": "speechready",
-  "version": "0.1.0-dev.0",
+  "version": "0.1.0",
   "description": "Prepare text for text-to-speech: clean LLM output, verbalize ambiguous tokens, compile pauses to each provider's syntax, chunk under model limits.",
   "type": "module",
   "main": "./dist/index.js",

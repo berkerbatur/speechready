@@ -6,8 +6,6 @@ Prepare text for text-to-speech. See the [repository README](https://github.com/
 npm install speechready
 ```
 
-(`npm install speechready` still gives the 0.0.1 name placeholder until the first release. Until then: clone the repository, `cd js && npm ci && npm run build && npm link`.)
-
 ESM only, Node 20 or newer, no runtime dependencies. Type declarations are included. The provider profiles from `spec/profiles` are compiled into the package, so it also runs in a browser bundle.
 
 ## Usage
@@ -91,4 +89,4 @@ npm ci
 npm test        # builds, then runs every fixture in ../spec/fixtures plus the package tests
 ```
 
-`npm run build` regenerates `src/profiles/data.ts` from `../spec/profiles` and compiles to `dist/`. Both are build outputs and are not committed.
+`npm run build` regenerates `src/profiles/data.ts` from `../spec/profiles` and `src/version.ts` from `package.json`, then compiles to `dist/`. All three are build outputs and are not committed.

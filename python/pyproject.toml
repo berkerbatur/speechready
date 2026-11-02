@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "speechready"
-version = "0.1.0.dev0"
+dynamic = ["version"]
 description = "Prepare text for text-to-speech: clean LLM output, verbalize ambiguous tokens, compile pauses to each provider's syntax, chunk under model limits."
 readme = "README.md"
 license = "MIT"
@@ -13,7 +13,7 @@ dependencies = ["pyyaml>=6"]
 authors = [{ name = "Berker Batur" }]
 keywords = ["tts", "text-to-speech", "text-normalization", "ssml", "voice-agents"]
 classifiers = [
-  "Development Status :: 1 - Planning",
+  "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Topic :: Multimedia :: Sound/Audio :: Speech",
@@ -21,12 +21,18 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/berkerbatur/speechready"
+Documentation = "https://berkerbatur.github.io/speechready/"
+Changelog = "https://github.com/berkerbatur/speechready/blob/main/CHANGELOG.md"
+Issues = "https://github.com/berkerbatur/speechready/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.hatch.version]
+path = "src/speechready/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/speechready"]
