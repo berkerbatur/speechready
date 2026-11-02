@@ -1,6 +1,6 @@
 {
   "name": "speechready",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Prepare text for text-to-speech: clean LLM output, verbalize ambiguous tokens, compile pauses to each provider's syntax, chunk under model limits.",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,11 +17,27 @@
   },
   "license": "MIT",
   "author": "Berker Batur",
-  "repository": { "type": "git", "url": "git+https://github.com/berkerbatur/speechready.git", "directory": "js" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berkerbatur/speechready.git",
+    "directory": "js"
+  },
   "homepage": "https://github.com/berkerbatur/speechready",
-  "keywords": ["tts", "text-to-speech", "text-normalization", "ssml", "voice-agents"],
-  "files": ["dist", "README.md", "LICENSE"],
-  "engines": { "node": ">=20" },
+  "keywords": [
+    "tts",
+    "text-to-speech",
+    "text-normalization",
+    "ssml",
+    "voice-agents"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "node scripts/build-profiles.mjs && tsc -p tsconfig.json",
     "test": "npm run build && node --test test/spec.test.mjs test/package.test.mjs test/livekit.test.mjs",
