@@ -1,8 +1,8 @@
 name: Pages
 
 # Publishes docs/ (the listening page and the playground) to GitHub Pages.
-# The playground runs the Python package in the browser, so the job builds the
-# wheel from python/ and ships it next to the page.
+# The playground runs the JavaScript package in the browser, so the job builds
+# js/ and ships its dist/ next to the page as play/lib/.
 
 on:
   push:
@@ -23,15 +23,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-node@v4
         with:
-          python-version: "3.12"
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: js/package-lock.json
+      - run: npm ci && npm run build
+        working-directory: js
       - name: Assemble the site
         run: |
           mkdir -p _site
           cp -R docs/. _site/
-          python -m pip wheel ./python --no-deps -w _site/play
-          basename _site/play/*.whl > _site/play/wheel.txt
+          cp -R js/dist _site/play/lib
+          find _site/play/lib -name '*.d.ts' -delete
           git rev-parse --short HEAD > _site/play/commit.txt
       - uses: actions/configure-pages@v5
         with:
