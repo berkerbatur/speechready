@@ -2,7 +2,7 @@
 
 Both packages share one version number and one fixture corpus, so an entry here applies to Python and JavaScript alike unless it says otherwise.
 
-## Unreleased
+## 0.2.0 (2026-11-02)
 
 - **Voice agents:** `speechready.integrations.livekit.text_transform()` for LiveKit Agents' `tts_text_transforms`, `speechready.integrations.pipecat.text_transform()` for a Pipecat TTS service's `text_transforms`, and `speechready/livekit` for LiveKit's Node SDK. No framework dependency: each returns the plain callable the framework expects.
 - **Segmenter:** a fenced code block (``` or ~~~) is released as one piece once it closes, so a stream can drop or mention it instead of reading it line by line. New fixtures in `chunk-stream.yaml`.
