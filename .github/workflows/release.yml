@@ -44,7 +44,10 @@ jobs:
           py=$(python -c "import re,pathlib; print(re.search(r'__version__ = \"([^\"]+)\"', pathlib.Path('python/src/speechready/__init__.py').read_text()).group(1))")
           js=$(node -p "require('./js/package.json').version")
           echo "tag=$tag python=$py js=$js"
-          test "$tag" = "$py" && test "$tag" = "$js"
+          if [ "$tag" != "$py" ] || [ "$tag" != "$js" ]; then
+            echo "::error::tag v$tag does not match the package versions (python $py, js $js); bump both before tagging"
+            exit 1
+          fi
           echo "version=$tag" >> "$GITHUB_OUTPUT"
       - run: python -m pip install -e "python[dev]" -e eval
       - run: pytest python eval
