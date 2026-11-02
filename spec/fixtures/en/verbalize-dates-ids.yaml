@@ -50,3 +50,6 @@ cases:
   - id: number-sign-before-long-id
     input: "Order #48219930 shipped."
     expect: "Order number four eight two one nine nine three zero shipped."
+  - id: spaced-minus-in-an-equation
+    input: "Step 1: 72 - 32 = 40, range 10-20."
+    expect: "Step 1: 72 minus 32 = 40, range 10 to 20."

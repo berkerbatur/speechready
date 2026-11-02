@@ -52,6 +52,16 @@ Measured on 2026-10-30 with the harness in `eval/` (scorer updated 2026-11-02): 
 
 Every voice improved and the control prose did not regress. Cartesia's Turkish is the weakest result: its voice speaks Turkish with an English accent, so the transcription model misses words that were rendered correctly.
 
+**Held-out check.** The corpus above is mostly the fixture inputs the rules were written against, so on 2026-11-02 we added an independent set: 60 answers (30 English, 30 Turkish) that gpt-4.1-mini gave to typical voice-agent questions as a chat assistant, with no instruction about speech, generated after the rules were written and not edited. The same model wrote the narration a reader would speak for each answer in a separate call, and that narration is the reference for both recordings. Four voices (ElevenLabs, OpenAI, Azure, Google Chirp 3 HD), 240 pairs:
+
+| | Pairs | Misread as written | Misread with speechready | Mean WER as written | Mean WER with speechready |
+| --- | --- | --- | --- | --- | --- |
+| All | 240 | 10% | 8% | 0.058 | 0.061 |
+| English | 120 | 6% | 3% | 0.030 | 0.033 |
+| Turkish | 120 | 14% | 13% | 0.087 | 0.088 |
+
+32 pairs got better, 42 worse, 166 did not change. Of the 42 worse: 14 are code blocks that speechready drops by default while the narration kept the command (`code_blocks="keep"` or `"mention"` changes that); 8 are convention differences between the library and the narration (lira and kuruş against "virgül", "dokuzda beş" against "beş bölü dokuz"); 6 are two bugs this run found, fixed in the next release (a dotted Turkish time with a suffix, `14.00'teki`, and a spaced minus in an equation read as a range); 18 differ by a word or two of transcription noise. The reading: concise assistant answers contain few of the constructs the library targets, so on them it changes little either way. The gain in the tables above is on inputs that do contain markdown, prices, phone numbers, dates and code, which is where voice agents fail audibly. The corpus is in `eval/corpus/heldout.*.yaml`, `summary.md` reports it in its own section, and the numbers here are as measured before the two fixes.
+
 - **Listen:** [berkerbatur.github.io/speechready](https://berkerbatur.github.io/speechready/) plays the clearest before/after pairs for every voice, with what the speech-to-text model heard under each.
 - **Try your own text:** [berkerbatur.github.io/speechready/play](https://berkerbatur.github.io/speechready/play/) runs the JavaScript package in your browser (35 kB) and shows the output, the chunks and every rewrite. Nothing you type leaves the page.
 - **Reproduce:** `eval/README.md` explains the keys, the scorer and the commands. The results in this table are also in `eval/out/summary.md` after a run.
@@ -71,7 +81,7 @@ Everything a caller may want to decide differently is an `Options` field (code b
 
 ## Status
 
-Version 0.1.0 is on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready). Both packages have all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram. The Python package has been through the evaluation above; the TypeScript package passes the same 210 fixtures, so it produces the same text. Changes are listed in `CHANGELOG.md`. The public API may still move before 1.0; anything that does will be called out there.
+Version 0.3.0 is on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready). Both packages have all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram. The Python package has been through the evaluation above; the TypeScript package passes the same 217 fixtures, so it produces the same text. Changes are listed in `CHANGELOG.md`. The public API may still move before 1.0; anything that does will be called out there.
 
 ### Releasing
 

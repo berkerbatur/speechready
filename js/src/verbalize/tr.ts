@@ -72,7 +72,12 @@ function timeWords(hh: string, mm: string): string {
   return `${hour} ${mm[0] !== "0" ? cardinal(minute) : "sıfır " + cardinal(minute)}`;
 }
 
-const time = (m: Match): string => attach(timeWords(m[1], m[2]), group(m, 3) ?? "");
+function time(m: Match): string {
+  const suffix = group(m, 3) ?? "";
+  if (suffix && parseInt(m[2], 10) === 0) return attach(cardinal(parseInt(m[1], 10)), suffix); // 14.00'teki -> on dörtteki
+  return attach(timeWords(m[1], m[2]), suffix);
+}
+const minus = (m: Match): string => `${m[1]} eksi ${m[2]}`;
 const timeRange = (m: Match): string => `${timeWords(m[1], m[2])} ile ${timeWords(m[3], m[4])}`;
 
 const CURRENCY: Record<string, [string, string]> = {
@@ -196,6 +201,7 @@ export const RULES: Rule[] = [
   rule("verbalize.abbreviation", re(String.raw`(?<![${W}.])(${ABBR_ALTERNATION})\.(?![${LOWER}${UPPER}])`), abbreviation, "abbreviation read in full"),
   rule("verbalize.date.dmy", re(String.raw`${B}(\d{1,2})[./](\d{1,2})[./](\d{4}|\d{2})${B}${SUFFIX}`), dateDmy, "date read as day, month name, year"),
   rule("verbalize.date.iso", re(String.raw`${B}(\d{4})-(\d{2})-(\d{2})${B}${SUFFIX}`), dateIso, "ISO date read as day, month name, year"),
+  rule("verbalize.time.range", re(String.raw`${B}([01]?\d|2[0-3])[.:]([0-5]\d)\s?[-–]\s?([01]?\d|2[0-3])[.:]([0-5]\d)${B}(?![.,]\d)`), timeRange, "time range read with 'ile'"),
   rule(
     "verbalize.phone",
     re(String.raw`(?<![${W}.])((?:\+?\d{1,3}${SEP})?(?:\(\d{2,4}\)[ \-]?|\d{2,4}${SEP})(?:\d{2,4}${SEP}){1,4}\d{2,4})${SUFFIX}(?![${W}\-]|[.,]\d)`),
@@ -205,8 +211,10 @@ export const RULES: Rule[] = [
   rule("verbalize.number_sign", re(String.raw`#(?=\d)`), () => "numara ", "number sign read as a word"),
   rule("verbalize.acronym.foreign", re(String.raw`(?<![${W}'’.])[bcdfghjklmnpqrstvwxyz]{2,5}(?![${W}'’])`), foreignAcronym, "lowercase foreign acronym read with English letter names"),
   rule("verbalize.digits.long", re(String.raw`(?<![${W}.,])\d{7,}(?![${W}]|[.,]\d)`), (m) => digits(m[0]), "long digit string read digit by digit"),
-  rule("verbalize.time.range", re(String.raw`${B}([01]?\d|2[0-3]):([0-5]\d)\s?[-–]\s?([01]?\d|2[0-3]):([0-5]\d)${B}`), timeRange, "time range read with 'ile'"),
   rule("verbalize.time", re(String.raw`${B}([01]?\d|2[0-3]):([0-5]\d)${B}(?!:)${SUFFIX}`), time, "clock time read as hours and minutes"),
+  // Turkish also writes times with a dot (saat 14.00); taken as a time only after "saat" or with a suffix, since 22.22 may be a decimal
+  rule("verbalize.time.dotted", re(String.raw`(?:(?<=[Ss]aat )|(?=[0-2]?\d\.[0-5]\d${APOS}))${B}([01]?\d|2[0-3])\.([0-5]\d)${B}(?![.,]\d)${SUFFIX}`), time, "dotted clock time read as hours and minutes"),
+  rule("verbalize.minus", re(String.raw`(?<![${W}.,\-/:])(\d+(?:,\d+)?) - (\d+(?:,\d+)?)(?=\s*=)`), minus, "spaced minus in an equation read as 'eksi'"),
   rule("verbalize.currency.postfix", re(String.raw`(?<![${W}.,])(\d+(?:,\d+)?)\s?(bin|milyon|milyar)?\s?([₺$€£])${SUFFIX}(?![${W}])`), currencyPostfix, "currency symbol after the amount read as words"),
   rule("verbalize.currency", re(String.raw`([₺$€£])\s?(\d{1,3}(?:\.\d{3})*|\d+)(?:,(\d{1,2}))?${SUFFIX}(?![${W}]|[.,]\d)`), currencyPrefix, "currency amount read as words"),
   rule("verbalize.currency.code", re(String.raw`(?<![${W}.,])(\d{1,3}(?:\.\d{3})*|\d+)(?:,(\d{1,2}))?\s?(TL|TRY|USD|EUR|GBP)${B}${SUFFIX}`), currencySuffix, "currency code read as words"),

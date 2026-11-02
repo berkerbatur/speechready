@@ -67,12 +67,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--voice", action="append", default=[], help="provider:model:voice[:locale]; repeatable, replaces the defaults")
     ap.add_argument("--stt", default="whisper", choices=["whisper", "openai"])
     ap.add_argument("--limit", type=int, default=None, help="first N corpus lines per locale")
+    ap.add_argument("--ids", default=None, help="regex on line ids; only matching lines run (e.g. '^heldout\\.')")
     ap.add_argument("--dry-run", action="store_true", help="print what would be synthesized and exit")
     ap.add_argument("--redo", default=None, help="'changed' re-synthesizes every processed variant whose text the library now renders differently; otherwise a regex on line ids")
     args = ap.parse_args(argv)
 
     locales = tuple(args.locales.split(","))
     lines = [l for loc in locales for l in corpus.build((loc,), args.limit)]
+    if args.ids:
+        lines = [l for l in lines if re.search(args.ids, l.id)]
 
     voices: list[synth.Voice] = []
     if args.voice:

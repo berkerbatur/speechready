@@ -189,6 +189,10 @@ def _fraction(m: re.Match[str], locale: str) -> str | None:
     return f"{cardinal(num)} {one if num == 1 else many}"
 
 
+def _minus(m: re.Match[str], locale: str) -> str | None:
+    return f"{m.group(1)} minus {m.group(2)}"
+
+
 def _range(m: re.Match[str], locale: str) -> str | None:
     a, b = m.group(1), m.group(2)
     short = len(a.replace(".", "")) <= 3 and len(b.replace(".", "")) <= 3
@@ -278,6 +282,7 @@ RULES: list[Rule] = [
     Rule("verbalize.percent", re.compile(r"(?<![\w.])(\d+(?:\.\d+)?)\s?%|%\s?(\d+(?:\.\d+)?)"), lambda m, loc: f"{m.group(1) or m.group(2)} percent", "percent sign read as a word"),
     Rule("verbalize.unit", re.compile(rf"(?<![\w.])(\d+(?:\.\d+)?)\s?({_UNIT_ALTERNATION})(?![\w/])"), _unit, "unit abbreviation read as a word"),
     Rule("verbalize.fraction", re.compile(r"(?<![\d/])([1-9])/([2-9]|10)(?![\d/])"), _fraction, "fraction read as words"),
+    Rule("verbalize.minus", re.compile(r"(?<![\w.,\-/:])(\d+(?:\.\d+)?) - (\d+(?:\.\d+)?)(?=\s*=)"), _minus, "spaced minus in an equation read as 'minus'"),
     Rule("verbalize.range", re.compile(r"(?<![\w.,\-/:])(\d+(?:\.\d+)?)\s?[-–]\s?(\d+(?:\.\d+)?)(?![\w\-/:]|[.,]\d)"), _range, "number range read with 'to'"),
     Rule("verbalize.year", re.compile(r"\b(in|In|since|Since|by|from|until|till|before|after|during|circa|year|est\.|©)\s+(1[1-9]\d\d|20\d\d)\b(?![\w.,]?\d)"), _year_in_context, "year read as a year"),
     Rule("verbalize.decade", re.compile(r"\b(1[1-9]\d0|20\d0)s\b"), _decade, "decade read as a year"),

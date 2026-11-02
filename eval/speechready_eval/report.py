@@ -39,6 +39,16 @@ def load() -> list[dict]:
     return out
 
 
+HELDOUT = "heldout."
+
+
+def split(ps: list[tuple[dict, dict]]) -> tuple[list[tuple[dict, dict]], list[tuple[dict, dict]]]:
+    """(main corpus pairs, held-out pairs). The held-out LLM answers never enter the headline numbers."""
+    main = [p for p in ps if not p[0]["id"].startswith(HELDOUT)]
+    held = [p for p in ps if p[0]["id"].startswith(HELDOUT)]
+    return main, held
+
+
 def pairs(rows: list[dict]) -> list[tuple[dict, dict]]:
     """(raw, processed) for every line/voice with both variants."""
     by: dict[tuple, dict[str, dict]] = defaultdict(dict)
@@ -98,8 +108,20 @@ def _pct(x: int, n: int) -> str:
     return f"{100 * x / n:.0f}%" if n else "-"
 
 
-def markdown(ps: list[tuple[dict, dict]]) -> str:
+def markdown(all_pairs: list[tuple[dict, dict]]) -> str:
+    ps, held = split(all_pairs)
     out = ["# speechready evaluation\n", f"{len(ps)} line/voice pairs. A misread is WER above {MISREAD}.\n"]
+    if held:
+        out += [f"\n## Held-out LLM answers ({len(held)} pairs, not in the tables below)\n",
+                "Real assistant answers generated after the rules were written (`eval/corpus/heldout.*.yaml`), scored against a narration written independently of the library.\n",
+                "| Provider | Model | Locale | n | Misreads raw | Misreads processed | Mean WER raw | Mean WER processed | Better | Worse |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+        for (p, m, loc), s in sorted(by_provider(held).items(), key=lambda kv: (kv[0][0] != "all", kv[0])):
+            out.append(f"| {p} | {m} | {loc} | {s['n']} | {s['raw_misreads']} ({_pct(s['raw_misreads'], s['n'])}) | {s['proc_misreads']} ({_pct(s['proc_misreads'], s['n'])}) | {s['raw_wer']:.3f} | {s['proc_wer']:.3f} | {s['better']} | {s['worse']} |")
+        out += ["\n| Locale | Domain | n | Misreads raw | Misreads processed | Mean WER raw | Mean WER processed | Better | Worse |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+        for (p, loc, cls), s in sorted(by_class(held).items()):
+            if p == "all":
+                out.append(f"| {loc} | {cls} | {s['n']} | {s['raw_misreads']} | {s['proc_misreads']} | {s['raw_wer']:.3f} | {s['proc_wer']:.3f} | {s['better']} | {s['worse']} |")
+        out.append("")
     out += ["## Per provider\n", "| Provider | Model | Locale | n | Misreads raw | Misreads processed | Mean WER raw | Mean WER processed | Better | Worse |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for (p, m, loc), s in sorted(by_provider(ps).items(), key=lambda kv: (kv[0][0] != "all", kv[0])):
         out.append(f"| {p} | {m} | {loc} | {s['n']} | {s['raw_misreads']} ({_pct(s['raw_misreads'], s['n'])}) | {s['proc_misreads']} ({_pct(s['proc_misreads'], s['n'])}) | {s['raw_wer']:.3f} | {s['proc_wer']:.3f} | {s['better']} | {s['worse']} |")

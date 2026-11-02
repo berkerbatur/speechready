@@ -79,8 +79,14 @@ def _time_words(hh: str, mm: str) -> str:
 
 
 def _time(m: re.Match[str], locale: str) -> str | None:
-    words = _time_words(m.group(1), m.group(2))
-    return attach(words, m.group(3) or "")
+    suffix = m.group(3) or ""
+    if suffix and int(m.group(2)) == 0:
+        return attach(cardinal(int(m.group(1))), suffix)  # 14.00'teki -> on dörtteki, as the writer harmonised it
+    return attach(_time_words(m.group(1), m.group(2)), suffix)
+
+
+def _minus(m: re.Match[str], locale: str) -> str | None:
+    return f"{m.group(1)} eksi {m.group(2)}"
 
 
 def _time_range(m: re.Match[str], locale: str) -> str | None:
@@ -228,6 +234,7 @@ RULES: list[Rule] = [
     Rule("verbalize.abbreviation", re.compile(rf"(?<![\w.])({_ABBR_ALTERNATION})\.(?![{_LOWER}{_UPPER}])"), _abbreviation, "abbreviation read in full"),
     Rule("verbalize.date.dmy", re.compile(rf"\b(\d{{1,2}})[./](\d{{1,2}})[./](\d{{4}}|\d{{2}})\b{_SUFFIX}"), _date_dmy, "date read as day, month name, year"),
     Rule("verbalize.date.iso", re.compile(rf"\b(\d{{4}})-(\d{{2}})-(\d{{2}})\b{_SUFFIX}"), _date_iso, "ISO date read as day, month name, year"),
+    Rule("verbalize.time.range", re.compile(r"\b([01]?\d|2[0-3])[.:]([0-5]\d)\s?[-–]\s?([01]?\d|2[0-3])[.:]([0-5]\d)\b(?![.,]\d)"), _time_range, "time range read with 'ile'"),
     Rule(
         "verbalize.phone",
         re.compile(rf"(?<![\w.])((?:\+?\d{{1,3}}{_SEP})?(?:\(\d{{2,4}}\)[ \-]?|\d{{2,4}}{_SEP})(?:\d{{2,4}}{_SEP}){{1,4}}\d{{2,4}}){_SUFFIX}(?![\w\-]|[.,]\d)"),
@@ -237,8 +244,10 @@ RULES: list[Rule] = [
     Rule("verbalize.number_sign", re.compile(r"#(?=\d)"), lambda m, loc: "numara ", "number sign read as a word"),
     Rule("verbalize.acronym.foreign", re.compile(r"(?<![\w'’.])[bcdfghjklmnpqrstvwxyz]{2,5}(?![\w'’])"), _foreign_acronym, "lowercase foreign acronym read with English letter names"),
     Rule("verbalize.digits.long", re.compile(r"(?<![\w.,])\d{7,}(?![\w]|[.,]\d)"), lambda m, loc: digits(m.group(0)), "long digit string read digit by digit"),
-    Rule("verbalize.time.range", re.compile(r"\b([01]?\d|2[0-3]):([0-5]\d)\s?[-–]\s?([01]?\d|2[0-3]):([0-5]\d)\b"), _time_range, "time range read with 'ile'"),
     Rule("verbalize.time", re.compile(rf"\b([01]?\d|2[0-3]):([0-5]\d)\b(?!:){_SUFFIX}"), _time, "clock time read as hours and minutes"),
+    # Turkish also writes times with a dot (saat 14.00); taken as a time only after "saat" or with a suffix, since 22.22 may be a decimal
+    Rule("verbalize.time.dotted", re.compile(rf"(?:(?<=[Ss]aat )|(?=[0-2]?\d\.[0-5]\d{_APOS}))\b([01]?\d|2[0-3])\.([0-5]\d)\b(?![.,]\d){_SUFFIX}"), _time, "dotted clock time read as hours and minutes"),
+    Rule("verbalize.minus", re.compile(r"(?<![\w.,\-/:])(\d+(?:,\d+)?) - (\d+(?:,\d+)?)(?=\s*=)"), _minus, "spaced minus in an equation read as 'eksi'"),
     Rule("verbalize.currency.postfix", re.compile(rf"(?<![\w.,])(\d+(?:,\d+)?)\s?(bin|milyon|milyar)?\s?([₺$€£]){_SUFFIX}(?![\w])"), _currency_postfix, "currency symbol after the amount read as words"),
     Rule("verbalize.currency", re.compile(rf"([₺$€£])\s?(\d{{1,3}}(?:\.\d{{3}})*|\d+)(?:,(\d{{1,2}}))?{_SUFFIX}(?![\w]|[.,]\d)"), _currency_prefix, "currency amount read as words"),
     Rule("verbalize.currency.code", re.compile(rf"(?<![\w.,])(\d{{1,3}}(?:\.\d{{3}})*|\d+)(?:,(\d{{1,2}}))?\s?(TL|TRY|USD|EUR|GBP)\b{_SUFFIX}"), _currency_suffix, "currency code read as words"),

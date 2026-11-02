@@ -57,7 +57,7 @@ def main(argv=None) -> int:
     ap.add_argument("--per-voice", type=int, default=3)
     ap.add_argument("--site", default=None, help="also write a standalone copy (page + audio) into this folder")
     args = ap.parse_args(argv)
-    ps = report.pairs(report.load())
+    ps, _ = report.split(report.pairs(report.load()))  # the listening page shows the main corpus only
     chosen = pick(ps, args.per_voice)
     SHOW.mkdir(parents=True, exist_ok=True)
     if (SHOW / "audio").exists():

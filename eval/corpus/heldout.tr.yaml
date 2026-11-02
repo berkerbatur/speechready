@@ -1,0 +1,156 @@
+# Held-out corpus: 30 answers from gpt-4.1-mini to user turns written for a voice agent,
+# generated 2026-11-02 by speechready_eval.heldout, unedited. `input` is the model's
+# answer as a chat assistant; `intended` is the narration the same model wrote for it in a
+# separate call (numbers in words, no markdown, links by domain, code blocks skipped).
+locale: tr-TR
+cases:
+- id: support-1
+  cls: heldout/support
+  question: Siparişim 10 gündür gelmedi, ne yapabilirim?
+  input: Siparişinizin durumunu kontrol etmek için öncelikle kargo takip numaranızla kargo firmasının web sitesini ziyaret edin. Eğer kargo hareketi yoksa veya gecikme varsa, satıcı ile iletişime geçerek durumu bildirin. Gerekirse müşteri hizmetlerinden destek talep edebilirsiniz.
+  intended: Siparişinizin durumunu kontrol etmek için öncelikle kargo takip numaranızla kargo firmasının web sitesini ziyaret edin. Eğer kargo hareketi yoksa veya gecikme varsa, satıcı ile iletişime geçerek durumu bildirin. Gerekirse müşteri hizmetlerinden destek talep edebilirsiniz.
+- id: support-2
+  cls: heldout/support
+  question: Eski e-postama erişimim yok, şifremi nasıl sıfırlarım?
+  input: Eski e-posta hesabınızın şifresini sıfırlamak için öncelikle o e-posta servisinin "Şifremi Unuttum" veya "Parola Sıfırlama" sayfasına gidin. Kayıtlı telefon numaranız veya alternatif e-posta adresiniz varsa, doğrulama kodu ile sıfırlama yapabilirsiniz. Eğer bu bilgilere erişiminiz yoksa, servis sağlayıcının destek ekibiyle iletişime geçmeniz gerekir.
+  intended: Eski e-posta hesabınızın şifresini sıfırlamak için öncelikle o e-posta servisinin Şifremi Unuttum veya Parola Sıfırlama sayfasına gidin. Kayıtlı telefon numaranız veya alternatif e-posta adresiniz varsa, doğrulama kodu ile sıfırlama yapabilirsiniz. Eğer bu bilgilere erişiminiz yoksa, servis sağlayıcının destek ekibiyle iletişime geçmeniz gerekir.
+- id: support-3
+  cls: heldout/support
+  question: Dün iptal ettiğim abonelik için iade koşullarını özetler misin?
+  input: İptal ettiğiniz abonelik için iade koşulları genellikle satın alma tarihinden itibaren belirli bir süre içinde geçerlidir. İade talebiniz, abonelik süresinin tamamlanmamış olması durumunda değerlendirilir. Kesin koşullar ve süreler için hizmet sağlayıcının iade politikası sayfasını incelemenizi öneririm.
+  intended: İptal ettiğiniz abonelik için iade koşulları genellikle satın alma tarihinden itibaren belirli bir süre içinde geçerlidir. İade talebiniz, abonelik süresinin tamamlanmamış olması durumunda değerlendirilir. Kesin koşullar ve süreler için hizmet sağlayıcının iade politikası sayfasını incelemenizi öneririm.
+- id: banking-1
+  cls: heldout/banking
+  question: Vadeli hesapta brüt faizle net faiz arasındaki fark ne?
+  input: Vadeli hesapta brüt faiz, vergi ve kesintiler yapılmadan önceki toplam faiz tutarıdır. Net faiz ise brüt faizden vergi, stopaj gibi kesintiler çıkarıldıktan sonra hesabınıza yatan gerçek faiz miktarıdır. Genellikle net faiz, brüt faizden daha düşüktür.
+  intended: Vadeli hesapta brüt faiz vergi ve kesintiler yapılmadan önceki toplam faiz tutarıdır. Net faiz ise brüt faizden vergi stopaj gibi kesintiler çıkarıldıktan sonra hesabınıza yatan gerçek faiz miktarıdır. Genellikle net faiz brüt faizden daha düşüktür.
+- id: banking-2
+  cls: heldout/banking
+  question: Kartımdan aynı şey için iki kez 399,90 TL çekildi. Nasıl itiraz ederim?
+  input: Kartınızdan aynı tutarın iki kez çekilmesi durumunda, öncelikle bankanızın müşteri hizmetlerini arayarak durumu bildirin. Ardından, işlem itiraz formu doldurarak veya bankanızın mobil uygulaması üzerinden itiraz talebinde bulunabilirsiniz. İşlemin detaylarını ve tarihlerini belirtmek itiraz sürecini hızlandırır.
+  intended: Kartınızdan aynı tutarın iki kez çekilmesi durumunda, öncelikle bankanızın müşteri hizmetlerini arayarak durumu bildirin. Ardından, işlem itiraz formu doldurarak veya bankanızın mobil uygulaması üzerinden itiraz talebinde bulunabilirsiniz. İşlemin detaylarını ve tarihlerini belirtmek itiraz sürecini hızlandırır.
+- id: banking-3
+  cls: heldout/banking
+  question: Yurt dışına havale ne kadar sürer ve ücreti ne kadar olur?
+  input: Yurt dışına havale genellikle 1-5 iş günü sürer, ancak gönderilen ülke ve banka süreçlerine göre değişebilir. Ücretler ise bankaya, tutara ve havale yöntemine bağlı olarak farklılık gösterir; genellikle sabit bir ücret veya %0.5-3 arasında komisyon alınır. Daha net bilgi için bankanızla iletişime geçmeniz faydalı olur.
+  intended: Yurt dışına havale genellikle bir ile beş iş günü sürer ancak gönderilen ülke ve banka süreçlerine göre değişebilir Ücretler ise bankaya tutara ve havale yöntemine bağlı olarak farklılık gösterir genellikle sabit bir ücret veya yüzde sıfır virgül beş ile üç arasında komisyon alınır Daha net bilgi için bankanızla iletişime geçmeniz faydalı olur
+- id: scheduling-1
+  cls: heldout/scheduling
+  question: Gelecek hafta Berlin'deki bir müşteriyle 45 dakikalık bir görüşme için uygun bir saat öner, ben Ankara'dayım.
+  input: Ankara ve Berlin arasında 1 saatlik bir zaman farkı var (Berlin, Ankara'dan 1 saat geride). Berlin'deki mesai saatleri genellikle 09:00-17:00 arasıdır. Örneğin, Berlin saatiyle 10:00 veya 14:00 uygun olabilir; Ankara saatiyle 11:00 veya 15:00 olur. Bu saatler her iki taraf için de uygundur.
+  intended: Ankara ve Berlin arasında bir saatlik bir zaman farkı var Berlin Ankara dan bir saat geride Berlin deki mesai saatleri genellikle dokuz sıfır sıfır on yedi sıfır sıfır arasıdır Örneğin Berlin saatiyle on sıfır sıfır veya on dört sıfır sıfır uygun olabilir Ankara saatiyle on bir sıfır sıfır veya on beş sıfır sıfır olur Bu saatler her iki taraf için de uygundur
+- id: scheduling-2
+  cls: heldout/scheduling
+  question: 3 Mart saat 9.30'daki diş hekimi randevum için ne hazırlamalıyım, hatırlat.
+  input: 3 Mart saat 9.30'daki diş hekimi randevunuz için kimlik kartınızı, varsa önceki diş tedavi kayıtlarınızı ve günlük kullandığınız ilaçları hazırlayın. Randevudan önce dişlerinizi fırçalamayı unutmayın. Randevudan birkaç dakika önce orada olmaya çalışın.
+  intended: Üç Mart saat dokuz buçuktaki diş hekimi randevunuz için kimlik kartınızı, varsa önceki diş tedavi kayıtlarınızı ve günlük kullandığınız ilaçları hazırlayın. Randevudan önce dişlerinizi fırçalamayı unutmayın. Randevudan birkaç dakika önce orada olmaya çalışın.
+- id: scheduling-3
+  cls: heldout/scheduling
+  question: Perşembe 14.00'teki toplantıyı cuma sabahına almam lazım. Katılımcılara kısa bir mesaj yaz.
+  input: Merhaba, Perşembe 14.00'teki toplantımızı Cuma sabahına ertelemek zorundayız. Yeni saat ve detayları en kısa sürede paylaşacağım. Anlayışınız için teşekkürler.
+  intended: Merhaba Perşembe saat ondörtteki toplantımızı Cuma sabahına ertelemek zorundayız Yeni saat ve detayları en kısa sürede paylaşacağım Anlayışınız için teşekkürler
+- id: travel-1
+  cls: heldout/travel
+  question: İstanbul Havalimanı'ndan Taksim'e toplu taşımayla nasıl giderim, yaklaşık ne kadar tutar?
+  input: İstanbul Havalimanı'ndan Taksim'e otobüsle gitmek için Havaist servislerini kullanabilirsiniz. Havaist otobüsleri doğrudan Taksim'e sefer yapar ve yolculuk yaklaşık 1 saat sürer. Ücret genellikle 30-35 TL civarındadır. Ayrıca, metrobüse aktarma yaparak da ulaşım sağlayabilirsiniz.
+  intended: İstanbul Havalimanı'ndan Taksim'e otobüsle gitmek için Havaist servislerini kullanabilirsiniz. Havaist otobüsleri doğrudan Taksim'e sefer yapar ve yolculuk yaklaşık bir saat sürer. Ücret genellikle otuz ile otuz beş Türk lirası civarındadır. Ayrıca, metrobüse aktarma yaparak da ulaşım sağlayabilirsiniz.
+- id: travel-2
+  cls: heldout/travel
+  question: Almanya'ya ilk kez gidiyorum, bahşiş konusunda ne bilmeliyim?
+  input: Almanya'da bahşiş genellikle fiş tutarının %5-10'u arasında verilir. Restoranlarda hesabı öderken genellikle toplam tutarı yuvarlayarak veya küçük bir miktar ekleyerek bahşiş bırakılır. Hizmet kalitesi iyi ise 1-2 Euro eklemek yaygındır. Taksi ve kuaför gibi yerlerde de benzer şekilde ufak bahşişler verilebilir.
+  intended: Almanya'da bahşiş genellikle fiş tutarının yüzde beş ile on u arasında verilir. Restoranlarda hesabı öderken genellikle toplam tutarı yuvarlayarak veya küçük bir miktar ekleyerek bahşiş bırakılır. Hizmet kalitesi iyi ise bir ile iki Euro eklemek yaygındır. Taksi ve kuaför gibi yerlerde de benzer şekilde ufak bahşişler verilebilir.
+- id: travel-3
+  cls: heldout/travel
+  question: Uçağım 3 saat rötarlı. Yolcu haklarıma göre neye hakkım var?
+  input: 3 saat ve üzeri rötarlarda yolcu haklarınız havayolu ve uçuş mesafesine göre değişir. Genellikle ücretsiz ikram, iletişim imkanları ve gerektiğinde konaklama sağlanır. Ayrıca, bazı durumlarda tazminat talep etme hakkınız olabilir. Detaylı bilgi için havayolu şirketi ile iletişime geçmeniz faydalı olur.
+  intended: Üç saat ve üzeri rötarlarda yolcu haklarınız havayolu ve uçuş mesafesine göre değişir. Genellikle ücretsiz ikram, iletişim imkanları ve gerektiğinde konaklama sağlanır. Ayrıca, bazı durumlarda tazminat talep etme hakkınız olabilir. Detaylı bilgi için havayolu şirketi ile iletişime geçmeniz faydalı olur.
+- id: tech-1
+  cls: heldout/tech
+  question: Python betiğim requests için ModuleNotFoundError veriyor. Nasıl düzeltirim?
+  input: 'Bu hata, `requests` modülünün yüklü olmadığını gösterir. Terminal veya komut istemcisinde şu komutu çalıştırarak modülü yükleyebilirsiniz: `pip install requests`. Eğer sanal ortam kullanıyorsanız, aktif olduğundan emin olun. Yükleme sonrası betiğinizi tekrar çalıştırmayı deneyin.'
+  intended: 'Bu hata requests modülünün yüklü olmadığını gösterir. Terminal veya komut istemcisinde şu komutu çalıştırarak modülü yükleyebilirsiniz: pip install requests. Eğer sanal ortam kullanıyorsanız, aktif olduğundan emin olun. Yükleme sonrası betiğinizi tekrar çalıştırmayı deneyin.'
+- id: tech-2
+  cls: heldout/tech
+  question: macOS'ta 8080 portunu hangi işlemin kullandığını nasıl bulurum?
+  input: "macOS'ta 8080 portunu kullanan işlemi bulmak için Terminal'de şu komutu kullanabilirsin:  \n```bash\nlsof -i :8080\n```  \nBu komut, 8080 numaralı portu dinleyen işlemi ve PID'sini gösterir. Alternatif olarak,  \n```bash\nsudo lsof -nP -iTCP:8080 -sTCP:LISTEN\n```  \nkomutunu da kullanabilirsin."
+  intended: macos'ta sekiz bin seksen portunu kullanan işlemi bulmak için terminalde şu komutu kullanabilirsin lsof eksi i iki nokta sekiz bin seksen bu komut sekiz bin seksen numaralı portu dinleyen işlemi ve pid'sini gösterir alternatif olarak sudo lsof eksi n p eksi i tcp iki nokta sekiz bin seksen eksi s tcp iki nokta listen komutunu da kullanabilirsin
+- id: tech-3
+  cls: heldout/tech
+  question: Linux'ta bir yedekleme betiğini her gece 02.00'de çalıştırmanın en basit yolu ne?
+  input: "En basit yol, `cron` servisini kullanmaktır. `crontab -e` komutuyla crontab dosyasını açıp şu satırı ekleyebilirsiniz:  \n`0 2 * * * /path/to/backup_script.sh`  \nBu şekilde betiğiniz her gece saat 02:00'de otomatik çalışır."
+  intended: "En basit yol cron servisini kullanmaktır. crontab e komutuyla crontab dosyasını açıp şu satırı ekleyebilirsiniz:  \nsıfır iki yıldız yıldız yıldız slash path slash to slash backup script dot sh  \nBu şekilde betiğiniz her gece saat iki sıfır sıfır de otomatik çalışır."
+- id: education-1
+  cls: heldout/education
+  question: Fotosentezi 12 yaşındaki bir çocuğa birkaç cümleyle anlat.
+  input: Fotosentez, bitkilerin güneş ışığını kullanarak su ve havadaki karbondioksitten yiyecek (şeker) yapma sürecidir. Bitkiler bunu yaparken oksijen de üretirler, bu da bizim solunum yapmamızı sağlar. Yani bitkiler hem yiyecek hem de oksijen üretir!
+  intended: Fotosentez bitkilerin güneş ışığını kullanarak su ve havadaki karbondioksitten yiyecek şeker yapma sürecidir Bitkiler bunu yaparken oksijen de üretirler bu da bizim solunum yapmamızı sağlar Yani bitkiler hem yiyecek hem de oksijen üretir
+- id: education-2
+  cls: heldout/education
+  question: Pisagor teoremi nedir, bir çözümlü örnek ver.
+  input: 'Pisagor teoremi, dik üçgende hipotenüsün karesinin, diğer iki kenarın kareleri toplamına eşit olduğunu söyler: \(c^2 = a^2 + b^2\). Örnek: Kenarları 3 ve 4 birim olan dik üçgende hipotenüs \(c = \sqrt{3^2 + 4^2} = \sqrt{9 + 16} = 5\) birimdir.'
+  intended: 'Pisagor teoremi, dik üçgende hipotenüsün karesinin, diğer iki kenarın kareleri toplamına eşit olduğunu söyler: c kare eşittir a kare artı b kare. Örnek: Kenarları üç ve dört birim olan dik üçgende hipotenüs c eşittir karekök üç kare artı dört kare eşittir karekök dokuz artı on altı eşittir beş birimdir.'
+- id: education-3
+  cls: heldout/education
+  question: 72 Fahrenheit kaç santigrat derece, adım adım göster.
+  input: "72 Fahrenheit'ı Santigrat'a çevirmek için formül:  \n°C = (°F - 32) × 5/9  \nAdım 1: 72 - 32 = 40  \nAdım 2: 40 × 5/9 ≈ 22.22  \nSonuç: 72°F ≈ 22.22°C."
+  intended: "Yetmiş iki Fahrenheit'ı Santigrat'a çevirmek için formül:  \nSantigrat derece eşittir parantez Fahrenheit derece eksi otuz iki parantez kapat çarpı beş bölü dokuz  \nAdım bir: yetmiş iki eksi otuz iki eşittir kırk  \nAdım iki: kırk çarpı beş bölü dokuz yaklaşık yirmi iki virgül yirmi iki  \nSonuç: yetmiş iki Fahrenheit derece yaklaşık yirmi iki virgül yirmi iki Santigrat derece."
+- id: health-1
+  cls: heldout/health
+  question: Bir yetişkin günde yaklaşık ne kadar su içmeli?
+  input: Bir yetişkinin günde ortalama 2-3 litre (8-12 bardak) su içmesi önerilir. Bu miktar kişinin yaşına, kilosuna, aktivite düzeyine ve hava koşullarına göre değişebilir. Vücudun susuz kalmaması için düzenli su tüketimi önemlidir.
+  intended: Bir yetişkinin günde ortalama iki üç litre sekiz on iki bardak su içmesi önerilir. Bu miktar kişinin yaşına kilosuna aktivite düzeyine ve hava koşullarına göre değişebilir. Vücudun susuz kalmaması için düzenli su tüketimi önemlidir.
+- id: health-2
+  cls: heldout/health
+  question: Normal dinlenme nabzı kaçtır, ne zaman endişelenmeliyim?
+  input: Normal dinlenme nabzı genellikle dakikada 60-100 atış arasındadır. Düzenli olarak nabzınız bu aralığın dışında seyrediyorsa, özellikle çok düşük (<60) veya çok yüksek (>100) ise, özellikle çarpıntı, baş dönmesi veya nefes darlığı gibi belirtiler varsa bir doktora başvurmalısınız.
+  intended: Normal dinlenme nabzı genellikle dakikada altmış ile yüz atış arasındadır. Düzenli olarak nabzınız bu aralığın dışında seyrediyorsa, özellikle çok düşük altmışdan az veya çok yüksek yüzden fazla ise, özellikle çarpıntı, baş dönmesi veya nefes darlığı gibi belirtiler varsa bir doktora başvurmalısınız.
+- id: health-3
+  cls: heldout/health
+  question: Diş fırçamı ne sıklıkla değiştirmeliyim, neden?
+  input: Diş fırçanızı genellikle 3 ayda bir değiştirmeniz önerilir. Çünkü kıllar zamanla aşınır, etkili temizlik yapamaz ve bakteriler birikebilir. Ayrıca hastalık sonrası fırça değiştirmek hijyen açısından faydalıdır.
+  intended: Diş fırçanızı genellikle üç ayda bir değiştirmeniz önerilir. Çünkü kıllar zamanla aşınır, etkili temizlik yapamaz ve bakteriler birikebilir. Ayrıca hastalık sonrası fırça değiştirmek hijyen açısından faydalıdır.
+- id: shopping-1
+  cls: heldout/shopping
+  question: 'Hangisi daha hesaplı: 3 tanesi 100 TL mi, yoksa tanesi 45 TL''ye yüzde 25 indirim mi?'
+  input: 3 tanesi 100 TL ise tanesi yaklaşık 33,33 TL olur. Tanesi 45 TL olan üründe yüzde 25 indirimle fiyat 33,75 TL olur. Yani 3 tanesi 100 TL seçeneği biraz daha hesaplıdır.
+  intended: Üç tanesi yüz Türk lirası ise tanesi yaklaşık otuz üç virgül otuz üç Türk lirası olur. Tanesi kırk beş Türk lirası olan üründe yüzde yirmi beş indirimle fiyat otuz üç virgül yetmiş beş Türk lirası olur. Yani üç tanesi yüz Türk lirası seçeneği biraz daha hesaplıdır.
+- id: shopping-2
+  cls: heldout/shopping
+  question: Video düzenleme için 60.000 TL altı bir dizüstü arıyorum. En çok hangi özellikler önemli?
+  input: Video düzenleme için işlemci (CPU) gücü, RAM kapasitesi (en az 16 GB önerilir), hızlı ve geniş depolama (SSD tercihen 512 GB ve üzeri) ile güçlü bir grafik kartı (NVIDIA GTX/RTX serisi ya da eşdeğeri) en önemli özelliklerdir. Ekran kalitesi ve renk doğruluğu da işinizi kolaylaştırır. 60.000 TL altında bu özellikleri dengeli sunan modelleri araştırabilirsiniz.
+  intended: Video düzenleme için işlemci CPU gücü RAM kapasitesi en az on altı gigabayt önerilir hızlı ve geniş depolama SSD tercihen beş yüz on iki gigabayt ve üzeri ile güçlü bir grafik kartı NVIDIA GTX slash RTX serisi ya da eşdeğeri en önemli özelliklerdir Ekran kalitesi ve renk doğruluğu da işinizi kolaylaştırır Altmış bin Türk lirası altında bu özellikleri dengeli sunan modelleri araştırabilirsiniz
+- id: shopping-3
+  cls: heldout/shopping
+  question: Kasım indirimleri ne zaman başlıyor ve kargo kaç günde gelir?
+  input: Kasım indirimleri genellikle Kasım ayının ilk haftasında başlar. Kargo süresi satıcıya ve bölgeye bağlı olarak değişir, genellikle 2-7 iş günü arasında teslim edilir. Sipariş verdiğiniz platformdan kesin teslimat bilgisi alabilirsiniz.
+  intended: Kasım indirimleri genellikle Kasım ayının ilk haftasında başlar. Kargo süresi satıcıya ve bölgeye bağlı olarak değişir, genellikle iki ile yedi iş günü arasında teslim edilir. Sipariş verdiğiniz platformdan kesin teslimat bilgisi alabilirsiniz.
+- id: billing-1
+  cls: heldout/billing
+  question: Elektrik faturam bu ay 800 TL'den 1.400 TL'ye çıktı. Sebebi ne olabilir?
+  input: 'Elektrik faturasının artmasının birkaç nedeni olabilir: Tüketimin artması, tarifelerde zam yapılması, eski veya arızalı cihazların fazla enerji harcaması veya sayaç hatası gibi. Öncelikle geçen ayki tüketimle bu ayki tüketimi karşılaştırın. Ayrıca elektrik tedarikçinizle iletişime geçip fatura detaylarını kontrol ettirmeniz faydalı olur.'
+  intended: Elektrik faturasının artmasının birkaç nedeni olabilir Tüketimin artması tarifelerde zam yapılması eski veya arızalı cihazların fazla enerji harcaması veya sayaç hatası gibi Öncelikle geçen ayki tüketimle bu ayki tüketimi karşılaştırın Ayrıca elektrik tedarikçinizle iletişime geçip fatura detaylarını kontrol ettirmeniz faydalı olur
+- id: billing-2
+  cls: heldout/billing
+  question: İnternet faturamdaki kullanım bölümünü nasıl okurum?
+  input: İnternet faturandaki kullanım bölümünde genellikle kullanılan veri miktarı, tarifen dahilindeki kullanım ve ekstra kullanılan veri miktarı yer alır. Tarife kapsamında ne kadar internet hakkın olduğu ve ne kadarını kullandığın belirtilir. Ekstra kullanım varsa, bunun ücretlendirmesi de gösterilir. Faturadaki tarih aralığına dikkat ederek hangi döneme ait kullanım olduğunu kontrol edebilirsin.
+  intended: İnternet faturandaki kullanım bölümünde genellikle kullanılan veri miktarı, tarifen dahilindeki kullanım ve ekstra kullanılan veri miktarı yer alır. Tarife kapsamında ne kadar internet hakkın olduğu ve ne kadarını kullandığın belirtilir. Ekstra kullanım varsa, bunun ücretlendirmesi de gösterilir. Faturadaki tarih aralığına dikkat ederek hangi döneme ait kullanım olduğunu kontrol edebilirsin.
+- id: billing-3
+  cls: heldout/billing
+  question: Kıst ücret nedir, kısa bir örnekle açıklar mısın?
+  input: Kıst ücret, çalışanın bir ayın tamamında değil, ayın belirli bir kısmında çalışması durumunda o süreye denk gelen maaşının hesaplanmasıdır. Örneğin, aylık 3000 TL alan biri ayın 10 günü çalıştıysa, kıst ücreti 3000 ÷ 30 × 10 = 1000 TL olur. Böylece sadece çalışılan gün kadar ücret ödenir.
+  intended: Kıst ücret çalışanın bir ayın tamamında değil ayın belirli bir kısmında çalışması durumunda o süreye denk gelen maaşının hesaplanmasıdır. Örneğin aylık üç bin Türk lirası alan biri ayın on günü çalıştıysa kıst ücreti üç bin bölü otuz çarpı on eşittir bin Türk lirası olur. Böylece sadece çalışılan gün kadar ücret ödenir.
+- id: local-1
+  cls: heldout/local
+  question: Ankara'da kasım ayında hava genelde nasıl olur?
+  input: Ankara'da Kasım ayında hava genellikle serin ve yağışlıdır. Ortalama sıcaklık 5-12°C arasında değişir. Akşamları ise hava daha soğuk olabilir, mont veya kalın giyinmek faydalı olur.
+  intended: Ankara'da Kasım ayında hava genellikle serin ve yağışlıdır. Ortalama sıcaklık beş ile on iki derece arasında değişir. Akşamları ise hava daha soğuk olabilir, mont veya kalın giyinmek faydalı olur.
+- id: local-2
+  cls: heldout/local
+  question: Nöbetçi eczaneyi nasıl bulurum, eczaneler pazar günü kaçta kapanır?
+  input: Nöbetçi eczaneyi, eczane nöbetçi bilgisi sunan mobil uygulamalar veya Sağlık Bakanlığı'nın web sitesi üzerinden öğrenebilirsiniz. Pazar günleri eczaneler genellikle saat 12:00 veya 13:00 civarında kapanır, ancak nöbetçi eczaneler 24 saat hizmet verir. Bölgenize göre değişiklik gösterebileceği için güncel bilgiyi kontrol etmeniz faydalı olur.
+  intended: Nöbetçi eczaneyi, eczane nöbetçi bilgisi sunan mobil uygulamalar veya Sağlık Bakanlığı'nın web sitesi üzerinden öğrenebilirsiniz. Pazar günleri eczaneler genellikle saat on iki veya on üç civarında kapanır, ancak nöbetçi eczaneler yirmi dört saat hizmet verir. Bölgenize göre değişiklik gösterebileceği için güncel bilgiyi kontrol etmeniz faydalı olur.
+- id: local-3
+  cls: heldout/local
+  question: Bir günde İstanbul'da görülecek yerleri iki cümleyle özetle.
+  input: İstanbul'da bir gün içinde Sultanahmet Camii, Ayasofya ve Topkapı Sarayı gibi tarihi mekanları gezebilir, ardından Boğaz turu yaparak şehrin eşsiz manzarasının tadını çıkarabilirsiniz. Ayrıca Kapalıçarşı'da alışveriş yaparak kültürel deneyiminizi tamamlayabilirsiniz.
+  intended: İstanbul'da bir gün içinde Sultanahmet Camii Ayasofya ve Topkapı Sarayı gibi tarihi mekanları gezebilir ardından Boğaz turu yaparak şehrin eşsiz manzarasının tadını çıkarabilirsiniz Ayrıca Kapalıçarşı'da alışveriş yaparak kültürel deneyiminizi tamamlayabilirsiniz
