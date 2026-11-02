@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>speechready Playground</title>
-<meta name="description" content="Paste text, pick a voice provider, and see what speechready would send to it. The Python package runs in your browser.">
+<meta name="description" content="Paste text, pick a voice provider, and see what speechready would send to it. The npm package runs in your browser.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 :root{
@@ -57,7 +57,7 @@ td code{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding
 
 <div class="wrap">
   <h1>What would the voice get?</h1>
-  <p class="lede">Paste what your app is about to send to text-to-speech. The right side is what <code>speechready.prepare</code> hands the provider instead, with every rewrite listed. The Python package runs here in your browser; nothing you type leaves the page. <a href="../">Hear the difference on real voices.</a></p>
+  <p class="lede">Paste what your app is about to send to text-to-speech. The right side is what <code>speechready.prepare</code> hands the provider instead, with every rewrite listed. The same package that ships on npm runs here in your browser; nothing you type leaves the page. <a href="../">Hear the difference on real voices.</a></p>
 
   <div class="controls">
     <label>Language
@@ -117,7 +117,7 @@ td code{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding
     </section>
     <section class="panel">
       <div class="eyebrow">What speechready sends</div>
-      <div class="status" id="status"><span class="dot"></span><span>Loading the Python runtime (about 10 MB, cached after the first visit)…</span></div>
+      <div class="status" id="status"><span class="dot"></span><span>Loading speechready…</span></div>
       <pre class="out" id="output"></pre>
       <div class="meta" id="profile"></div>
     </section>
@@ -137,12 +137,11 @@ td code{font-family:var(--mono);font-size:13px;background:var(--code-bg);padding
   <p class="foot">
     Source and fixtures: <a href="https://github.com/berkerbatur/speechready">github.com/berkerbatur/speechready</a>. Install the same code with
     <code>pip install speechready</code> or <code>npm install speechready</code>.
-    Built from commit <span id="commit">…</span>.
+    This page runs speechready <span id="version">…</span> for JavaScript, built from commit <span id="commit">…</span>; the Python package gives the same output for the same text.
   </p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
-<script>
+<script type="module">
 const SAMPLES = {
   "en-US": {
     "LLM answer": "Here's what I found:\n\n## Summary\n1. **Install** with `pip install speechready`.\n2. Read the docs at https://speechready.dev/docs.\n\n> Note: this is a *preview* 🚀",
@@ -160,7 +159,7 @@ const SAMPLES = {
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let runner = null;
+let lib = null;
 let timer = null;
 
 function renderSamples() {
@@ -177,45 +176,27 @@ function setStatus(text, cls) {
 function schedule() { clearTimeout(timer); timer = setTimeout(run, 150); }
 
 function run() {
-  if (!runner) return;
+  if (!lib) return;
+  const model = $('model').value.trim() || null;
   const options = {
     code_blocks: $('code_blocks').value, list_numbers: $('list_numbers').value,
     fractions: $('fractions').value, urls: $('urls').value,
   };
   let res;
   try {
-    res = JSON.parse(runner($('input').value, $('provider').value, $('model').value.trim(), $('locale').value, JSON.stringify(options)));
+    res = lib.prepare($('input').value, { provider: $('provider').value || null, model, locale: $('locale').value, options });
   } catch (e) {
-    setStatus(String(e).split('\n').slice(-2).join(' '), 'err');
+    setStatus(e && e.message ? e.message : String(e), 'err');
     return;
   }
-  if (res.error) { setStatus(res.error, 'err'); return; }
+  const limit = res.profile.limitFor(model);
   setStatus(`${res.changes.length} rewrite${res.changes.length === 1 ? '' : 's'}, ${res.chunks.length} chunk${res.chunks.length === 1 ? '' : 's'}`, 'ok');
   $('output').textContent = res.text;
-  $('profile').textContent = `Profile ${res.profile.id}: ${res.profile.syntax} output, ` + (res.profile.limit ? `${res.profile.limit} ${res.profile.unit} per request` : 'no request limit') + '.';
+  $('profile').textContent = `Profile ${res.profile.id}: ${res.profile.syntax} output, ` + (limit ? `${limit} ${res.profile.limitUnit} per request` : 'no request limit') + '.';
   $('chunks').innerHTML = res.chunks.map(c => `<div class="chunk">${esc(c)}</div>`).join('') || '<div class="meta">Nothing to send.</div>';
   const rows = res.changes.map(c => `<tr><td class="rule">${esc(c.rule)}</td><td><code class="del">${esc(c.before) || '&nbsp;'}</code></td><td><code class="ins">${esc(c.after) || '&nbsp;'}</code></td><td>${esc(c.note)}</td></tr>`);
   $('changes').querySelector('tbody').innerHTML = rows.join('') || '<tr><td colspan="4" class="meta">No rewrites: the text was already safe to speak.</td></tr>';
 }
-
-const PY = `
-import json, traceback
-from speechready import Options, prepare
-
-def run(text, provider, model, locale, options_json):
-    try:
-        opts = Options(**json.loads(options_json))
-        r = prepare(text, provider=provider or None, model=model or None, locale=locale, options=opts)
-        p = r.profile
-        return json.dumps({
-            "text": r.text, "chunks": list(r.chunks),
-            "changes": [{"rule": c.rule, "before": c.before, "after": c.after, "note": c.note} for c in r.changes],
-            "profile": {"id": p.id, "syntax": p.syntax, "limit": p.limit_for(model or None), "unit": p.limit_unit},
-        }, ensure_ascii=False)
-    except Exception as exc:
-        return json.dumps({"error": f"{type(exc).__name__}: {exc}"})
-run
-`;
 
 async function boot() {
   renderSamples();
@@ -223,18 +204,14 @@ async function boot() {
   ['locale', 'provider', 'code_blocks', 'list_numbers', 'fractions', 'urls'].forEach(id => $(id).addEventListener('change', () => { if (id === 'locale') { renderSamples(); $('input').value = Object.values(SAMPLES[$('locale').value])[0]; } schedule(); }));
   $('model').addEventListener('input', schedule);
   $('input').addEventListener('input', schedule);
+  fetch('commit.txt').then(r => r.ok ? r.text() : '').then(t => { $('commit').textContent = (t || 'main').trim(); }).catch(() => {});
   try {
-    fetch('commit.txt').then(r => r.ok ? r.text() : '').then(t => { $('commit').textContent = (t || 'main').trim(); }).catch(() => {});
-    const pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/' });
-    setStatus('Installing speechready…');
-    await pyodide.loadPackage(['pyyaml', 'micropip']);
-    const wheel = (await (await fetch('wheel.txt')).text()).trim();
-    if (!wheel) throw new Error('wheel.txt is empty; the Pages build did not ship the package');
-    await pyodide.pyimport('micropip').install(new URL(wheel, location.href).href);
-    runner = pyodide.runPython(PY);
+    // The Pages build compiles js/ and ships dist/ here as lib/, so this is the npm package at the same commit.
+    lib = await import('./lib/index.js');
+    $('version').textContent = lib.version;
     run();
   } catch (e) {
-    setStatus('Could not start: ' + String(e).split('\n')[0], 'err');
+    setStatus('Could not load speechready: ' + (e && e.message ? e.message : String(e)), 'err');
   }
 }
 boot();

@@ -53,7 +53,7 @@ Measured on 2026-10-30 with the harness in `eval/`: 145 lines of English and Tur
 Every voice improved and the control prose did not regress. Cartesia's Turkish is the weakest result: its voice speaks Turkish with an English accent, so the transcription model misses words that were rendered correctly.
 
 - **Listen:** [berkerbatur.github.io/speechready](https://berkerbatur.github.io/speechready/) plays the clearest before/after pairs for every voice, with what the speech-to-text model heard under each.
-- **Try your own text:** [berkerbatur.github.io/speechready/play](https://berkerbatur.github.io/speechready/play/) runs the Python package in your browser and shows the output, the chunks and every rewrite. Nothing you type leaves the page.
+- **Try your own text:** [berkerbatur.github.io/speechready/play](https://berkerbatur.github.io/speechready/play/) runs the JavaScript package in your browser (35 kB) and shows the output, the chunks and every rewrite. Nothing you type leaves the page.
 - **Reproduce:** `eval/README.md` explains the keys, the scorer and the commands. The results in this table are also in `eval/out/summary.md` after a run.
 
 ## Try it
