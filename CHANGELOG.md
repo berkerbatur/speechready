@@ -2,6 +2,10 @@
 
 Both packages share one version number and one fixture corpus, so an entry here applies to Python and JavaScript alike unless it says otherwise.
 
+## Unreleased
+
+- **Evaluation scorer:** a Turkish acronym the speech-to-text wrote as letters (`NPM`) now matches the English letter names speechready writes out (`en pi em`); `25°C`, `™` and `&` are scored as the words every voice says; a Turkish `3.` before a lowercase word is the ordinal. These were scorer artefacts, not misreads, and they applied to both sides. Re-scored on the same recordings: misreads fell from 32% to 8% overall (English 29% to 7%, Turkish 37% to 10%), previously reported as 33% to 10%.
+
 ## 0.2.0 (2026-11-02)
 
 - **Voice agents:** `speechready.integrations.livekit.text_transform()` for LiveKit Agents' `tts_text_transforms`, `speechready.integrations.pipecat.text_transform()` for a Pipecat TTS service's `text_transforms`, and `speechready/livekit` for LiveKit's Node SDK. No framework dependency: each returns the plain callable the framework expects.

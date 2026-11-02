@@ -30,25 +30,25 @@ The same call with `provider="openai"` renders the pause as punctuation and chun
 
 ## Does it help?
 
-Measured on 2026-10-30 with the harness in `eval/`: 145 lines of English and Turkish (LLM answers, markdown, dates, phone numbers, prices, URLs, identifiers, plus control prose that should pass untouched), 16 voices across 7 providers. Every line was synthesized twice, as written and after `prepare`, and both recordings were transcribed back with OpenAI gpt-4o-transcribe. A misread is a transcript that differs from the intended words by more than a fifth.
+Measured on 2026-10-30 with the harness in `eval/` (scorer updated 2026-11-02): 145 lines of English and Turkish (LLM answers, markdown, dates, phone numbers, prices, URLs, identifiers, plus control prose that should pass untouched), 16 voices across 7 providers. Every line was synthesized twice, as written and after `prepare`, and both recordings were transcribed back with OpenAI gpt-4o-transcribe. A misread is a transcript that differs from the intended words by more than a fifth.
 
 | | Line/voice pairs | Misread as written | Misread with speechready |
 | --- | --- | --- | --- |
-| All | 1180 | 33% | 10% |
-| English | 774 | 30% | 8% |
-| Turkish | 406 | 39% | 13% |
+| All | 1180 | 32% | 8% |
+| English | 774 | 29% | 7% |
+| Turkish | 406 | 37% | 10% |
 
 | Provider | Model | Pairs | As written | With speechready |
 | --- | --- | --- | --- | --- |
-| ElevenLabs | eleven_multilingual_v2 | 144 | 42% | 9% |
-| OpenAI | gpt-4o-mini-tts | 144 | 33% | 7% |
-| Azure AI Speech | neural | 144 | 28% | 8% |
-| Google Cloud TTS | Chirp 3 HD | 144 | 35% | 8% |
-| Google Cloud TTS | Neural2 (en) / WaveNet (tr) | 144 | 32% | 8% |
-| Amazon Polly | neural | 144 | 28% | 9% |
-| Amazon Polly | generative (en) | 86 | 31% | 8% |
-| Cartesia | sonic-3.6 | 144 | 35% | 18% |
-| Deepgram | aura-2 (en) | 86 | 31% | 12% |
+| ElevenLabs | eleven_multilingual_v2 | 144 | 41% | 8% |
+| OpenAI | gpt-4o-mini-tts | 144 | 33% | 6% |
+| Azure AI Speech | neural | 144 | 27% | 6% |
+| Google Cloud TTS | Chirp 3 HD | 144 | 34% | 6% |
+| Google Cloud TTS | Neural2 (en) / WaveNet (tr) | 144 | 31% | 6% |
+| Amazon Polly | neural | 144 | 26% | 8% |
+| Amazon Polly | generative (en) | 86 | 30% | 6% |
+| Cartesia | sonic-3.6 | 144 | 33% | 16% |
+| Deepgram | aura-2 (en) | 86 | 30% | 9% |
 
 Every voice improved and the control prose did not regress. Cartesia's Turkish is the weakest result: its voice speaks Turkish with an English accent, so the transcription model misses words that were rendered correctly.
 

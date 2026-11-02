@@ -10,6 +10,12 @@ writes what it heard in its own written conventions ("2026", "9AM", "21st",
   spelled (AB12X9 -> a b 1 2 x 9), on both sides;
 - every digit run is expanded as a cardinal, digit by digit, or as a year,
   and the combination with the fewest errors counts;
+- symbols the voices read as words become those words (25°C degrees Celsius,
+  ™ trademark, & and / ve), and a Turkish "3." before a lowercase word is the
+  ordinal "üçüncü", as every voice reads it;
+- in Turkish, a short acronym the STT wrote as letters (NPM, npm, SQL) is also
+  tried with the English letter names speechready writes out ("en pi em"),
+  since the voices say exactly that and the STT writes the acronym back;
 - as one more candidate, the whole hypothesis is run through speechready's
   own verbalizer, which covers ordinals, decades, dates and currency formats.
 
@@ -24,20 +30,25 @@ import re
 import unicodedata
 
 from speechready.verbalize import numbers_en, numbers_tr, verbalize
+from speechready.verbalize.tr import _EN_LETTERS  # the table the Turkish verbalizer spells foreign acronyms with
 
 _TAG = re.compile(r"<[^>]+>|\[[^\]]+\]")
 _PUNCT = re.compile(r"[^\w\s']", re.UNICODE)
 _DIGITS = re.compile(r"\d+")
 _MAX_COMBOS = 64
+_ACRONYM = re.compile(r"\b([A-Z]{2,5}|[bcdfghjklmnpqrstvwxyz]{2,5})\b")  # what the Turkish verbalizer spells with English letter names
 
 _SYMBOLS = {
     "en": [(r"\+(?=\s?\d)", " plus "), (r"(\d)\s?%", r"\1 percent "), (r"%\s?(\d)", r"percent \1"),
            (r"\$\s?(\d[\d,]*(?:\.\d+)?)", r"\1 dollars "), (r"€\s?(\d[\d,]*(?:\.\d+)?)", r"\1 euros "), (r"£\s?(\d[\d,]*(?:\.\d+)?)", r"\1 pounds "),
-           (r"(\d+)\s*[-–]\s*(\d+)", r"\1 to \2"), (r"\b(\d{1,2}):00\b", r"\1")],
+           (r"(\d+)\s*[-–]\s*(\d+)", r"\1 to \2"), (r"\b(\d{1,2}):00\b", r"\1"),
+           (r"(\d)\s?°\s?C\b", r"\1 degrees celsius "), (r"(\d)\s?°\s?F\b", r"\1 degrees fahrenheit "), (r"°", " degrees "),
+           (r"™", " trademark "), (r"®", " registered "), (r"&", " and ")],
     "tr": [(r"\+(?=\s?\d)", " artı "), (r"%\s?(\d)", r"yüzde \1"), (r"(\d)\s?%", r"yüzde \1"),
            (r"\bTL\b", " lira "), (r"\btürk lirası\b", " lira "), (r"₺\s?(\d[\d.]*(?:,\d+)?)", r"\1 lira "),
            (r"\$\s?(\d[\d.]*(?:,\d+)?)", r"\1 dolar "), (r"€\s?(\d[\d.]*(?:,\d+)?)", r"\1 avro "),
-           (r"(\d+)\s*[-–]\s*(\d+)", r"\1 ila \2"), (r"\b(\d{1,2}):00\b", r"\1")],
+           (r"(\d+)\s*[-–]\s*(\d+)", r"\1 ila \2"), (r"\b(\d{1,2}):00\b", r"\1"),
+           (r"(\d)\s?°\s?C\b", r"\1 derece "), (r"°", " derece "), (r"™", " trademark "), (r"®", " registered "), (r"&", " ve ")],
 }
 
 
@@ -49,15 +60,22 @@ def _num_words(locale: str):
     return numbers_tr if _lang(locale) == "tr" else numbers_en
 
 
-def _pre(text: str, locale: str) -> str:
-    """Everything before digit expansion: shared by both sides."""
+def _pre(text: str, locale: str, letter_names: bool = False) -> str:
+    """Everything before digit expansion: shared by both sides.
+
+    `letter_names` (Turkish only) rewrites short acronyms with the English letter
+    names the verbalizer uses; `candidates` tries the hypothesis both ways.
+    """
     lang = _lang(locale)
     text = unicodedata.normalize("NFC", text)
     text = _TAG.sub(" ", text)
-    text = text.replace("’", "'")
+    text = text.replace("’", "'").replace("&amp;", "&")
     if lang == "tr":
         text = re.sub(r"(?<=\d)\.(?=\d{3}\b)", "", text)  # 1.250 -> 1250
         text = re.sub(r"(?<=\d),(?=\d)", " virgül ", text)  # 3,14 -> 3 virgül 14
+        text = re.sub(r"\b(\d{1,3})\.(?=\s+[a-zçğıöşü])", lambda m: numbers_tr.ordinal(int(m.group(1))), text)  # "3. madde" -> üçüncü madde
+        if letter_names:
+            text = _ACRONYM.sub(lambda m: " ".join(_EN_LETTERS[ch] for ch in m.group(1).lower()), text)  # NPM / npm -> en pi em
     else:
         text = re.sub(r"(?<=\d),(?=\d{3}\b)", "", text)  # 1,250 -> 1250
         text = re.sub(r"(?<=\d)\.(?=\d)", " point ", text)  # 3.14 -> 3 point 14
@@ -99,7 +117,23 @@ def normalize(text: str, locale: str = "en-US", digits_mode: str = "cardinal") -
 
 def candidates(hypothesis: str, locale: str) -> list[list[str]]:
     """Every reading of the hypothesis worth scoring."""
-    pre = _pre(hypothesis, locale)
+    pres = [_pre(hypothesis, locale)]
+    if _lang(locale) == "tr":
+        alt = _pre(hypothesis, locale, letter_names=True)
+        if alt != pres[0]:
+            pres.append(alt)
+    outs: list[list[str]] = []
+    for pre in pres:
+        outs.extend(_readings(pre, locale))
+    try:
+        outs.append(normalize(verbalize(hypothesis, locale), locale))
+    except Exception:  # noqa: BLE001 - the verbalizer is a convenience here, never a failure
+        pass
+    return outs
+
+
+def _readings(pre: str, locale: str) -> list[list[str]]:
+    """Every digit expansion of one pre-normalized text."""
     runs = _DIGITS.findall(pre)
     alts = [_expansions(n, locale) for n in runs]
     outs: list[list[str]] = []
@@ -112,12 +146,10 @@ def candidates(hypothesis: str, locale: str) -> list[list[str]]:
             text = parts[0] + "".join(w + parts[k + 1] for k, w in enumerate(combo))
             outs.append(text.replace("-", " ").split())
     else:
-        outs.append(normalize(hypothesis, locale, "cardinal"))
-        outs.append(normalize(hypothesis, locale, "digits"))
-    try:
-        outs.append(normalize(verbalize(hypothesis, locale), locale))
-    except Exception:  # noqa: BLE001 - the verbalizer is a convenience here, never a failure
-        pass
+        mod = _num_words(locale)
+        for mode in ("cardinal", "digits"):
+            expanded = _DIGITS.sub(lambda m: mod.digits(m.group(0)) if mode == "digits" or len(m.group(0)) > 15 else mod.cardinal(int(m.group(0))), pre)
+            outs.append(expanded.replace("-", " ").split())
     return outs
 
 
