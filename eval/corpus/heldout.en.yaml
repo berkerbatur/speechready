@@ -1,0 +1,235 @@
+# Held-out corpus: 30 answers from gpt-4.1-mini to user turns written for a voice agent,
+# generated 2026-11-02 by speechready_eval.heldout, unedited. `input` is the model's
+# answer as a chat assistant; `intended` is the narration the same model wrote for it in a
+# separate call (numbers in words, no markdown, links by domain, code blocks skipped).
+locale: en-US
+cases:
+- id: support-1
+  cls: heldout/support
+  question: My order hasn't arrived yet, it's been 10 days. What can I do?
+  input: I'm sorry to hear your order hasn't arrived. Please check the tracking information provided by the seller to see the current status. If there’s no update or it shows delivered but you haven't received it, contact the seller or customer service for assistance and possible refund or replacement. Let me know if you need help drafting a message to them!
+  intended: I'm sorry to hear your order hasn't arrived. Please check the tracking information provided by the seller to see the current status. If there’s no update or it shows delivered but you haven't received it, contact the seller or customer service for assistance and possible refund or replacement. Let me know if you need help drafting a message to them!
+- id: support-2
+  cls: heldout/support
+  question: How do I reset my password if I no longer have access to my old email?
+  input: 'If you no longer have access to your old email, try the following steps to reset your password: 1) Use any alternative recovery options provided, such as a phone number or security questions. 2) Contact the service''s customer support directly and explain your situation; they may verify your identity through other means. 3) Check if the service allows account recovery via linked accounts (like social media). Each platform has different procedures, so refer to their official help or support pages for specific guidance.'
+  intended: 'If you no longer have access to your old email, try the following steps to reset your password: one, use any alternative recovery options provided, such as a phone number or security questions. Two, contact the service''s customer support directly and explain your situation; they may verify your identity through other means. Three, check if the service allows account recovery via linked accounts, like social media. Each platform has different procedures, so refer to their official help or support pages for specific guidance.'
+- id: support-3
+  cls: heldout/support
+  question: Can you summarize your refund policy for a subscription I cancelled yesterday?
+  input: Sure! Typically, if you cancel a subscription, you will continue to have access until the end of the current billing period, but no further charges will be made. Refunds for the current period are usually not provided unless stated otherwise in the policy. For specific details, please check the refund section of the subscription service you used or provide the service name, and I can give you more tailored information.
+  intended: Sure! Typically, if you cancel a subscription, you will continue to have access until the end of the current billing period, but no further charges will be made. Refunds for the current period are usually not provided unless stated otherwise in the policy. For specific details, please check the refund section of the subscription service you used or provide the service name, and I can give you more tailored information.
+- id: banking-1
+  cls: heldout/banking
+  question: What's the difference between APR and APY on a savings account?
+  input: APR (Annual Percentage Rate) represents the yearly interest rate without compounding, showing the simple interest earned. APY (Annual Percentage Yield) includes the effect of compounding interest, reflecting the actual annual return on your savings. In short, APY gives a more accurate picture of how much you'll earn in a year because it accounts for interest-on-interest growth.
+  intended: APR, Annual Percentage Rate, represents the yearly interest rate without compounding, showing the simple interest earned. APY, Annual Percentage Yield, includes the effect of compounding interest, reflecting the actual annual return on your savings. In short, APY gives a more accurate picture of how much you'll earn in a year because it accounts for interest-on-interest growth.
+- id: banking-2
+  cls: heldout/banking
+  question: I was charged $39.99 twice for the same thing. How do I dispute it?
+  input: To dispute the double charge, first contact the merchant where the purchase was made and explain the issue. If they can't resolve it, reach out to your bank or credit card company to report the duplicate charge and request a dispute. Be sure to have your transaction details and receipts handy for reference.
+  intended: To dispute the double charge, first contact the merchant where the purchase was made and explain the issue. If they can't resolve it, reach out to your bank or credit card company to report the duplicate charge and request a dispute. Be sure to have your transaction details and receipts handy for reference.
+- id: banking-3
+  cls: heldout/banking
+  question: How long does an international wire transfer usually take and what does it cost?
+  input: International wire transfers typically take 1 to 5 business days to complete, depending on the banks involved, the countries, and the currencies. Costs vary widely but usually range from $15 to $50 per transfer, plus possible fees for currency conversion. Some banks and services may offer faster options at higher fees. It's best to check with your bank for specific timing and cost details.
+  intended: International wire transfers typically take one to five business days to complete, depending on the banks involved, the countries, and the currencies. Costs vary widely but usually range from fifteen dollars to fifty dollars per transfer, plus possible fees for currency conversion. Some banks and services may offer faster options at higher fees. It's best to check with your bank for specific timing and cost details.
+- id: scheduling-1
+  cls: heldout/scheduling
+  question: Can you suggest a time for a 45-minute call next week with someone in Tokyo if I'm in New York?
+  input: Tokyo is 13 to 14 hours ahead of New York, depending on daylight saving time. A good time for a 45-minute call could be around 8:00 PM in New York, which would be 9:00 or 10:00 AM the next day in Tokyo. This time frame is convenient as it falls within typical working hours for Tokyo and early evening for New York. Would you like me to suggest specific dates?
+  intended: Tokyo is thirteen to fourteen hours ahead of New York, depending on daylight saving time. A good time for a forty-five minute call could be around eight PM in New York, which would be nine or ten AM the next day in Tokyo. This time frame is convenient as it falls within typical working hours for Tokyo and early evening for New York. Would you like me to suggest specific dates?
+- id: scheduling-2
+  cls: heldout/scheduling
+  question: Remind me what I need to prepare for a dentist appointment on March 3rd at 9:30.
+  input: For your dentist appointment on March 3rd at 9:30, make sure to bring your insurance card, a list of any current medications, and your ID. Arrive a few minutes early to complete any necessary paperwork. Also, avoid eating or drinking anything sugary right before the appointment, and bring any questions or concerns you want to discuss with the dentist.
+  intended: For your dentist appointment on March third at nine thirty, make sure to bring your insurance card, a list of any current medications, and your ID. Arrive a few minutes early to complete any necessary paperwork. Also, avoid eating or drinking anything sugary right before the appointment, and bring any questions or concerns you want to discuss with the dentist.
+- id: scheduling-3
+  cls: heldout/scheduling
+  question: I need to move my 2pm Thursday meeting to Friday morning. Draft a short message to the attendees.
+  input: "Sure! Here’s a concise message you can use:\n\n---\n\nHi everyone,  \nPlease note that our 2pm meeting on Thursday has been rescheduled to Friday morning. I will send the exact time shortly. Thanks for your flexibility!  \n\nBest,  \n[Your Name]"
+  intended: "Sure! Here’s a concise message you can use:\n\nHi everyone,  \nPlease note that our two p m meeting on Thursday has been rescheduled to Friday morning. I will send the exact time shortly. Thanks for your flexibility!  \n\nBest,  \n[Your Name]"
+- id: travel-1
+  cls: heldout/travel
+  question: How do I get from JFK to Manhattan by public transport, and roughly how much does it cost?
+  input: To get from JFK Airport to Manhattan by public transport, you can take the AirTrain JFK to either the Howard Beach station or the Jamaica station. From Howard Beach, transfer to the A subway line to Manhattan; from Jamaica, transfer to the E subway line to Manhattan. The AirTrain costs $8, and a subway ride costs $2.90, so the total fare is about $10.90. The trip usually takes around 45-60 minutes depending on your final destination in Manhattan.
+  intended: To get from JFK Airport to Manhattan by public transport, you can take the AirTrain JFK to either the Howard Beach station or the Jamaica station. From Howard Beach, transfer to the A subway line to Manhattan; from Jamaica, transfer to the E subway line to Manhattan. The AirTrain costs eight dollars, and a subway ride costs two dollars and ninety cents, so the total fare is about ten dollars and ninety cents. The trip usually takes around forty-five to sixty minutes depending on your final destination in Manhattan.
+- id: travel-2
+  cls: heldout/travel
+  question: What should I know about tipping in Turkey as a tourist?
+  input: In Turkey, tipping (known as "bahşiş") is appreciated but not always mandatory. In restaurants, it’s customary to leave around 5-10% of the bill if service is not included. For cafes or smaller eateries, rounding up the bill or leaving small change is common. Tipping hotel staff, taxi drivers, and tour guides is also welcomed but usually modest. Overall, tips are seen as a gesture of gratitude for good service.
+  intended: In Turkey, tipping, known as bahshish, is appreciated but not always mandatory. In restaurants, it’s customary to leave around five to ten percent of the bill if service is not included. For cafes or smaller eateries, rounding up the bill or leaving small change is common. Tipping hotel staff, taxi drivers, and tour guides is also welcomed but usually modest. Overall, tips are seen as a gesture of gratitude for good service.
+- id: travel-3
+  cls: heldout/travel
+  question: My flight is delayed 3 hours. What am I entitled to under EU rules?
+  input: Under EU Regulation 261/2004, if your flight is delayed by 3 hours or more and the flight is within the EU or operated by an EU airline, you may be entitled to compensation ranging from €250 to €600, depending on the flight distance. Additionally, the airline must provide you with assistance such as meals, refreshments, and communication (e.g., phone calls or emails) during the delay. If the delay extends overnight, they should also offer accommodation. Compensation may not apply if the delay was caused by extraordinary circumstances beyond the airline's control.
+  intended: Under EU Regulation two six one slash two thousand four, if your flight is delayed by three hours or more and the flight is within the EU or operated by an EU airline, you may be entitled to compensation ranging from two hundred fifty euros to six hundred euros, depending on the flight distance. Additionally, the airline must provide you with assistance such as meals, refreshments, and communication, for example, phone calls or emails, during the delay. If the delay extends overnight, they should also offer accommodation. Compensation may not apply if the delay was caused by extraordinary circumstances beyond the airline's control.
+- id: tech-1
+  cls: heldout/tech
+  question: My Python script says ModuleNotFoundError for requests. How do I fix it?
+  input: 'The error means the `requests` library is not installed in your Python environment. You can fix it by installing the package using pip. Run this command in your terminal or command prompt:
+
+
+    ```
+
+    pip install requests
+
+    ```
+
+
+    If you have multiple Python versions, you might need to use `pip3` instead:
+
+
+    ```
+
+    pip3 install requests
+
+    ```
+
+
+    After installation, try running your script again.'
+  intended: 'The error means the requests library is not installed in your Python environment. You can fix it by installing the package using pip. Run this command in your terminal or command prompt: pip install requests. If you have multiple Python versions, you might need to use pip three instead: pip three install requests. After installation, try running your script again.'
+- id: tech-2
+  cls: heldout/tech
+  question: Give me a quick way to find which process is using port 8080 on macOS.
+  input: 'You can quickly find the process using port 8080 on macOS by running this command in the Terminal:
+
+
+    ```bash
+
+    lsof -i :8080
+
+    ```
+
+
+    This will list the process ID (PID) and name of the process occupying that port.'
+  intended: 'You can quickly find the process using port eight thousand eighty on macOS by running this command in the Terminal: lsof dash i colon eight thousand eighty. This will list the process ID, PID, and name of the process occupying that port.'
+- id: tech-3
+  cls: heldout/tech
+  question: What's the simplest way to schedule a backup script to run every night at 2am on Linux?
+  input: 'The simplest way is to use cron. Run `crontab -e` and add this line to schedule your backup script at 2 AM daily:
+
+
+    ```
+
+    0 2 * * * /path/to/your/backup_script.sh
+
+    ```
+
+
+    Make sure your script is executable (`chmod +x /path/to/your/backup_script.sh`). Cron will then run it every night at 2 AM.'
+  intended: 'The simplest way is to use cron. Run crontab dash e and add this line to schedule your backup script at two A M daily: zero two asterisk asterisk asterisk slash path slash to slash your slash backup underscore script dot sh. Make sure your script is executable, chmod plus x slash path slash to slash your slash backup underscore script dot sh. Cron will then run it every night at two A M.'
+- id: education-1
+  cls: heldout/education
+  question: Explain photosynthesis to a 12-year-old in a few sentences.
+  input: Photosynthesis is how plants make their own food using sunlight. They take in sunlight, water from the soil, and a gas called carbon dioxide from the air. Using these, they make sugar, which is their food, and release oxygen for us to breathe. It's like the plant's way of cooking using sunlight!
+  intended: Photosynthesis is how plants make their own food using sunlight. They take in sunlight, water from the soil, and a gas called carbon dioxide from the air. Using these, they make sugar, which is their food, and release oxygen for us to breathe. It's like the plant's way of cooking using sunlight!
+- id: education-2
+  cls: heldout/education
+  question: What's the Pythagorean theorem and give me one worked example.
+  input: 'The Pythagorean theorem states that in a right-angled triangle, the square of the length of the hypotenuse (the side opposite the right angle) is equal to the sum of the squares of the lengths of the other two sides. Mathematically, it’s \(a^2 + b^2 = c^2\).
+
+
+    Example: If one side is 3 units and the other side is 4 units, the hypotenuse is found by:
+
+    \(3^2 + 4^2 = c^2\)
+
+    \(9 + 16 = c^2\)
+
+    \(25 = c^2\)
+
+    So, \(c = 5\) units.'
+  intended: 'The Pythagorean theorem states that in a right-angled triangle, the square of the length of the hypotenuse, the side opposite the right angle, is equal to the sum of the squares of the lengths of the other two sides. Mathematically, it’s a squared plus b squared equals c squared.
+
+
+    Example: If one side is three units and the other side is four units, the hypotenuse is found by: three squared plus four squared equals c squared, nine plus sixteen equals c squared, twenty-five equals c squared. So, c equals five units.'
+- id: education-3
+  cls: heldout/education
+  question: How do I convert 72 degrees Fahrenheit to Celsius, step by step?
+  input: 'To convert 72°F to Celsius, follow these steps:
+
+
+    1. Subtract 32 from the Fahrenheit temperature: 72 - 32 = 40.
+
+    2. Multiply the result by 5/9: 40 × (5/9) = 22.22.
+
+
+    So, 72°F is approximately 22.22°C.'
+  intended: 'To convert seventy-two degrees Fahrenheit to Celsius, follow these steps:
+
+
+    One. Subtract thirty-two from the Fahrenheit temperature: seventy-two minus thirty-two equals forty.
+
+
+    Two. Multiply the result by five ninths: forty times five ninths equals twenty-two point two two.
+
+
+    So, seventy-two degrees Fahrenheit is approximately twenty-two point two two degrees Celsius.'
+- id: health-1
+  cls: heldout/health
+  question: How much water should an adult drink per day, roughly?
+  input: An average adult should aim to drink about 2 to 3 liters (8 to 12 cups) of water per day. This amount can vary based on factors like activity level, climate, and overall health. It's also important to consider water obtained from food and other beverages. Listening to your body's thirst signals is a good way to stay hydrated.
+  intended: An average adult should aim to drink about two to three liters, eight to twelve cups, of water per day. This amount can vary based on factors like activity level, climate, and overall health. It's also important to consider water obtained from food and other beverages. Listening to your body's thirst signals is a good way to stay hydrated.
+- id: health-2
+  cls: heldout/health
+  question: What's a normal resting heart rate and when should I worry?
+  input: A normal resting heart rate for adults typically ranges from 60 to 100 beats per minute. Athletes or very fit individuals may have a resting heart rate below 60, which can be normal for them. You should be concerned if your resting heart rate is consistently below 50 or above 100, especially if accompanied by symptoms like dizziness, shortness of breath, or chest pain. In such cases, it's best to consult a healthcare professional.
+  intended: A normal resting heart rate for adults typically ranges from sixty to one hundred beats per minute. Athletes or very fit individuals may have a resting heart rate below sixty, which can be normal for them. You should be concerned if your resting heart rate is consistently below fifty or above one hundred, especially if accompanied by symptoms like dizziness, shortness of breath, or chest pain. In such cases, it's best to consult a healthcare professional.
+- id: health-3
+  cls: heldout/health
+  question: How often should I replace my toothbrush and why?
+  input: You should replace your toothbrush every 3 to 4 months, or sooner if the bristles become frayed. Worn-out bristles are less effective at cleaning teeth and removing plaque, which can lead to oral health issues. Additionally, replacing your toothbrush regularly helps prevent the buildup of bacteria.
+  intended: You should replace your toothbrush every three to four months, or sooner if the bristles become frayed. Worn-out bristles are less effective at cleaning teeth and removing plaque, which can lead to oral health issues. Additionally, replacing your toothbrush regularly helps prevent the buildup of bacteria.
+- id: shopping-1
+  cls: heldout/shopping
+  question: 'Which is the better deal: 3 for $10 or 25% off $4.50 each?'
+  input: 'Let''s compare the prices:
+
+
+    - 3 for $10 means each item costs about $10 ÷ 3 = $3.33.
+
+    - 25% off $4.50 means each item costs $4.50 × 0.75 = $3.38.
+
+
+    The 3 for $10 deal is slightly better since each item costs $3.33 versus $3.38.'
+  intended: 'Let''s compare the prices: Three for ten dollars means each item costs about ten dollars divided by three equals three dollars and thirty-three cents. Twenty-five percent off four dollars and fifty cents means each item costs four dollars and fifty cents times zero point seven five equals three dollars and thirty-eight cents. The three for ten dollars deal is slightly better since each item costs three dollars and thirty-three cents versus three dollars and thirty-eight cents.'
+- id: shopping-2
+  cls: heldout/shopping
+  question: I'm looking for a laptop for video editing under $1,500. What specs matter most?
+  input: For video editing under $1,500, prioritize a laptop with a powerful processor (at least an Intel i7 or AMD Ryzen 7), 16GB or more of RAM, and a dedicated graphics card (such as an NVIDIA GeForce GTX/RTX or AMD Radeon). A fast SSD (at least 512GB) is important for quick file access, and a high-resolution display with good color accuracy (IPS panel, preferably 100% sRGB) will improve your editing experience. Also, consider good thermal management and sufficient ports for your peripherals.
+  intended: For video editing under one thousand five hundred dollars, prioritize a laptop with a powerful processor, at least an Intel i seven or AMD Ryzen seven, sixteen gigabytes or more of RAM, and a dedicated graphics card, such as an NVIDIA GeForce GTX or RTX or AMD Radeon. A fast SSD, at least five hundred twelve gigabytes, is important for quick file access, and a high-resolution display with good color accuracy, IPS panel, preferably one hundred percent sRGB, will improve your editing experience. Also, consider good thermal management and sufficient ports for your peripherals.
+- id: shopping-3
+  cls: heldout/shopping
+  question: When does your Black Friday sale start and how long does shipping take?
+  input: Our Black Friday sale starts on November 24th and runs through November 27th. Shipping typically takes 3-5 business days, but during the sale period, it might take a bit longer due to high order volumes. Be sure to place your order early for the best selection and timely delivery!
+  intended: Our Black Friday sale starts on November twenty-fourth and runs through November twenty-seventh. Shipping typically takes three to five business days, but during the sale period, it might take a bit longer due to high order volumes. Be sure to place your order early for the best selection and timely delivery!
+- id: billing-1
+  cls: heldout/billing
+  question: My electricity bill went from $80 to $140 this month. What could explain that?
+  input: Several factors could explain the increase in your electricity bill from $80 to $140. You might have used more electricity due to seasonal changes, such as running heating or cooling systems more often. New appliances, increased occupancy, or leaving devices on longer can also raise consumption. Additionally, changes in your utility rates or billing errors could contribute, so it's worth reviewing your usage details and contacting your provider if needed.
+  intended: Several factors could explain the increase in your electricity bill from eighty dollars to one hundred forty dollars. You might have used more electricity due to seasonal changes, such as running heating or cooling systems more often. New appliances, increased occupancy, or leaving devices on longer can also raise consumption. Additionally, changes in your utility rates or billing errors could contribute, so it's worth reviewing your usage details and contacting your provider if needed.
+- id: billing-2
+  cls: heldout/billing
+  question: How do I read the usage section of my internet bill?
+  input: To read the usage section of your internet bill, start by identifying the billing period it covers. It typically shows the amount of data you've used, often in GB or MB, and may break down usage by day or service type. Look for terms like "Data Usage," "Usage Summary," or "Internet Consumption." This section helps you understand how much internet you’ve used compared to your plan’s limits, which can explain any extra charges or slowdowns. If anything is unclear, your provider’s customer service can offer detailed explanations.
+  intended: To read the usage section of your internet bill, start by identifying the billing period it covers. It typically shows the amount of data you have used, often in gigabytes or megabytes, and may break down usage by day or service type. Look for terms like Data Usage, Usage Summary, or Internet Consumption. This section helps you understand how much internet you have used compared to your plan’s limits, which can explain any extra charges or slowdowns. If anything is unclear, your provider’s customer service can offer detailed explanations.
+- id: billing-3
+  cls: heldout/billing
+  question: Can you explain what a prorated charge is with a quick example?
+  input: A prorated charge is a partial fee calculated based on the amount of time a service is used, rather than the full billing period. For example, if a monthly subscription costs $30 and you start the service halfway through the month, you might be charged $15 for that partial month instead of the full $30. This ensures you only pay for the time you actually use the service.
+  intended: A prorated charge is a partial fee calculated based on the amount of time a service is used, rather than the full billing period. For example, if a monthly subscription costs thirty dollars and you start the service halfway through the month, you might be charged fifteen dollars for that partial month instead of the full thirty dollars. This ensures you only pay for the time you actually use the service.
+- id: local-1
+  cls: heldout/local
+  question: What's the weather usually like in Ankara in November?
+  input: In November, Ankara typically experiences cool and mild weather. Average temperatures range from about 3°C (37°F) in the early mornings to around 13°C (55°F) during the day. Rainfall is moderate, and the city starts to see more cloudy and rainy days as it transitions into winter. It's a good idea to dress in layers and be prepared for occasional wet weather.
+  intended: In November, Ankara typically experiences cool and mild weather. Average temperatures range from about three degrees Celsius, thirty-seven degrees Fahrenheit, in the early mornings to around thirteen degrees Celsius, fifty-five degrees Fahrenheit, during the day. Rainfall is moderate, and the city starts to see more cloudy and rainy days as it transitions into winter. It's a good idea to dress in layers and be prepared for occasional wet weather.
+- id: local-2
+  cls: heldout/local
+  question: What time do most pharmacies close on Sundays and how do I find an open one?
+  input: Most pharmacies typically close earlier on Sundays, often around 6 PM or 7 PM, but hours can vary widely by location. To find a pharmacy open near you, you can use Google Maps or apps like Walgreens, CVS, or Rite Aid, which show store hours and locations. Additionally, many 24-hour pharmacies or those inside grocery stores may remain open later on Sundays.
+  intended: Most pharmacies typically close earlier on Sundays, often around six PM or seven PM, but hours can vary widely by location. To find a pharmacy open near you, you can use Google Maps or apps like Walgreens, CVS, or Rite Aid, which show store hours and locations. Additionally, many twenty-four-hour pharmacies or those inside grocery stores may remain open later on Sundays.
+- id: local-3
+  cls: heldout/local
+  question: Give me a two-sentence overview of what to see in Istanbul in one day.
+  input: In one day in Istanbul, explore the historic Sultanahmet district to visit iconic sites like the Hagia Sophia, Blue Mosque, and Topkapi Palace. Then, stroll through the bustling Grand Bazaar and enjoy a scenic Bosphorus cruise for stunning city views.
+  intended: In one day in Istanbul, explore the historic Sultanahmet district to visit iconic sites like the Hagia Sophia, Blue Mosque, and Topkapi Palace. Then, stroll through the bustling Grand Bazaar and enjoy a scenic Bosphorus cruise for stunning city views.

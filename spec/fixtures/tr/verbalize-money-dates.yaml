@@ -90,3 +90,18 @@ cases:
     options: {foreign_acronyms: false}
     input: "npm install çalıştırın."
     expect: "npm install çalıştırın."
+  - id: dotted-time-with-suffix
+    input: "Perşembe 14.00'teki toplantı ve saat 9.30'da kahve."
+    expect: "Perşembe on dörtteki toplantı ve saat dokuz otuzda kahve."
+  - id: dotted-time-range
+    input: "Mesai 09.00-17.30 arası."
+    expect: "Mesai dokuz sıfır sıfır ile on yedi otuz arası."
+  - id: dotted-number-without-time-context-stays
+    input: "Sonuç yaklaşık 22.22 derece."
+    expect: "Sonuç yaklaşık 22.22 derece."
+  - id: colon-time-on-the-hour-with-suffix
+    input: "14:00'teki toplantı."
+    expect: "on dörtteki toplantı."
+  - id: spaced-minus-in-an-equation
+    input: "Adım 1: 72 - 32 = 40, aralık 10-20."
+    expect: "Adım 1: 72 eksi 32 = 40, aralık 10 ila 20."
