@@ -2,7 +2,7 @@
 
 Both packages share one version number and one fixture corpus, so an entry here applies to Python and JavaScript alike unless it says otherwise.
 
-## Unreleased
+## 0.3.1 (2026-11-02)
 
 - **Fixed, Turkish:** a dotted clock time after "saat" or with a suffix is read as a time (`14.00'teki` → on dörtteki, `saat 9.30'da` → saat dokuz otuzda, `09.00-17.30` → dokuz sıfır sıfır ile on yedi otuz); it was split into digits and a mis-harmonised suffix. A time on the hour with a suffix takes the suffix on the hour (`14:00'teki` → on dörtteki).
 - **Fixed, both locales:** a spaced minus in an equation (`72 - 32 = 40`) is read as minus / eksi, not as a range.
