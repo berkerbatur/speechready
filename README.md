@@ -63,7 +63,9 @@ pip install speechready      # Python 3.10+, depends only on PyYAML
 npm install speechready      # Node 20+, ESM, no runtime dependencies
 ```
 
-In a voice agent, drop it between the LLM and the TTS: `speechready.integrations.livekit.text_transform(...)` goes in LiveKit's `tts_text_transforms`, `speechready.integrations.pipecat.text_transform(...)` in a Pipecat TTS service's `text_transforms`, and `speechready/livekit` does the same for LiveKit's Node SDK. See `python/README.md`.
+In a voice agent, drop it between the LLM and the TTS: `speechready.integrations.livekit.text_transform(...)` goes in LiveKit's `tts_text_transforms`, `speechready.integrations.pipecat.text_transform(...)` in a Pipecat TTS service's `text_transforms`, and `speechready/livekit` does the same for LiveKit's Node SDK. Runnable agents for all three are in [`examples/`](examples/README.md).
+
+For Turkish developer vocabulary there is a bundled lexicon: `prepare(text, locale="tr-TR", lexicon="tr-tech")` reads `API` as "ey pi ay" and `JSON` as "ceyson", and refits an apostrophe suffix to the spoken form (`API'yi` → `ey pi ay'ı`).
 
 Everything a caller may want to decide differently is an `Options` field (code blocks dropped, kept or replaced by one spoken sentence; list numbers kept or dropped; fractions spoken or read as a division; URLs reduced to their domain, dropped or kept). The defaults are what the evaluation above ran with. See `python/README.md`.
 
@@ -79,11 +81,12 @@ Bump `__version__` in `python/src/speechready/__init__.py` and `version` in `js/
 
 | Folder | Holds |
 | --- | --- |
-| `spec/` | The shared fixture corpus and provider profiles. Both runtimes must pass every fixture. |
+| `spec/` | The shared fixture corpus, provider profiles and bundled lexicons. Both runtimes must pass every fixture. |
 | `python/` | The Python package. |
 | `js/` | The TypeScript package, compiled to ESM with type declarations. Same API, same fixtures. |
 | `eval/` | The evaluation harness: raw vs preprocessed audio per provider, STT round trip, before/after page. |
 | `docs/` | The GitHub Pages site: the listening page written by the harness, and the browser playground. |
+| `examples/` | Runnable LiveKit (Python and Node) and Pipecat agents, and a sample lexicon. |
 
 ## Licence
 

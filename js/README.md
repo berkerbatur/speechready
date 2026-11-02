@@ -57,7 +57,7 @@ for (const token of llmStream) {
 for (const sentence of seg.flush()) speak(sentence);
 ```
 
-For LiveKit Agents (Node), the same thing as a `ttsTextTransforms` entry; sentences are released as they are confirmed, and a fenced code block is handled as one piece:
+For LiveKit Agents (Node), the same thing as a `ttsTextTransforms` entry. It returns the `(ReadableStream<string>) => ReadableStream<string>` the SDK chains; sentences are released as they are confirmed, and a fenced code block is handled as one piece. A complete agent is in [`examples/livekit_agent.mjs`](../examples/livekit_agent.mjs).
 
 ```js
 import { textTransform } from "speechready/livekit";
@@ -86,6 +86,15 @@ prepare("Restart Nginx.", { provider: "openai", lexicon: lex }).text;
 lex.toPls();          // PLS XML for ElevenLabs, Azure and Polly uploads
 lex.toGoogleJson();   // Google Cloud TTS custom pronunciations
 await Lexicon.load("lexicon.json");   // Node only; .yaml files need the optional `yaml` package
+```
+
+One lexicon is bundled: `tr-tech`, foreign tech acronyms and names as Turkish developers say them (`API` → ey pi ay, `JSON` → ceyson). In Turkish an apostrophe suffix is refitted to the spoken form, so `API'yi` becomes `ey pi ay'ı`.
+
+```js
+import { loadLexicon, prepare } from "speechready";
+
+prepare("API'yi JSON ile çağır.", { locale: "tr-TR", lexicon: "tr-tech" }).text;   // "ey pi ay'ı ceyson ile çağır."
+const lex = loadLexicon("tr-tech");   // a Lexicon you can extend before passing it
 ```
 
 ## Differences from the Python package

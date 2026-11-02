@@ -11,6 +11,7 @@ from .clean import Options, clean
 from .compile import compile_text
 from .intents import Intent, extract, SENTINEL_CLOSE, SENTINEL_OPEN
 from .lexicon import Lexicon
+from .lexicons import list_lexicons, load_lexicon
 import re
 from .profiles import Profile, resolve_profile
 from .verbalize import verbalize
@@ -43,9 +44,13 @@ def prepare(
 
     Returns the full compiled text, the request-sized chunks, and every change made.
     `limit` overrides the profile's request limit (None = use the profile's).
-    `lexicon` is a Lexicon or a path to a lexicon file; its words are pronounced as it says.
+    `lexicon` is a Lexicon, the name of a bundled one ("tr-tech") or a path to a lexicon
+    file; its words are pronounced as it says.
     """
-    lex = Lexicon.load(lexicon) if isinstance(lexicon, (str, Path)) else lexicon
+    if isinstance(lexicon, str) and lexicon in list_lexicons():
+        lex: Lexicon | None = load_lexicon(lexicon)
+    else:
+        lex = Lexicon.load(lexicon) if isinstance(lexicon, (str, Path)) else lexicon
     prof = profile or resolve_profile(provider, model)
     rec = Recorder()
 

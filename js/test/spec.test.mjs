@@ -6,7 +6,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 
-import { Lexicon, Segmenter, clean, loadProfile, pack, prepare, splitSentences, verbalize } from "../dist/index.js";
+import { Lexicon, Segmenter, clean, loadLexicon, loadProfile, pack, prepare, splitSentences, verbalize } from "../dist/index.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const SPEC = resolve(here, "..", "..", "spec", "fixtures");
@@ -24,7 +24,7 @@ function run(doc, c) {
   const locale = c.locale ?? doc.locale ?? "en-US";
   const opts = c.options ?? null;
   if (rule.startsWith("clean")) return clean(c.input, opts, undefined, locale);
-  const lexicon = c.lexicon ? Lexicon.fromEntries(c.lexicon, locale) : null;
+  const lexicon = typeof c.lexicon === "string" ? loadLexicon(c.lexicon) : c.lexicon ? Lexicon.fromEntries(c.lexicon, locale) : null;
   if (rule === "lexicon.export") return lexicon.export(c.format, c.alphabet ?? "ipa");
   if (rule.startsWith("verbalize")) return verbalize(c.input, locale, undefined, opts);
   if (rule === "chunk.sentences") return splitSentences(c.input, locale);

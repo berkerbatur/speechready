@@ -1,0 +1,85 @@
+# Foreign tech acronyms and names as Turkish developers say them, with English letter
+# names (API -> ey pi ay) and English-sounding respellings (JSON -> ceyson). The source
+# of truth for the lexicon bundled in both packages:
+#
+#     prepare(text, locale="tr-TR", lexicon="tr-tech")           # Python
+#     prepare(text, { locale: "tr-TR", lexicon: "tr-tech" })     # JavaScript
+#
+# The Turkish verbalizer already reads lowercase consonant-only acronyms (npm, css)
+# with English letter names; this file covers the uppercase and vowel-bearing ones
+# the rule cannot decide on its own, and a few product names. Everyday acronyms that
+# Turkish speakers say with Turkish letter names (TV, ATM, SMS, USB) are left out on
+# purpose. An apostrophe suffix is refitted to the spoken form (API'yi -> ey pi ay'ı).
+locale: tr-TR
+entries:
+  - {word: API, say: "ey pi ay"}
+  - {word: URL, say: "yu ar el"}
+  - {word: URI, say: "yu ar ay"}
+  - {word: AWS, say: "ey dabılyu es"}
+  - {word: GCP, say: "ci si pi"}
+  - {word: CPU, say: "si pi yu"}
+  - {word: GPU, say: "ci pi yu"}
+  - {word: SSD, say: "es es di"}
+  - {word: HTML, say: "eyç ti em el"}
+  - {word: CSS, say: "si es es"}
+  - {word: SQL, say: "es kyu el"}
+  - {word: PHP, say: "pi eyç pi"}
+  - {word: HTTP, say: "eyç ti ti pi"}
+  - {word: HTTPS, say: "eyç ti ti pi es"}
+  - {word: JS, say: "cey es"}
+  - {word: TS, say: "ti es"}
+  - {word: UI, say: "yu ay"}
+  - {word: UX, say: "yu eks"}
+  - {word: AI, say: "ey ay"}
+  - {word: ML, say: "em el"}
+  - {word: LLM, say: "el el em"}
+  - {word: GPT, say: "ci pi ti"}
+  - {word: OCR, say: "o si ar"}
+  - {word: PDF, say: "pi di ef"}
+  - {word: CSV, say: "si es vi"}
+  - {word: XML, say: "eks em el"}
+  - {word: SDK, say: "es di key"}
+  - {word: CLI, say: "si el ay"}
+  - {word: IDE, say: "ay di i"}
+  - {word: DNS, say: "di en es"}
+  - {word: IP, say: "ay pi"}
+  - {word: TCP, say: "ti si pi"}
+  - {word: UDP, say: "yu di pi"}
+  - {word: SSH, say: "es es eyç"}
+  - {word: SSL, say: "es es el"}
+  - {word: TLS, say: "ti el es"}
+  - {word: VPN, say: "vi pi en"}
+  - {word: VM, say: "vi em"}
+  - {word: DB, say: "di bi"}
+  - {word: ORM, say: "o ar em"}
+  - {word: JWT, say: "cey dabılyu ti"}
+  - {word: NPM, say: "en pi em"}
+  - {word: UUID, say: "yu yu ay di"}
+  - {word: CDN, say: "si di en"}
+  - {word: TTS, say: "ti ti es"}
+  - {word: STT, say: "es ti ti"}
+  - {word: ASR, say: "ey es ar"}
+  - {word: NLP, say: "en el pi"}
+  - {word: MCP, say: "em si pi"}
+  - {word: QA, say: "kyu ey"}
+  - {word: PR, say: "pi ar"}
+  - {word: CI, say: "si ay"}
+  - {word: CD, say: "si di"}
+  - {word: CRM, say: "si ar em"}
+  - {word: ERP, say: "i ar pi"}
+  - {word: SEO, say: "es i o"}
+  - {word: KPI, say: "key pi ay"}
+  - {word: CEO, say: "si i o"}
+  - {word: CTO, say: "si ti o"}
+  - {word: OS, say: "o es"}
+  - {word: PC, say: "pi si"}
+  - {word: iOS, say: "ay o es"}
+  - {word: IT, say: "ay ti", case_sensitive: true}   # lowercase "it" is a Turkish word
+  - {word: JSON, say: "ceyson"}
+  - {word: GitHub, say: "githab"}
+  - {word: Python, say: "paytın"}
+  - {word: WiFi, say: "vayfay"}
+  - {word: Wi-Fi, say: "vayfay"}
+  - {word: Java, say: "cava"}
+  - {word: Excel, say: "eksel"}
+  - {word: Chrome, say: "krom"}

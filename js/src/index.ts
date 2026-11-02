@@ -11,6 +11,7 @@ export { DEFAULT_OPTIONS, clean, options } from "./clean.js";
 export type { Options } from "./clean.js";
 export { Lexicon } from "./lexicon.js";
 export type { Entry, EntryInput } from "./lexicon.js";
+export { listLexicons, loadLexicon } from "./lexicons/index.js";
 export { prepare } from "./pipeline.js";
 export type { Prepared, PrepareInit } from "./pipeline.js";
 export { listProfiles, loadProfile, resolveProfile } from "./profiles/index.js";

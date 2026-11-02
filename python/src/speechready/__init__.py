@@ -9,6 +9,7 @@ from .changes import Change
 from .chunk import Segmenter, pack, split_sentences
 from .clean import CleanOptions, Options, clean
 from .lexicon import Entry, Lexicon
+from .lexicons import list_lexicons, load_lexicon
 from .pipeline import Prepared, prepare
 from .profiles import Profile, list_profiles, load_profile, resolve_profile
 
@@ -25,7 +26,9 @@ __all__ = [
     "Segmenter",
     "__version__",
     "clean",
+    "list_lexicons",
     "list_profiles",
+    "load_lexicon",
     "load_profile",
     "pack",
     "prepare",

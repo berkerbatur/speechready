@@ -6,6 +6,7 @@ import { Options, clean } from "./clean.js";
 import { compileText } from "./compile.js";
 import { Intent, extract, sentinelPattern } from "./intents.js";
 import { EntryInput, Lexicon } from "./lexicon.js";
+import { loadLexicon } from "./lexicons/index.js";
 import { Profile, resolveProfile } from "./profiles/index.js";
 import { sub } from "./util.js";
 import { verbalize } from "./verbalize/index.js";
@@ -32,8 +33,8 @@ export interface PrepareInit {
   /** Overrides the profile's request limit (null = no limit, undefined = the profile's). */
   limit?: number | null;
   options?: Partial<Options> | null;
-  /** A Lexicon, or its entries; its words are pronounced as it says. */
-  lexicon?: Lexicon | EntryInput[] | null;
+  /** A Lexicon, its entries, or the name of a bundled lexicon ("tr-tech"); its words are pronounced as it says. */
+  lexicon?: Lexicon | EntryInput[] | string | null;
 }
 
 /** Prepare `text` for the given provider and model.
@@ -42,7 +43,10 @@ export interface PrepareInit {
  */
 export function prepare(text: string, init: PrepareInit = {}): Prepared {
   const locale = init.locale ?? "en-US";
-  const lex = Array.isArray(init.lexicon) ? Lexicon.fromEntries(init.lexicon, locale) : init.lexicon ?? null;
+  const lex =
+    typeof init.lexicon === "string" ? loadLexicon(init.lexicon)
+    : Array.isArray(init.lexicon) ? Lexicon.fromEntries(init.lexicon, locale)
+    : init.lexicon ?? null;
   const prof = init.profile ?? resolveProfile(init.provider ?? null, init.model ?? null);
   const rec = new Recorder();
 

@@ -14,6 +14,9 @@
 import { Intent, SENTINEL_CLOSE, SENTINEL_OPEN, intent } from "./intents.js";
 import { Profile } from "./profiles/index.js";
 import { W, escapeRe, escapeXml, re, sub } from "./util.js";
+import { respellSuffix } from "./verbalize/numbers_tr.js";
+
+const TR_SUFFIX = "(?:(['’])([a-zçğıöşü]+))?";
 
 export interface Entry {
   word: string;
@@ -90,12 +93,22 @@ export class Lexicon {
     if (!this.entries.length) return text;
     let work = text;
     const ordered = [...this.entries].sort((a, b) => b.word.length - a.word.length);
+    const turkish = this.locale.split("-")[0].toLowerCase() === "tr";
     for (const e of ordered) {
       const flags = e.case_sensitive ? "" : "i";
-      const pattern = re(`(?<![${W}${SENTINEL_OPEN}${SENTINEL_CLOSE}])${escapeRe(e.word)}(?![${W}])`, flags);
+      // In Turkish a respelled word's apostrophe suffix (API'yi) is refitted to the spoken form (ey pi ay'ı).
+      const refit = turkish && !!e.say && !e.ipa;
+      const suffix = refit ? TR_SUFFIX : "";
+      const pattern = re(`(?<![${W}${SENTINEL_OPEN}${SENTINEL_CLOSE}])${escapeRe(e.word)}${suffix}(?![${W}])`, flags);
       work = sub(pattern, work, (m) => {
-        intents.push(entryIntent(e, m[0]));
-        return `${SENTINEL_OPEN}${intents.length - 1}${SENTINEL_CLOSE}`;
+        let word = m[0];
+        let tail = "";
+        if (refit && m[2]) {
+          word = word.slice(0, word.length - m[1].length - m[2].length);
+          tail = m[1] + respellSuffix(e.say, m[2]);
+        }
+        intents.push(entryIntent(e, word));
+        return `${SENTINEL_OPEN}${intents.length - 1}${SENTINEL_CLOSE}${tail}`;
       });
     }
     return work;

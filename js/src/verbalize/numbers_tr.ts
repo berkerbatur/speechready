@@ -98,6 +98,24 @@ export function reharmonize(word: string, suffix: string): string {
   return Array.from(suffix).map((ch) => ("ae".includes(ch) ? two : "ıiuü".includes(ch) ? four : ch)).join("");
 }
 
+/** The suffix a writer attached to an abbreviation (API'yi), refitted to how the word is said (ey pi ay -> 'ı).
+ *
+ * Harmony follows the last spoken word, and the buffer consonant follows whether it
+ * ends in a vowel: GPU'yu -> ci pi yu'yu, API'si -> ey pi ay'ı.
+ */
+export function respellSuffix(word: string, suffix: string): string {
+  if (!suffix) return suffix;
+  const last = word.slice(word.lastIndexOf(" ") + 1);
+  let s = reharmonize(last, suffix);
+  const endsInVowel = VOWELS.includes(last[last.length - 1]);
+  if ("sy".includes(s[0]) && s.length > 1 && VOWELS.includes(s[1]) && !endsInVowel) {
+    s = s.slice(1);
+  } else if (VOWELS.includes(s[0]) && endsInVowel) {
+    s = "y" + s;
+  }
+  return s;
+}
+
 /** üçüncü, dördüncü, yirmi birinci. */
 export function ordinal(n: number): string {
   const words = cardinal(n);
