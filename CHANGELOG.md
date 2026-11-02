@@ -2,7 +2,7 @@
 
 Both packages share one version number and one fixture corpus, so an entry here applies to Python and JavaScript alike unless it says otherwise.
 
-## Unreleased
+## 0.3.0 (2026-11-02)
 
 - **Bundled lexicon `tr-tech`:** foreign tech acronyms and names as Turkish developers say them, with English letter names (`API` → ey pi ay, `SQL` → es kyu el) and respellings (`JSON` → ceyson, `GitHub` → githab). `prepare(..., lexicon="tr-tech")` / `{ lexicon: "tr-tech" }`, or `load_lexicon` / `loadLexicon` for a copy to extend. Source of truth in `spec/lexicons`, bundled into both packages like the profiles.
 - **Lexicon, Turkish:** a respelled word's apostrophe suffix is refitted to the spoken form (`API'yi` → `ey pi ay'ı`, `GPU'yu` → `ci pi yu'yu`, `API'si` → `ey pi ay'ı`).
