@@ -85,7 +85,7 @@ Version 0.3.0 is on [PyPI](https://pypi.org/project/speechready/) and [npm](http
 
 ### Releasing
 
-Bump `__version__` in `python/src/speechready/__init__.py` and `version` in `js/package.json` to the same number, add the entry to `CHANGELOG.md`, merge, then publish a GitHub release tagged `vX.Y.Z`. The `release` workflow checks that the tag matches both versions, runs the tests, and publishes to PyPI and npm through trusted publishing, so no registry tokens are stored anywhere.
+A release is a pull request that bumps `__version__` in `python/src/speechready/__init__.py` and `version` in `js/package.json` to the same number and dates the `CHANGELOG.md` entry. Merging it is the release: the `release` workflow runs the tests, publishes to PyPI and npm through trusted publishing (no registry tokens are stored anywhere), then tags the commit `vX.Y.Z` and creates the GitHub release with the changelog entry as its notes. A merge whose versions differ, or whose changelog entry is missing, fails the workflow instead of publishing.
 
 ## Layout
 
