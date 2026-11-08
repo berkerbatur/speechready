@@ -37,6 +37,8 @@ export interface Options {
   fractions: "spoken" | "division";
   /** Turkish: lowercase vowel-less tokens like npm, css read with English letter names */
   foreign_acronyms: boolean;
+  /** digits: leave plain numbers to the voice | words: write every remaining number out | null: the profile's choice, else digits */
+  numbers: "digits" | "words" | null;
   extra: Record<string, unknown>;
 }
 
@@ -54,6 +56,7 @@ export const DEFAULT_OPTIONS: Options = Object.freeze({
   html: "strip",
   fractions: "spoken",
   foreign_acronyms: true,
+  numbers: null,
   extra: {},
 }) as Options;
 

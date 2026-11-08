@@ -7,7 +7,7 @@ It is deterministic and makes no network calls. Every rewrite is reported back a
 ## What it does
 
 1. **Cleans** markdown, code fences, tables, emoji, URLs, emails and invisible Unicode out of LLM output.
-2. **Verbalizes only the ambiguous tokens**: phone numbers, IDs, dates in a stated locale, years, currency decimals, units, ranges and acronyms from a lexicon. Ordinary numbers are left to the model, which reads them well.
+2. **Verbalizes only the ambiguous tokens**: phone numbers, IDs, dates in a stated locale, years, currency decimals, units, ranges and acronyms from a lexicon. Ordinary numbers are left to hosted models, which read them well; for local models without a text normalizer (Kokoro, Piper, Chatterbox, XTTS, Orpheus) the profile switches to writing every number out.
 3. **Compiles** pacing intents such as a pause or emphasis into each vendor's own syntax: an SSML break where the model accepts it, punctuation where it does not, the vendor's tag elsewhere. Escapes SSML characters where needed.
 4. **Chunks** at sentence and clause boundaries under the model's character limit, on whole strings and on streaming token feeds.
 5. **Applies one pronunciation lexicon** everywhere: phoneme tags where the vendor takes them, respellings elsewhere, and exports it as PLS (ElevenLabs, Azure, Polly) or Google custom pronunciations.
@@ -62,6 +62,16 @@ Every voice improved and the control prose did not regress. Cartesia's Turkish i
 
 32 pairs got better, 42 worse, 166 did not change. Of the 42 worse: 14 are code blocks that speechready drops by default while the narration kept the command (`code_blocks="keep"` or `"mention"` changes that); 8 are convention differences between the library and the narration (lira and kuruş against "virgül", "dokuzda beş" against "beş bölü dokuz"); 6 are two bugs this run found, fixed in the next release (a dotted Turkish time with a suffix, `14.00'teki`, and a spaced minus in an equation read as a range); 18 differ by a word or two of transcription noise. The reading: concise assistant answers contain few of the constructs the library targets, so on them it changes little either way. The gain in the tables above is on inputs that do contain markdown, prices, phone numbers, dates and code, which is where voice agents fail audibly. The corpus is in `eval/corpus/heldout.*.yaml`, `summary.md` reports it in its own section, and the numbers here are as measured before the two fixes.
 
+**Local models.** Measured on 2026-11-08 on a laptop CPU, no API calls: the same corpus (grown to 89 English and 63 Turkish lines by then) through Kokoro 82M and Piper, transcribed with faster-whisper large-v3 instead of the hosted transcription model, so the rows are comparable with each other and with the trend above, not digit for digit with the hosted table. These models have no text normalizer of their own, so their profiles also write every remaining number out in words.
+
+| Model | Locale | Pairs | Misread as written | Misread with speechready |
+| --- | --- | --- | --- | --- |
+| Kokoro 82M | English | 89 | 38% | 11% |
+| Piper (lessac-medium) | English | 89 | 42% | 12% |
+| Piper (dfki-medium) | Turkish | 63 | 43% | 14% |
+
+Small local models fail on the same inputs as the hosted voices, more often: a raw ISO date, a markdown table or an inline code span comes out as noise, and written-out text fixes most of it. The held-out assistant answers behaved as they did for the hosted voices (Kokoro 3% misread either way, Piper 10% as written and 13% processed over 60 pairs, the difference being code blocks the library drops). Their pairs are in the listening page under their own headings.
+
 - **Listen:** [berkerbatur.github.io/speechready](https://berkerbatur.github.io/speechready/) plays the clearest before/after pairs for every voice, with what the speech-to-text model heard under each.
 - **Try your own text:** [berkerbatur.github.io/speechready/play](https://berkerbatur.github.io/speechready/play/) runs the JavaScript package in your browser (35 kB) and shows the output, the chunks and every rewrite. Nothing you type leaves the page.
 - **Reproduce:** `eval/README.md` explains the keys, the scorer and the commands. The results in this table are also in `eval/out/summary.md` after a run.
@@ -81,7 +91,7 @@ Everything a caller may want to decide differently is an `Options` field (code b
 
 ## Status
 
-Version 0.3.0 is on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready). Both packages have all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram. The Python package has been through the evaluation above; the TypeScript package passes the same 217 fixtures, so it produces the same text. Changes are listed in `CHANGELOG.md`. The public API may still move before 1.0; anything that does will be called out there.
+Version 0.3.0 is on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready). Both packages have all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram, and for the open-weight models Kokoro, Piper, Chatterbox, XTTS v2 and Orpheus. The Python package has been through the evaluation above; the TypeScript package passes the same 233 fixtures, so it produces the same text. Changes are listed in `CHANGELOG.md`. The public API may still move before 1.0; anything that does will be called out there.
 
 ### Releasing
 

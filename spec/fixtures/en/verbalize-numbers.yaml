@@ -95,3 +95,23 @@ cases:
     options: {fractions: division}
     input: "Add 1/2 cup."
     expect: "Add one over two cup."
+  # numbers: words (the default for local models with no text normalizer; see spec/profiles)
+  - id: words-plain-numbers-written-out
+    options: {numbers: words}
+    input: "I have 42 apples and 3,500 followers; it costs 19.99."
+    expect: "I have forty-two apples and three thousand five hundred followers; it costs nineteen point nine nine."
+  - id: words-leading-zero-digit-by-digit
+    options: {numbers: words}
+    input: "Agent 007 waited 0.75 seconds."
+    expect: "Agent zero zero seven waited zero point seven five seconds."
+  - id: words-clock-times
+    options: {numbers: words}
+    input: "Lunch at 12:30, dinner at 19:05, open 09:00-17:30, call at 2:30 pm."
+    expect: "Lunch at twelve thirty, dinner at seven oh five PM, open nine AM to five thirty PM, call at two thirty pm."
+  - id: words-leaves-versions-and-hyphenated-codes
+    options: {numbers: words}
+    input: "Version 2.0.1 ships; ref 555-0100; 1,000,000 fans."
+    expect: "Version 2.0.1 ships; ref 555-0100; one million fans."
+  - id: digits-is-the-default
+    input: "I have 42 apples at 12:30."
+    expect: "I have 42 apples at 12:30."

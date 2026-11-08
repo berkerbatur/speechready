@@ -1,4 +1,9 @@
-"""TTS adapters. Each takes text and returns MP3 bytes. Keys come from the environment.
+"""TTS adapters. Each takes text and returns MP3 bytes.
+
+Hosted providers take their keys from the environment. Local models (Kokoro, Piper,
+Chatterbox, XTTS v2, Orpheus) need their Python package installed and ffmpeg on the
+path to encode MP3; Piper also needs its voice files under eval/models/piper. A
+provider whose package or keys are missing is skipped by the run.
 
 Raw text goes to each provider the way a developer would send it: plain text.
 Preprocessed text goes the way the profile says: an SSML body wrapped in
@@ -8,8 +13,14 @@ Preprocessed text goes the way the profile says: an SSML body wrapped in
 from __future__ import annotations
 
 import base64
+import importlib.util
+import io
 import os
+import subprocess
+import wave
 from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
 from xml.sax.saxutils import escape as xml_escape
 
 import httpx
@@ -38,13 +49,24 @@ def _env(*names: str) -> str:
     raise KeyError(f"none of {names} is set")
 
 
-def has_keys(provider: str) -> bool:
+# Local models: the module whose presence means the provider can run here.
+LOCAL = {"kokoro": "kokoro", "piper": "piper", "chatterbox": "chatterbox", "xtts": "TTS", "orpheus": "orpheus_tts"}
+MODELS_DIR = Path(__file__).resolve().parents[1] / "models"  # downloaded voice files, gitignored
+
+
+def available(provider: str) -> bool:
+    """True when the provider can run here: its package is importable (local models) or its keys are set."""
+    if provider in LOCAL:
+        return importlib.util.find_spec(LOCAL[provider]) is not None
     return all(any(os.environ.get(n) for n in group) for group in ENV[provider])
+
+
+has_keys = available  # the earlier name
 
 
 @dataclass(frozen=True)
 class Voice:
-    provider: str  # elevenlabs | openai | azure | google | polly | cartesia | deepgram
+    provider: str  # a key of ADAPTERS: elevenlabs | openai | azure | google | polly | cartesia | deepgram | kokoro | piper | chatterbox | xtts | orpheus
     model: str
     voice: str
     locale: str = "en-US"
@@ -140,9 +162,129 @@ def deepgram(text: str, v: Voice, preprocessed: bool) -> bytes:
     return r.content
 
 
+# --- local models ----------------------------------------------------------------------
+# Each returns MP3 like the hosted adapters, so the results file and the listening page
+# need no special case. Models are loaded once per process and kept.
+
+
+def _wav_bytes(samples, rate: int) -> bytes:
+    """Mono float or int16 samples to WAV bytes."""
+    import numpy as np
+
+    a = np.asarray(samples)
+    if a.dtype.kind == "f":
+        a = (np.clip(a, -1.0, 1.0) * 32767).astype("<i2")
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(rate)
+        w.writeframes(a.astype("<i2").tobytes())
+    return buf.getvalue()
+
+
+def _mp3(wav: bytes) -> bytes:
+    r = subprocess.run(
+        ["ffmpeg", "-loglevel", "error", "-i", "pipe:0", "-codec:a", "libmp3lame", "-q:a", "2", "-f", "mp3", "pipe:1"],
+        input=wav, capture_output=True, check=True,
+    )
+    return r.stdout
+
+
+@lru_cache(maxsize=4)
+def _kokoro(lang_code: str):
+    from kokoro import KPipeline
+
+    return KPipeline(lang_code=lang_code, repo_id="hexgrad/Kokoro-82M")
+
+
+def kokoro(text: str, v: Voice, preprocessed: bool) -> bytes:
+    import numpy as np
+
+    lang = {"en-GB": "b", "es": "e", "fr": "f", "hi": "h", "it": "i", "pt": "p"}.get(v.locale, {"en": "a"}.get(v.locale.split("-")[0], "a"))
+    pieces = [np.asarray(audio) for _, _, audio in _kokoro(lang)(text, voice=v.voice)]
+    return _mp3(_wav_bytes(np.concatenate(pieces) if pieces else np.zeros(2400, dtype="float32"), 24000))
+
+
+@lru_cache(maxsize=4)
+def _piper(name: str):
+    from piper import PiperVoice
+
+    path = MODELS_DIR / "piper" / f"{name}.onnx"
+    if not path.exists():
+        raise FileNotFoundError(f"{path} is missing; download it with: python -m piper.download_voices {name} --data-dir {path.parent}")
+    return PiperVoice.load(str(path))
+
+
+def piper(text: str, v: Voice, preprocessed: bool) -> bytes:
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        _piper(v.voice).synthesize_wav(text, w)
+    return _mp3(buf.getvalue())
+
+
+def _device() -> str:
+    import torch
+
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
+@lru_cache(maxsize=2)
+def _chatterbox(model: str):
+    if model == "chatterbox-multilingual":
+        from chatterbox.mtl_tts import ChatterboxMultilingualTTS
+
+        return ChatterboxMultilingualTTS.from_pretrained(device=_device())
+    from chatterbox.tts import ChatterboxTTS
+
+    return ChatterboxTTS.from_pretrained(device=_device())
+
+
+def chatterbox(text: str, v: Voice, preprocessed: bool) -> bytes:
+    """`voice` is "default" for the built-in voice or the path of a reference clip to clone."""
+    m = _chatterbox(v.model)
+    kw: dict = {}
+    if v.model == "chatterbox-multilingual":
+        kw["language_id"] = v.locale.split("-")[0]
+    if v.voice != "default":
+        kw["audio_prompt_path"] = v.voice
+    wav = m.generate(text, **kw)
+    return _mp3(_wav_bytes(wav.squeeze(0).cpu().numpy(), m.sr))
+
+
+@lru_cache(maxsize=1)
+def _xtts():
+    from TTS.api import TTS
+
+    return TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(_device())
+
+
+def xtts(text: str, v: Voice, preprocessed: bool) -> bytes:
+    """`voice` is one of the model's built-in speakers, e.g. "Ana Florence"."""
+    import numpy as np
+
+    wav = _xtts().tts(text=text, speaker=v.voice, language=v.locale.split("-")[0])
+    return _mp3(_wav_bytes(np.asarray(wav, dtype="float32"), 24000))
+
+
+@lru_cache(maxsize=1)
+def _orpheus(model: str):
+    from orpheus_tts import OrpheusModel
+
+    return OrpheusModel(model_name=f"canopylabs/{model}", max_model_len=2048)
+
+
+def orpheus(text: str, v: Voice, preprocessed: bool) -> bytes:
+    pcm = b"".join(_orpheus(v.model).generate_speech(prompt=text, voice=v.voice))
+    import numpy as np
+
+    return _mp3(_wav_bytes(np.frombuffer(pcm, dtype="<i2"), 24000))
+
+
 ADAPTERS = {
     "elevenlabs": elevenlabs, "openai": openai, "azure": azure, "google": google,
     "polly": polly, "cartesia": cartesia, "deepgram": deepgram,
+    "kokoro": kokoro, "piper": piper, "chatterbox": chatterbox, "xtts": xtts, "orpheus": orpheus,
 }
 
 
@@ -168,6 +310,12 @@ DEFAULT_VOICES = {
         Voice("polly", "generative", "Ruth", "en-US"),
         Voice("cartesia", "sonic-3.6", _CARTESIA_VOICE, "en-US"),
         Voice("deepgram", "aura-2", "aura-2-thalia-en", "en-US"),
+        # local models; run when the package is installed (eval[local] covers Kokoro and Piper)
+        Voice("kokoro", "kokoro-82m", "af_heart", "en-US"),
+        Voice("piper", "piper", "en_US-lessac-medium", "en-US"),
+        Voice("chatterbox", "chatterbox-multilingual", "default", "en-US"),
+        Voice("xtts", "xtts-v2", "Ana Florence", "en-US"),
+        Voice("orpheus", "orpheus-3b-0.1-ft", "tara", "en-US"),
     ],
     "tr-TR": [
         Voice("elevenlabs", "eleven_multilingual_v2", "JBFqnCBsd6RMkjVDRZzb", "tr-TR"),
@@ -177,5 +325,8 @@ DEFAULT_VOICES = {
         Voice("google", "wavenet", "tr-TR-Wavenet-A", "tr-TR"),
         Voice("polly", "neural", "Burcu", "tr-TR"),
         Voice("cartesia", "sonic-3.6", _CARTESIA_VOICE, "tr-TR"),
+        Voice("piper", "piper", "tr_TR-dfki-medium", "tr-TR"),
+        Voice("chatterbox", "chatterbox-multilingual", "default", "tr-TR"),
+        Voice("xtts", "xtts-v2", "Ana Florence", "tr-TR"),
     ],
 }

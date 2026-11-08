@@ -1,0 +1,29 @@
+id: xtts-v2
+provider: xtts
+models: [xtts-v2, xtts_v2, tts_models/multilingual/multi-dataset/xtts_v2]
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: chars
+  max: 226
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+lexicon: {format: none}
+options: {numbers: words}
+notes: >
+  Coqui XTTS v2 (Coqui Public Model License, non-commercial), maintained in the
+  idiap/coqui-ai-TTS fork. 17 languages including Turkish. Its tokenizer runs
+  its own cleaner: lowercases, expands cardinals and ordinals with num2words
+  and a few abbreviations, but skips decimals in Turkish and knows nothing
+  about times, dates, phone numbers, units or Turkish suffixes; `numbers:
+  words` makes the input unambiguous before that cleaner sees it. The tokenizer
+  warns (does not cut) above a per-language character limit: 250 for English,
+  226 for Turkish; the lower one is the limit here so both locales fit.
+sources:
+  - https://github.com/idiap/coqui-ai-TTS/blob/dev/TTS/tts/layers/xtts/tokenizer.py
+  - https://huggingface.co/coqui/XTTS-v2
+verified: "2026-11-08"

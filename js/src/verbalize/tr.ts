@@ -197,6 +197,13 @@ function alnum(m: Match): string | null {
 const SEP = String.raw`(?:[ \-]|\.(?!\s))`;
 const SUFFIX = `(?:${APOS}([${LOWER}]+))?`;
 
+/** `numbers: words`: a plain number the other rules left alone, written out. */
+function numberWords(m: Match): string | null {
+  if (option("numbers", null) !== "words") return null;
+  const n = m[1];
+  return n.length > 1 && n.startsWith("0") ? digits(n) : cardinal(parseInt(n, 10));
+}
+
 export const RULES: Rule[] = [
   rule("verbalize.abbreviation", re(String.raw`(?<![${W}.])(${ABBR_ALTERNATION})\.(?![${LOWER}${UPPER}])`), abbreviation, "abbreviation read in full"),
   rule("verbalize.date.dmy", re(String.raw`${B}(\d{1,2})[./](\d{1,2})[./](\d{4}|\d{2})${B}${SUFFIX}`), dateDmy, "date read as day, month name, year"),
@@ -228,6 +235,7 @@ export const RULES: Rule[] = [
   rule("verbalize.ordinal", re(String.raw`${B}(\d{1,3})\.(?=\s+[${LOWER}])`), ordinalDot, "numeral with a dot before a lowercase word read as an ordinal"),
   rule("verbalize.minus", re(String.raw`(?<![${W}.)\-–])[-–](?=\d)`), () => "eksi ", "leading minus read as a word"),
   rule("verbalize.alnum", re(String.raw`${B}(?=[${UPPER}0-9-]*\d)(?=[${UPPER}0-9-]*[${UPPER}])[${UPPER}0-9]+(?:-[${UPPER}0-9]+)*${B}`), alnum, "identifier spelled out"),
+  rule("verbalize.number.words", re(String.raw`(?<![${W}.,:/\-])(\d+)(?![${W}'’]|[.,]\d)`), numberWords, "plain number written out (numbers: words)"),
 ];
 
 registerRules("tr", RULES);

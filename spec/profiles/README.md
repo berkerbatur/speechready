@@ -20,9 +20,12 @@ intents:
   emphasis: {render: '{text}'}
   phoneme: {render: '<phoneme alphabet="ipa" ph="{ipa}">{text}</phoneme>'}  # omit when the model takes no phoneme tag
 lexicon: {format: pls, alphabet: ipa}   # how a lexicon is uploaded to this provider: pls | google | none
+options: {numbers: words}  # option values the profile decides when the caller leaves them unset; only `numbers` today
 notes: free text for maintainers
 sources: [urls the numbers were taken from]
 verified: 2026-10-27         # the day someone last checked the sources
 ```
+
+`options` is for models that need the text prepared differently: a local model with no text normalizer gets `numbers: words`, so every remaining number is written out unless the caller sets `numbers` explicitly. Only `numbers` is read from here today.
 
 Render templates take `{ms}` and `{s}` (seconds, shortest form) for pauses, `{text}` for spell and emphasis, and `{text}` plus `{ipa}` for phoneme. A lexicon entry with IPA becomes a phoneme tag only where `intents.phoneme` is set; elsewhere its `say` respelling is used.

@@ -37,6 +37,7 @@ class Options:
     # verbalize stage
     fractions: str = "spoken"  # spoken ("one half", "yarım") | division ("one over two", "bir bölü iki")
     foreign_acronyms: bool = True  # Turkish: lowercase vowel-less tokens like npm, css read with English letter names
+    numbers: str | None = None  # digits (leave plain numbers to the voice) | words (write every remaining number out); None = the profile's choice, else digits
     extra: dict = field(default_factory=dict)
 
 

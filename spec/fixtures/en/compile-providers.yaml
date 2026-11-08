@@ -53,3 +53,12 @@ cases:
     profile: deepgram-aura
     input: "Sure [laughs] okay."
     expect: "Sure okay."
+  - id: piper-profile-writes-numbers-out
+    profile: piper
+    input: "Wait 10 minutes at 14:30."
+    expect: "Wait ten minutes at two thirty PM."
+  - id: piper-profile-caller-keeps-digits
+    profile: piper
+    options: {numbers: digits}
+    input: "Wait 10 minutes at 14:30."
+    expect: "Wait 10 minutes at 2:30 PM."

@@ -1,0 +1,32 @@
+id: kokoro
+provider: kokoro
+models: [kokoro-82m, kokoro-v1.0, kokoro]
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: chars
+  max: 400
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+lexicon: {format: none}
+options: {numbers: words}
+notes: >
+  Open-weight 82M-parameter model (Apache-2.0), run locally through the `kokoro`
+  package or an ONNX port. Plain text only; its misaki front end turns integers,
+  decimals, $ £ € amounts and ordinals into words itself, but has no rule for
+  times, ranges, phone numbers, dates or units, and reads a bare four-digit
+  number as a year. `numbers: words` makes the spoken form explicit so the two
+  front ends cannot disagree. The model takes at most 510 phoneme tokens per
+  pass; KPipeline splits long text itself and the ports pack roughly 400
+  characters, which is the per-request limit used here. English (American and
+  British), Spanish, French, Hindi, Italian, Japanese, Portuguese and Mandarin;
+  no Turkish voice.
+sources:
+  - https://github.com/hexgrad/kokoro
+  - https://github.com/hexgrad/misaki/blob/main/misaki/en.py
+  - https://huggingface.co/hexgrad/Kokoro-82M
+verified: "2026-11-08"

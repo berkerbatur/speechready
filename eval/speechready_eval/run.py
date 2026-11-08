@@ -44,7 +44,9 @@ def _load_done(path: Path) -> set[str]:
     return done
 
 
-def _one(line: corpus.Line, v: synth.Voice, variant: str, text: str, processed, stt: str) -> dict:
+def _one(line: corpus.Line, v: synth.Voice, variant: str, text: str, processed, stt: str, synth_only: bool = False) -> dict | None:
+    """Synthesize (if the clip is not there yet) and transcribe one variant. With `synth_only`
+    the clip is written and None is returned; a later run without the flag transcribes it."""
     key = _key(line.id, v, variant)
     audio = OUT / "audio" / f"{key}.mp3"
     base = {"key": key, "id": line.id, "locale": line.locale, "cls": line.cls, "variant": variant,
@@ -52,6 +54,8 @@ def _one(line: corpus.Line, v: synth.Voice, variant: str, text: str, processed, 
     try:
         if not audio.exists():
             audio.write_bytes(synth.synthesize(text, v, preprocessed=(variant == "processed")))
+        if synth_only:
+            return None
         hyp = transcribe.transcribe(audio, line.locale, stt)
         score = metrics.wer(line.intended, hyp, line.locale)
         return {**base, "transcript": hyp, "wer": round(score, 4), "misread": metrics.is_misread(line.intended, hyp, line.locale),
@@ -63,12 +67,13 @@ def _one(line: corpus.Line, v: synth.Voice, variant: str, text: str, processed, 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--locales", default="en,tr")
-    ap.add_argument("--providers", default="all", help="comma list or 'all'; providers without keys in the environment are skipped")
+    ap.add_argument("--providers", default="all", help="comma list or 'all'; providers whose keys (hosted) or packages (local) are missing are skipped")
     ap.add_argument("--voice", action="append", default=[], help="provider:model:voice[:locale]; repeatable, replaces the defaults")
     ap.add_argument("--stt", default="whisper", choices=["whisper", "openai"])
     ap.add_argument("--limit", type=int, default=None, help="first N corpus lines per locale")
     ap.add_argument("--ids", default=None, help="regex on line ids; only matching lines run (e.g. '^heldout\\.')")
     ap.add_argument("--dry-run", action="store_true", help="print what would be synthesized and exit")
+    ap.add_argument("--synth-only", action="store_true", help="write the audio clips and stop; a later run transcribes them (keeps local TTS models and Whisper in separate processes)")
     ap.add_argument("--redo", default=None, help="'changed' re-synthesizes every processed variant whose text the library now renders differently; otherwise a regex on line ids")
     args = ap.parse_args(argv)
 
@@ -87,9 +92,9 @@ def main(argv: list[str] | None = None) -> int:
         for loc, vs in synth.DEFAULT_VOICES.items():
             if loc.split("-")[0] in locales:
                 voices.extend(v for v in vs if v.provider in wanted)
-    missing = sorted({v.provider for v in voices if not synth.has_keys(v.provider)})
+    missing = sorted({v.provider for v in voices if not synth.available(v.provider)})
     if missing:
-        print(f"skipping providers without keys: {', '.join(missing)}", file=sys.stderr)
+        print(f"skipping providers whose keys or packages are missing: {', '.join(missing)}", file=sys.stderr)
         voices = [v for v in voices if v.provider not in missing]
 
     OUT.mkdir(parents=True, exist_ok=True)
@@ -139,7 +144,11 @@ def main(argv: list[str] | None = None) -> int:
             for variant, text in (("raw", line.raw), ("processed", processed.text)):
                 if _key(line.id, v, variant) in done:
                     continue
-                row = _one(line, v, variant, text, processed, args.stt)
+                row = _one(line, v, variant, text, processed, args.stt, args.synth_only)
+                if row is None:
+                    print(f"{line.id} {v.provider}/{v.model} {variant} synthesized", file=sys.stderr)
+                    n += 1
+                    continue
                 with lock:
                     sink.write(json.dumps(row, ensure_ascii=False) + "\n")
                     sink.flush()

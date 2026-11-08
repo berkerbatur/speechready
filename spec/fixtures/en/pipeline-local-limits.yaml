@@ -1,0 +1,11 @@
+# Local models publish small per-call limits (XTTS warns above 226 characters for Turkish);
+# the profile's limit packs whole sentences under it.
+rule: pipeline.chunks
+locale: en-US
+profile: xtts-v2
+cases:
+- id: xtts-packs-under-the-turkish-limit
+  input: The first sentence is forty-two letters long. The second sentence is forty-two letters long. The third sentence is forty-two letters long. The fourth sentence is forty-two letters long. The fifth sentence is forty-two letters long. The sixth sentence is forty-two letters long.
+  expect:
+  - The first sentence is forty-two letters long. The second sentence is forty-two letters long. The third sentence is forty-two letters long. The fourth sentence is forty-two letters long.
+  - The fifth sentence is forty-two letters long. The sixth sentence is forty-two letters long.

@@ -28,6 +28,7 @@ class Profile:
     audio_tags: bool
     lexicon_format: str = "none"  # pls | google | none: how a lexicon is uploaded to this provider
     lexicon_alphabet: str = "ipa"
+    options: dict = field(default_factory=dict)  # option values this profile decides when the caller leaves them unset (today: numbers)
     default: bool = False
     notes: str = ""
     sources: tuple[str, ...] = ()
@@ -67,6 +68,7 @@ def _from_dict(data: dict) -> Profile:
         audio_tags=bool(data.get("audio_tags", False)),
         lexicon_format=str((data.get("lexicon") or {}).get("format", "none")),
         lexicon_alphabet=str((data.get("lexicon") or {}).get("alphabet", "ipa")),
+        options=dict(data.get("options") or {}),
         default=bool(data.get("default", False)),
         notes=data.get("notes", ""),
         sources=tuple(data.get("sources") or ()),

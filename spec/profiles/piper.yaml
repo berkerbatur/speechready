@@ -1,0 +1,28 @@
+id: piper
+provider: piper
+models: [piper, piper1-gpl]
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: chars
+  max: null
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+lexicon: {format: none}
+options: {numbers: words}
+notes: >
+  Local VITS voices (GPL-3.0 package `piper-tts`, voices per language on
+  Hugging Face under rhasspy/piper-voices, including Turkish). Plain text; the
+  embedded espeak-ng phonemizer reads plain cardinals in most languages but has
+  no idea about dates, clock times, currency, units, phone numbers or Turkish
+  dotted thousands, so `numbers: words` hands it finished words. No request
+  limit is published; one sentence per call is the usual pattern.
+sources:
+  - https://github.com/OHF-Voice/piper1-gpl
+  - https://github.com/OHF-Voice/piper1-gpl/blob/main/docs/API_PYTHON.md
+  - https://huggingface.co/rhasspy/piper-voices
+verified: "2026-11-08"

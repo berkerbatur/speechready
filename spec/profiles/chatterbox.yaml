@@ -1,0 +1,30 @@
+id: chatterbox
+provider: chatterbox
+models: [chatterbox, chatterbox-multilingual, chatterbox-turbo, chatterbox-nano]
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: chars
+  max: 300
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+lexicon: {format: none}
+options: {numbers: words}
+notes: >
+  Resemble AI's open models (MIT; the repository says the research line is
+  retired as of August 2026 but the code and weights stay available). The
+  multilingual checkpoint covers 23 languages including Turkish. No text
+  normalizer in the package: digits go to the model as characters, so
+  `numbers: words`. The repository publishes no per-call limit; hosted
+  deployments cap or recommend 300 characters, which is used here, and the
+  streaming segmenter's one-sentence pieces fit comfortably. Turbo and Nano
+  take bracket tags such as [laugh] and [cough] natively; this profile does not
+  pass bracket tags through, so write them after `prepare` if you use them.
+sources:
+  - https://github.com/resemble-ai/chatterbox
+  - https://github.com/resemble-ai/chatterbox/wiki
+verified: "2026-11-08"
