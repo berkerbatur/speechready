@@ -1,0 +1,30 @@
+id: orpheus
+provider: orpheus
+models: [orpheus-3b-0.1-ft, orpheus-tts-0.1-finetune-prod, orpheus-3b-0.1-pretrained]
+default: true
+syntax: plain
+escape: none
+audio_tags: false
+limit:
+  unit: chars
+  max: null
+intents:
+  pause: {render: punctuation}
+  spell: {render: spaced}
+  emphasis: {render: "{text}"}
+lexicon: {format: none}
+options: {numbers: words}
+notes: >
+  Canopy Labs' Llama-based model (Apache-2.0), served through vLLM by the
+  `orpheus-speech` package. English voices (tara, leah, jess, leo, dan, mia,
+  zac, zoe); multilingual checkpoints are a research release. The model reads
+  raw text through an LLM tokenizer with no normalizer, so digits, dates and
+  times come out however the training data read them; `numbers: words`
+  removes that chance. Emotive tags are angle brackets (<laugh>, <sigh>), not
+  the [bracket] tags this library passes through, so add them after `prepare`.
+  No per-request text limit is published; the context is bounded by
+  `max_model_len` (2048 tokens in the README example).
+sources:
+  - https://github.com/canopyai/Orpheus-TTS
+  - https://huggingface.co/canopylabs/orpheus-3b-0.1-ft
+verified: "2026-11-08"

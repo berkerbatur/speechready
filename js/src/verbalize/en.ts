@@ -49,16 +49,30 @@ const longDigits = (m: Match): string => digits(m[0]);
 
 // --- time ----------------------------------------------------------------------------
 
+/** 24-hour hour text to a 12-hour hour and the AM/PM a reader adds; null when the text already reads as 12-hour. */
+function clock(hour: string): [number, string | null] {
+  const h = parseInt(hour, 10);
+  if (h >= 13) return [h - 12, "PM"];
+  if (h === 0) return [12, "AM"];
+  if (hour.startsWith("0")) return [h, "AM"];
+  return [h, null];
+}
+
+function clockWords(h: number, minute: string, suffix: string | null): string {
+  let words = cardinal(h);
+  if (minute !== "00") words += " " + (minute.startsWith("0") ? "oh " + cardinal(parseInt(minute, 10)) : cardinal(parseInt(minute, 10)));
+  return words + (suffix ? " " + suffix : "");
+}
+
 function time(m: Match): string | null {
   const hour = m[1];
   const minute = m[2];
   const suffix = group(m, 3);
-  if (suffix) return null; // "2:30 pm" is read correctly as it stands
-  const h = parseInt(hour, 10);
-  if (h >= 13) return `${h - 12}:${minute} PM`;
-  if (h === 0) return `12:${minute} AM`;
-  if (hour.startsWith("0")) return `${h}:${minute} AM`;
-  return null;
+  const words = option("numbers", null) === "words";
+  if (suffix) return words ? clockWords(parseInt(hour, 10), minute, suffix) : null; // "2:30 pm" is read correctly as it stands
+  const [h, amPm] = clock(hour);
+  if (words) return clockWords(h, minute, amPm);
+  return amPm ? `${h}:${minute} ${amPm}` : null;
 }
 
 // --- currency --------------------------------------------------------------------------
@@ -206,12 +220,31 @@ function alnum(m: Match): string | null {
 // a separator inside a phone number: space, dash, or a dot that is not followed by whitespace
 const SEP = String.raw`(?:[ \-]|\.(?!\s))`;
 
-const timeRange = (m: Match): string => `${m[1]} to ${m[2]}`;
+function timeRange(m: Match): string {
+  if (option("numbers", null) === "words") {
+    const sides = [m[1], m[2]].map((side) => {
+      const [hour, minute] = side.split(":");
+      const [h, amPm] = clock(hour);
+      return clockWords(h, minute, amPm);
+    });
+    return `${sides[0]} to ${sides[1]}`;
+  }
+  return `${m[1]} to ${m[2]}`;
+}
 
 const PER: Record<string, string> = {
   mo: "month", month: "month", yr: "year", year: "year", hr: "hour", hour: "hour",
   min: "minute", minute: "minute", day: "day", week: "week", wk: "week",
 };
+
+/** `numbers: words`: a plain number the other rules left alone, written out. */
+function numberWords(m: Match): string | null {
+  if (option("numbers", null) !== "words") return null;
+  const whole = m[1].replace(/,/g, "");
+  const frac = group(m, 2);
+  if (whole.length > 1 && whole.startsWith("0")) return digits(whole) + (frac ? " point " + digits(frac) : "");
+  return frac ? decimal(whole, frac) : cardinal(parseInt(whole, 10));
+}
 
 export const RULES: Rule[] = [
   rule("verbalize.date.iso", re(String.raw`${B}(\d{4})-(\d{2})-(\d{2})${B}`), dateIso, "ISO date read as month, day, year"),
@@ -251,6 +284,7 @@ export const RULES: Rule[] = [
   rule("verbalize.ordinal", re(String.raw`${B}(\d{1,4})(?:st|nd|rd|th)${B}`), ordinalRule, "ordinal read as words"),
   rule("verbalize.minus", re(String.raw`(?<![${W}.)\-–])[-–](?=\d)`), () => "minus ", "leading minus read as a word"),
   rule("verbalize.alnum", re(String.raw`${B}(?=[A-Z0-9-]*\d)(?=[A-Z0-9-]*[A-Z])[A-Z0-9]+(?:-[A-Z0-9]+)*${B}`), alnum, "identifier spelled out"),
+  rule("verbalize.number.words", re(String.raw`(?<![${W}.,:/\-])(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(?![${W}:]|[.,\-–]\d)`), numberWords, "plain number written out (numbers: words)"),
 ];
 
 registerRules("en", RULES);

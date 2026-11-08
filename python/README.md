@@ -26,7 +26,7 @@ for change in result.changes:
     print(change.rule, repr(change.before), "->", repr(change.after))
 ```
 
-The verbalize stage rewrites only what models misread: phone numbers and long digit strings (digit by digit), numeric dates in the locale's order, 24-hour times, currency amounts, percent and unit abbreviations, small fractions, number ranges, years in context, decades, ordinals, and identifiers such as `AB12X9`. Ordinary numbers, decimals and pronounceable names like `COVID-19` are left alone.
+The verbalize stage rewrites only what models misread: phone numbers and long digit strings (digit by digit), numeric dates in the locale's order, 24-hour times, currency amounts, percent and unit abbreviations, small fractions, number ranges, years in context, decades, ordinals, and identifiers such as `AB12X9`. Ordinary numbers, decimals and pronounceable names like `COVID-19` are left alone, because hosted voices read them well. Local models mostly do not have a text normalizer, so their profiles (`kokoro`, `piper`, `chatterbox`, `xtts-v2`, `orpheus`) set `numbers="words"` and every remaining number and clock time is written out (`42` → forty-two, `14:30` → two thirty PM); pass `numbers="digits"` to keep them.
 
 Turkish (`locale="tr-TR"`) adds what foreign models get wrong in Turkish: suffixes on numerals and abbreviations are joined to the spoken word with vowel harmony and buffer consonants (`3'te` → üçte, `1990'da` → bin dokuz yüz doksanda, `100 TL'ye` → yüz liraya, `1/4'ü` → çeyreği), `%50` → yüzde elli, dotted thousands `1.250` → bin iki yüz elli, decimal commas `3,14` → üç virgül on dört, `3. madde` → üçüncü madde, dates `27.10.2026` → yirmi yedi Ekim iki bin yirmi altı, and abbreviations such as `vb.`, `Dr.`, `Üniv.`, `Cad.` read in full.
 
@@ -50,6 +50,7 @@ prepare(text, provider="openai", options=Options(
     list_numbers="keep",       # keep (default, "1. Open the app") | drop
     fractions="spoken",        # spoken (default: "one half", "yarım") | division ("one over two", "bir bölü iki")
     foreign_acronyms=True,     # Turkish: npm, css, sql read with English letter names (en pi em)
+    numbers=None,              # digits (leave plain numbers to the voice) | words (write every remaining number and clock time out); None = the profile decides, else digits
     terminal_punctuation=".",  # added to a block that ends without one
 ))
 ```

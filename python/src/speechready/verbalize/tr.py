@@ -188,6 +188,14 @@ def _suffixed_number(m: re.Match[str], locale: str) -> str | None:
     return attach(cardinal(n), suffix)
 
 
+def _number_words(m: re.Match[str], locale: str) -> str | None:
+    """`numbers: words`: a plain number the other rules left alone, written out."""
+    if option("numbers", None) != "words":
+        return None
+    n = m.group(1)
+    return digits(n) if len(n) > 1 and n.startswith("0") else cardinal(int(n))
+
+
 def _ordinal_dot(m: re.Match[str], locale: str) -> str | None:
     return ordinal(int(m.group(1)))
 
@@ -261,4 +269,5 @@ RULES: list[Rule] = [
     Rule("verbalize.ordinal", re.compile(rf"\b(\d{{1,3}})\.(?=\s+[{_LOWER}])"), _ordinal_dot, "numeral with a dot before a lowercase word read as an ordinal"),
     Rule("verbalize.minus", re.compile(r"(?<![\w.)\-–])[-–](?=\d)"), lambda m, loc: "eksi ", "leading minus read as a word"),
     Rule("verbalize.alnum", re.compile(rf"\b(?=[{_UPPER}0-9-]*\d)(?=[{_UPPER}0-9-]*[{_UPPER}])[{_UPPER}0-9]+(?:-[{_UPPER}0-9]+)*\b"), _alnum, "identifier spelled out"),
+    Rule("verbalize.number.words", re.compile(rf"(?<![\w.,:/\-])(\d+)(?![\w'’]|[.,]\d)"), _number_words, "plain number written out (numbers: words)"),
 ]

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from .changes import Change, Recorder
@@ -52,6 +52,7 @@ def prepare(
     else:
         lex = Lexicon.load(lexicon) if isinstance(lexicon, (str, Path)) else lexicon
     prof = profile or resolve_profile(provider, model)
+    options = _with_profile_defaults(options, prof)
     rec = Recorder()
 
     work, intents = extract(text)
@@ -68,6 +69,16 @@ def prepare(
     sentences = split_sentences(work, locale)
     chunks = pack(sentences, max_size, prof.limit_unit, joiner=" ")
     return Prepared(text=work, chunks=chunks, changes=_readable(rec.changes, intents), profile=prof, locale=locale)
+
+
+def _with_profile_defaults(options: Options | None, prof: Profile) -> Options | None:
+    """Fill the options a profile may decide for the caller. Today that is `numbers`:
+    a profile for a model that reads digits badly sets `options: {numbers: words}`, and
+    a caller who left `numbers` at None gets that; an explicit value always wins."""
+    opts = options or Options()
+    if opts.numbers is None and prof.options.get("numbers"):
+        return replace(opts, numbers=str(prof.options["numbers"]))
+    return options
 
 
 _SENTINEL = re.compile(f"{SENTINEL_OPEN}(\\d+){SENTINEL_CLOSE}")

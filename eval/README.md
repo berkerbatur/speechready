@@ -12,16 +12,17 @@ This harness answers the plan's go/no-go question. Every corpus line is synthesi
 ## Run
 
 ```
-python -m pip install -e python -e "eval[whisper]"     # faster-whisper needs a GPU for large-v3 at a sane speed
-set -a; source .env; set +a                            # keys live in .env (gitignored), never in the repo
+python -m pip install -e python -e "eval[whisper,local]"   # faster-whisper (a GPU makes large-v3 fast; a laptop CPU runs it at about 1.5x the audio length) plus Kokoro and Piper
+set -a; source .env; set +a                                 # keys live in .env (gitignored), never in the repo
 
 python -m speechready_eval.run --dry-run                       # what would be synthesized
 python -m speechready_eval.run --locales en --providers openai --stt openai --limit 10   # a cheap first pass
-python -m speechready_eval.run                                 # everything: en + tr, every provider with a key, local whisper
+python -m speechready_eval.run                                 # everything: en + tr, every provider with a key or an installed package, local whisper
+python -m speechready_eval.run --providers kokoro,piper        # the local models only: no keys, no spend
 python -m speechready_eval.report                              # eval/out/summary.md and eval/out/index.html
 ```
 
-Results accumulate in `eval/out/results.jsonl`; a rerun skips finished variants, so a crash or a key running out loses nothing. Providers run in parallel with one worker each, so no provider sees concurrent requests. Pass `--voice provider:model:voice:locale` to change voices (defaults are in `synth.py`); providers whose keys are missing are skipped with a notice.
+Results accumulate in `eval/out/results.jsonl`; a rerun skips finished variants, so a crash or a key running out loses nothing. Providers run in parallel with one worker each, so no provider sees concurrent requests. Pass `--voice provider:model:voice:locale` to change voices (defaults are in `synth.py`); providers whose keys or packages are missing are skipped with a notice.
 
 ## Providers and keys
 
@@ -34,6 +35,27 @@ Results accumulate in `eval/out/results.jsonl`; a rerun skips finished variants,
 | Amazon Polly | neural en + tr, generative en | `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` (or `AWS_POLLY_USER_AWS_CLI_ACCESS_KEY`/`..._SECRET`), optional `AWS_POLLY_REGION` (default `eu-central-1`) |
 | Cartesia | sonic-3.6, en + tr | `CARTESIA_API_KEY` |
 | Deepgram | aura-2, en only | `DEEPGRAM_API_KEY` |
+
+## Local models
+
+These run on the machine, so the only cost is time. They need `ffmpeg` on the path (the audio is stored as MP3 like everything else) and the model package; a provider whose package is not installed is skipped.
+
+| Provider | Voices in the default run | Install |
+| --- | --- | --- |
+| Kokoro | kokoro-82m `af_heart`, en | `eval[local]` (the `kokoro` package; `espeak-ng` for out-of-vocabulary words). Weights download from Hugging Face on first use. |
+| Piper | `en_US-lessac-medium`, `tr_TR-dfki-medium` | `eval[local]` (`piper-tts`), then `python -m piper.download_voices en_US-lessac-medium tr_TR-dfki-medium --data-dir eval/models/piper` (or fetch the `.onnx` and `.onnx.json` from `rhasspy/piper-voices` on Hugging Face into that folder). |
+| Chatterbox | chatterbox-multilingual, built-in voice, en + tr | `pip install chatterbox-tts`; a GPU in practice. `--voice chatterbox:chatterbox-multilingual:/path/to/clip.wav:en-US` clones a reference clip. |
+| XTTS v2 | `Ana Florence`, en + tr | `pip install coqui-tts`; a GPU in practice. Non-commercial licence. |
+| Orpheus | orpheus-3b-0.1-ft `tara`, en | `pip install orpheus-speech` (vLLM, a GPU). |
+
+Model files land in `eval/models/` (gitignored) or the Hugging Face cache. On macOS, PyTorch models (Kokoro, Chatterbox) and faster-whisper cannot share a process: each brings its own OpenMP runtime and the second one aborts or hangs. Run those providers with `--synth-only` first, then the normal run transcribes the clips it finds (Piper's onnxruntime and Whisper coexist fine):
+
+```
+python -m speechready_eval.run --providers kokoro --synth-only
+python -m speechready_eval.run --providers kokoro,piper
+```
+
+On an Intel Mac, PyTorch stops at 2.2, which needs `transformers<4.50`, `tokenizers<0.22`, `numpy<2` and `av<14` beside the current `kokoro` and `faster-whisper`; Apple silicon and Linux need none of that.
 
 Raw text is sent as plain text everywhere. Processed text is sent the way its profile says: an SSML body wrapped in `<speak>` for Azure, Polly and Google's classic voices, plain text for the rest.
 

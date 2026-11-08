@@ -2,6 +2,12 @@
 
 Both packages share one version number and one fixture corpus, so an entry here applies to Python and JavaScript alike unless it says otherwise.
 
+## Unreleased
+
+- **Local models:** profiles for Kokoro, Piper, Chatterbox, XTTS v2 and Orpheus (`provider="kokoro"`, `"piper"`, `"chatterbox"`, `"xtts"`, `"orpheus"`), plain text with the limits and quirks each one publishes.
+- **Option `numbers`:** `words` writes every number the other rules left alone out in full, clock times included (`42` → forty-two, `3,500` → three thousand five hundred, `14:30` → two thirty PM, `2019 yılında` → iki bin on dokuz yılında). The default `digits` leaves them to the voice as before. A profile may set it for its model (`options: {numbers: words}` in the YAML, which the five local profiles do); an explicit value from the caller always wins.
+- **Evaluation:** the harness runs local models beside the hosted ones (`eval[local]` installs Kokoro and Piper; Chatterbox, XTTS and Orpheus are picked up when their packages are present), with no keys and no spend. Measured 2026-11-08 with local Whisper: Kokoro misreads 38% of the English corpus as written and 11% after `prepare`; Piper 42% → 12% in English and 43% → 14% in Turkish.
+
 ## 0.3.1 (2026-11-02)
 
 - **Fixed, Turkish:** a dotted clock time after "saat" or with a suffix is read as a time (`14.00'teki` → on dörtteki, `saat 9.30'da` → saat dokuz otuzda, `09.00-17.30` → dokuz sıfır sıfır ile on yedi otuz); it was split into digits and a mis-harmonised suffix. A time on the hour with a suffix takes the suffix on the hour (`14:00'teki` → on dörtteki).

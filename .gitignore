@@ -33,3 +33,6 @@ npm-debug.log*
 
 # Evaluation outputs (audio, transcripts, pages)
 eval/out/
+
+# Local TTS model files for the evaluation (downloaded, large)
+eval/models/

@@ -25,7 +25,7 @@ for (const change of result.changes) {
 }
 ```
 
-`provider` and `model` pick a profile; with neither, the `plain` profile renders pauses as punctuation and returns one chunk. Pass `profile: loadProfile("azure-neural")` to pick one directly and `limit` to override the request limit. `locale` is `en-US` by default; `tr-TR` turns on the Turkish rules.
+`provider` and `model` pick a profile; with neither, the `plain` profile renders pauses as punctuation and returns one chunk. Profiles for local models (`kokoro`, `piper`, `chatterbox`, `xtts`, `orpheus`) also turn on `numbers: "words"`, since those models have no text normalizer of their own. Pass `profile: loadProfile("azure-neural")` to pick one directly and `limit` to override the request limit. `locale` is `en-US` by default; `tr-TR` turns on the Turkish rules.
 
 Everything a caller may want to decide differently is an option. The names are the same as in the Python package and in the shared fixtures, so they are snake_case; a name the package does not know throws.
 
@@ -41,6 +41,7 @@ prepare(text, { provider: "openai", options: {
   list_numbers: "keep",       // keep (default, "1. Open the app") | drop
   fractions: "spoken",        // spoken (default: "one half", "yarım") | division ("one over two", "bir bölü iki")
   foreign_acronyms: true,     // Turkish: npm, css, sql read with English letter names (en pi em)
+  numbers: null,              // digits (leave plain numbers to the voice) | words (write every remaining number and clock time out); null = the profile decides, else digits
   terminal_punctuation: ".",  // added to a block that ends without one
 }});
 ```

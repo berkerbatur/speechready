@@ -25,6 +25,8 @@ export interface Profile {
   /** pls | google | none: how a lexicon is uploaded to this provider */
   lexiconFormat: string;
   lexiconAlphabet: string;
+  /** option values this profile decides when the caller leaves them unset (today: numbers) */
+  options: Record<string, unknown>;
   default: boolean;
   notes: string;
   sources: string[];
@@ -51,6 +53,7 @@ function fromDict(data: Raw): Profile {
     audioTags: Boolean(data.audio_tags ?? false),
     lexiconFormat: String(lexicon.format ?? "none"),
     lexiconAlphabet: String(lexicon.alphabet ?? "ipa"),
+    options: { ...((data.options as Record<string, unknown> | undefined) ?? {}) },
     default: Boolean(data.default ?? false),
     notes: (data.notes as string | undefined) ?? "",
     sources: ((data.sources as string[] | undefined) ?? []).map(String),

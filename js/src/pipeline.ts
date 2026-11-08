@@ -48,23 +48,35 @@ export function prepare(text: string, init: PrepareInit = {}): Prepared {
     : Array.isArray(init.lexicon) ? Lexicon.fromEntries(init.lexicon, locale)
     : init.lexicon ?? null;
   const prof = init.profile ?? resolveProfile(init.provider ?? null, init.model ?? null);
+  const opts = withProfileDefaults(init.options, prof);
   const rec = new Recorder();
 
   let [work, intents] = extract(text);
-  work = clean(work, init.options, rec, locale);
+  work = clean(work, opts, rec, locale);
   [work, intents] = extract(work, intents);
   if (lex) {
     const before = work;
     work = lex.apply(work, intents);
     rec.add("lexicon", "lexicon.apply", before, work, "lexicon words marked for pronunciation");
   }
-  work = verbalize(work, locale, rec, init.options);
+  work = verbalize(work, locale, rec, opts);
   work = compileText(work, intents, prof, rec);
 
   const maxSize = init.limit !== undefined ? init.limit : prof.limitFor(init.model ?? null);
   const sentences = splitSentences(work, locale);
   const chunks = pack(sentences, maxSize, prof.limitUnit, " ");
   return { text: work, chunks, changes: readable(rec.changes, intents), profile: prof, locale };
+}
+
+/** Fill the options a profile may decide for the caller. Today that is `numbers`: a profile
+ * for a model that reads digits badly sets `options: {numbers: words}`, and a caller who left
+ * `numbers` unset gets that; an explicit value always wins. */
+function withProfileDefaults(options: Partial<Options> | null | undefined, prof: Profile): Partial<Options> | null | undefined {
+  const numbers = prof.options.numbers;
+  if ((options?.numbers ?? null) === null && (numbers === "words" || numbers === "digits")) {
+    return { ...(options ?? {}), numbers };
+  }
+  return options;
 }
 
 function intentTag(intent: Intent): string {

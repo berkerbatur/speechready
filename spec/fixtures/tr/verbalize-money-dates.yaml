@@ -105,3 +105,12 @@ cases:
   - id: spaced-minus-in-an-equation
     input: "Adım 1: 72 - 32 = 40, aralık 10-20."
     expect: "Adım 1: 72 eksi 32 = 40, aralık 10 ila 20."
+  # numbers: words (the default for local models with no text normalizer; see spec/profiles)
+  - id: words-plain-numbers-written-out
+    options: {numbers: words}
+    input: "42 elma aldım, 2019 yılında 101 numaralı oda."
+    expect: "kırk iki elma aldım, iki bin on dokuz yılında yüz bir numaralı oda."
+  - id: words-leading-zero-keeps-suffix-and-ordinal-rules
+    options: {numbers: words}
+    input: "007 ajanı 3. kata çıktı, 42'si geldi."
+    expect: "sıfır sıfır yedi ajanı üçüncü kata çıktı, kırk ikisi geldi."

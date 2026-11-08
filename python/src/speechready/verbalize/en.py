@@ -63,18 +63,34 @@ def _long_digits(m: re.Match[str], locale: str) -> str | None:
 # --- time ----------------------------------------------------------------------------
 
 
-def _time(m: re.Match[str], locale: str) -> str | None:
-    hour, minute, suffix = m.group(1), m.group(2), m.group(3)
-    if suffix:
-        return None  # "2:30 pm" is read correctly as it stands
+def _clock(hour: str) -> tuple[int, str | None]:
+    """24-hour hour text to a 12-hour hour and the AM/PM a reader adds; None when the text already reads as 12-hour."""
     h = int(hour)
     if h >= 13:
-        return f"{h - 12}:{minute} PM"
+        return h - 12, "PM"
     if h == 0:
-        return f"12:{minute} AM"
+        return 12, "AM"
     if hour.startswith("0"):
-        return f"{h}:{minute} AM"
-    return None
+        return h, "AM"
+    return h, None
+
+
+def _clock_words(h: int, minute: str, suffix: str | None) -> str:
+    words = cardinal(h)
+    if minute != "00":
+        words += " " + ("oh " + cardinal(int(minute)) if minute.startswith("0") else cardinal(int(minute)))
+    return words + (" " + suffix if suffix else "")
+
+
+def _time(m: re.Match[str], locale: str) -> str | None:
+    hour, minute, suffix = m.group(1), m.group(2), m.group(3)
+    words = option("numbers", None) == "words"
+    if suffix:
+        return _clock_words(int(hour), minute, suffix) if words else None  # "2:30 pm" is read correctly as it stands
+    h, am_pm = _clock(hour)
+    if words:
+        return _clock_words(h, minute, am_pm)
+    return f"{h}:{minute} {am_pm}" if am_pm else None
 
 
 # --- currency --------------------------------------------------------------------------
@@ -245,7 +261,24 @@ def _alnum(m: re.Match[str], locale: str) -> str | None:
 _SEP = r"(?:[ \-]|\.(?!\s))"
 
 
+def _number_words(m: re.Match[str], locale: str) -> str | None:
+    """`numbers: words`: a plain number the other rules left alone, written out."""
+    if option("numbers", None) != "words":
+        return None
+    whole, frac = m.group(1).replace(",", ""), m.group(2)
+    if len(whole) > 1 and whole.startswith("0"):
+        return digits(whole) + (" point " + digits(frac) if frac else "")
+    return decimal(whole, frac) if frac else cardinal(int(whole))
+
+
 def _time_range(m: re.Match[str], locale: str) -> str | None:
+    if option("numbers", None) == "words":
+        sides = []
+        for side in (m.group(1), m.group(2)):
+            hour, minute = side.split(":")
+            h, am_pm = _clock(hour)
+            sides.append(_clock_words(h, minute, am_pm))
+        return f"{sides[0]} to {sides[1]}"
     return f"{m.group(1)} to {m.group(2)}"
 
 
@@ -289,4 +322,5 @@ RULES: list[Rule] = [
     Rule("verbalize.ordinal", re.compile(r"\b(\d{1,4})(?:st|nd|rd|th)\b"), _ordinal, "ordinal read as words"),
     Rule("verbalize.minus", re.compile(r"(?<![\w.)\-–])[-–](?=\d)"), lambda m, loc: "minus ", "leading minus read as a word"),
     Rule("verbalize.alnum", re.compile(r"\b(?=[A-Z0-9-]*\d)(?=[A-Z0-9-]*[A-Z])[A-Z0-9]+(?:-[A-Z0-9]+)*\b"), _alnum, "identifier spelled out"),
+    Rule("verbalize.number.words", re.compile(r"(?<![\w.,:/\-])(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?(?![\w:]|[.,\-–]\d)"), _number_words, "plain number written out (numbers: words)"),
 ]
