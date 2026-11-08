@@ -102,7 +102,7 @@ def main(argv: list[str] | None = None) -> int:
     # A provider without its key or package can still be transcribed when its clips are already on disk
     # (a --synth-only pass in another environment); it is skipped only when it has nothing to transcribe.
     def has_clips(provider: str) -> bool:
-        return any((OUT / "audio" / f"{_key(l, v, var)}.mp3").exists()
+        return any((OUT / "audio" / f"{_key(l.id, v, var)}.mp3").exists()
                    for l in lines for v in voices if v.provider == provider and v.locale == l.locale for var in ("raw", "processed"))
 
     missing = sorted({v.provider for v in voices if not synth.available(v.provider) and not has_clips(v.provider)})
