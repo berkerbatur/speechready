@@ -25,7 +25,10 @@ venv() {  # venv NAME [--system-site-packages] PACKAGES...
 stamp() { date "+%H:%M:%S $*"; }
 
 if has chatterbox; then
-  stamp "chatterbox: install"; venv chatterbox chatterbox-tts
+  # pkg_resources (perth watermarker) left setuptools in 81; the Chinese segmenter fetches a model
+  # from GitHub releases on first use, which this corpus never needs, so it goes.
+  stamp "chatterbox: install"; venv chatterbox chatterbox-tts "setuptools<81"
+  .venv-chatterbox/bin/pip uninstall -y -q spacy-pkuseg 2>/dev/null || true
   stamp "chatterbox: synth"; .venv-chatterbox/bin/python -m speechready_eval.run --providers chatterbox --synth-only
 fi
 if has orpheus; then

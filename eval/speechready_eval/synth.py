@@ -267,11 +267,22 @@ def xtts(text: str, v: Voice, preprocessed: bool) -> bytes:
     return _mp3(_wav_bytes(np.asarray(wav, dtype="float32"), 24000))
 
 
+# canopylabs gates its weights behind a Hugging Face login; unsloth republishes them openly, same tensors.
+ORPHEUS_REPOS = {"orpheus-3b-0.1-ft": "unsloth/orpheus-3b-0.1-ft"}
+
+
 @lru_cache(maxsize=1)
 def _orpheus(model: str):
     from orpheus_tts import OrpheusModel
+    from vllm import AsyncEngineArgs, AsyncLLMEngine
 
-    return OrpheusModel(model_name=f"canopylabs/{model}", max_model_len=2048)
+    class Engine(OrpheusModel):
+        def _setup_engine(self):  # the package takes no engine options; short prompts need neither the 128k context nor 90% of the card
+            return AsyncLLMEngine.from_engine_args(AsyncEngineArgs(
+                model=self.model_name, dtype=self.dtype, max_model_len=4096,
+                gpu_memory_utilization=float(os.environ.get("SPEECHREADY_EVAL_VLLM_MEM", "0.8"))))
+
+    return Engine(model_name=ORPHEUS_REPOS.get(model, f"canopylabs/{model}"))
 
 
 def orpheus(text: str, v: Voice, preprocessed: bool) -> bytes:
