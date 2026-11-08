@@ -13,7 +13,7 @@ from .lexicons import list_lexicons, load_lexicon
 from .pipeline import Prepared, prepare
 from .profiles import Profile, list_profiles, load_profile, resolve_profile
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 __all__ = [
     "Change",

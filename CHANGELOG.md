@@ -2,7 +2,7 @@
 
 Both packages share one version number and one fixture corpus, so an entry here applies to Python and JavaScript alike unless it says otherwise.
 
-## Unreleased
+## 0.4.0 (2026-11-09)
 
 - **Local models:** profiles for Kokoro, Piper, Chatterbox, XTTS v2 and Orpheus (`provider="kokoro"`, `"piper"`, `"chatterbox"`, `"xtts"`, `"orpheus"`), plain text with the limits and quirks each one publishes.
 - **Option `numbers`:** `words` writes every number the other rules left alone out in full, clock times included (`42` → forty-two, `3,500` → three thousand five hundred, `14:30` → two thirty PM, `2019 yılında` → iki bin on dokuz yılında). The default `digits` leaves them to the voice as before. A profile may set it for its model (`options: {numbers: words}` in the YAML, which the five local profiles do); an explicit value from the caller always wins.
