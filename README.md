@@ -96,7 +96,7 @@ Everything a caller may want to decide differently is an `Options` field (code b
 
 ## Status
 
-Version 0.3.0 is on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready). Both packages have all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram, and for the open-weight models Kokoro, Piper, Chatterbox, XTTS v2 and Orpheus. The Python package has been through the evaluation above; the TypeScript package passes the same 233 fixtures, so it produces the same text. Changes are listed in `CHANGELOG.md`. The public API may still move before 1.0; anything that does will be called out there.
+Version 0.4.0 is on [PyPI](https://pypi.org/project/speechready/) and [npm](https://www.npmjs.com/package/speechready). Both packages have all four stages, the streaming segmenter, English and Turkish verbalization rules, the lexicon, and profiles for ElevenLabs (v2 and v3/v4 families), OpenAI, Azure, Google (Chirp 3 HD and the SSML voices), Amazon Polly, Cartesia and Deepgram, and for the open-weight models Kokoro, Piper, Chatterbox, XTTS v2 and Orpheus. The Python package has been through the evaluation above; the TypeScript package passes the same 233 fixtures, so it produces the same text. Changes are listed in `CHANGELOG.md`. The public API may still move before 1.0; anything that does will be called out there.
 
 ### Releasing
 
