@@ -62,15 +62,20 @@ Every voice improved and the control prose did not regress. Cartesia's Turkish i
 
 32 pairs got better, 42 worse, 166 did not change. Of the 42 worse: 14 are code blocks that speechready drops by default while the narration kept the command (`code_blocks="keep"` or `"mention"` changes that); 8 are convention differences between the library and the narration (lira and kuruş against "virgül", "dokuzda beş" against "beş bölü dokuz"); 6 are two bugs this run found, fixed in the next release (a dotted Turkish time with a suffix, `14.00'teki`, and a spaced minus in an equation read as a range); 18 differ by a word or two of transcription noise. The reading: concise assistant answers contain few of the constructs the library targets, so on them it changes little either way. The gain in the tables above is on inputs that do contain markdown, prices, phone numbers, dates and code, which is where voice agents fail audibly. The corpus is in `eval/corpus/heldout.*.yaml`, `summary.md` reports it in its own section, and the numbers here are as measured before the two fixes.
 
-**Local models.** Measured on 2026-11-08 on a laptop CPU, no API calls: the same corpus (grown to 89 English and 63 Turkish lines by then) through Kokoro 82M and Piper, transcribed with faster-whisper large-v3 instead of the hosted transcription model, so the rows are comparable with each other and with the trend above, not digit for digit with the hosted table. These models have no text normalizer of their own, so their profiles also write every remaining number out in words.
+**Local models.** Measured on 2026-11-08, no API calls: the same corpus (grown to 89 English and 63 Turkish lines by then) through five open-weight models, Kokoro and Piper on a laptop CPU, Chatterbox, XTTS v2 and Orpheus on a rented RTX 4090, all transcribed with faster-whisper large-v3 instead of the hosted transcription model. The rows are comparable with each other and with the trend above, not digit for digit with the hosted table. None of these models has a text normalizer of its own, so their profiles also write every remaining number out in words.
 
 | Model | Locale | Pairs | Misread as written | Misread with speechready |
 | --- | --- | --- | --- | --- |
 | Kokoro 82M | English | 89 | 38% | 11% |
 | Piper (lessac-medium) | English | 89 | 42% | 12% |
 | Piper (dfki-medium) | Turkish | 63 | 43% | 14% |
+| Chatterbox multilingual | English | 89 | 60% | 27% |
+| Chatterbox multilingual | Turkish | 63 | 86% | 21% |
+| XTTS v2 | English | 89 | 49% | 25% |
+| XTTS v2 | Turkish | 63 | 52% | 22% |
+| Orpheus 3B | English | 89 | 43% | 8% |
 
-Small local models fail on the same inputs as the hosted voices, more often: a raw ISO date, a markdown table or an inline code span comes out as noise, and written-out text fixes most of it. The held-out assistant answers behaved as they did for the hosted voices (Kokoro 3% misread either way, Piper 10% as written and 13% processed over 60 pairs, the difference being code blocks the library drops). Their pairs are in the listening page under their own headings.
+Local models fail on the same inputs as the hosted voices, more often: a raw ISO date, a markdown table or an inline code span comes out as noise, and written-out text fixes most of it. What remains after preprocessing for Chatterbox and XTTS is largely the model itself: given a very short sentence, both tend to keep talking past the end of the text, and the transcript then carries a few seconds of invented words. Orpheus is a streaming model that expects a sentence at a time; the harness sends whole lines, and its package stops a clip after 14 seconds unless told otherwise, which the harness now does. The held-out assistant answers behaved as they did for the hosted voices (Kokoro 3% misread either way, Piper 10% as written and 13% processed, Chatterbox 30% and 17%, XTTS 17% and 13%, Orpheus 20% and 10%, each over 60 pairs or 30 for the English-only models; the differences are mostly code blocks the library drops). Their pairs are in the listening page under their own headings.
 
 - **Listen:** [berkerbatur.github.io/speechready](https://berkerbatur.github.io/speechready/) plays the clearest before/after pairs for every voice, with what the speech-to-text model heard under each.
 - **Try your own text:** [berkerbatur.github.io/speechready/play](https://berkerbatur.github.io/speechready/play/) runs the JavaScript package in your browser (35 kB) and shows the output, the chunks and every rewrite. Nothing you type leaves the page.
