@@ -26,7 +26,8 @@ SHOW = OUT / "showcase"
 PROVIDER_NAMES = {
     "elevenlabs": "ElevenLabs", "openai": "OpenAI", "azure": "Azure AI Speech", "google": "Google Cloud TTS",
     "polly": "Amazon Polly", "cartesia": "Cartesia", "deepgram": "Deepgram",
-    "kokoro": "Kokoro (local)", "piper": "Piper (local)",
+    "kokoro": "Kokoro (local)", "piper": "Piper (local)", "chatterbox": "Chatterbox (local)",
+    "xtts": "XTTS v2 (local)", "orpheus": "Orpheus (local)",
 }
 
 

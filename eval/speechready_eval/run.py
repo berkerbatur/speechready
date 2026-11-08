@@ -53,6 +53,8 @@ def _one(line: corpus.Line, v: synth.Voice, variant: str, text: str, processed, 
             "provider": v.provider, "model": v.model, "voice": v.voice, "text": text, "intended": line.intended}
     try:
         if not audio.exists():
+            if not synth.available(v.provider):
+                raise RuntimeError(f"no clip on disk and the {v.provider} package or key is not available here")
             audio.write_bytes(synth.synthesize(text, v, preprocessed=(variant == "processed")))
         if synth_only:
             return None
@@ -92,15 +94,21 @@ def main(argv: list[str] | None = None) -> int:
         for loc, vs in synth.DEFAULT_VOICES.items():
             if loc.split("-")[0] in locales:
                 voices.extend(v for v in vs if v.provider in wanted)
-    missing = sorted({v.provider for v in voices if not synth.available(v.provider)})
-    if missing:
-        print(f"skipping providers whose keys or packages are missing: {', '.join(missing)}", file=sys.stderr)
-        voices = [v for v in voices if v.provider not in missing]
-
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "audio").mkdir(exist_ok=True)
     results = OUT / "results.jsonl"
     done = _load_done(results)
+
+    # A provider without its key or package can still be transcribed when its clips are already on disk
+    # (a --synth-only pass in another environment); it is skipped only when it has nothing to transcribe.
+    def has_clips(provider: str) -> bool:
+        return any((OUT / "audio" / f"{_key(l.id, v, var)}.mp3").exists()
+                   for l in lines for v in voices if v.provider == provider and v.locale == l.locale for var in ("raw", "processed"))
+
+    missing = sorted({v.provider for v in voices if not synth.available(v.provider) and not has_clips(v.provider)})
+    if missing:
+        print(f"skipping providers whose keys or packages are missing: {', '.join(missing)}", file=sys.stderr)
+        voices = [v for v in voices if v.provider not in missing]
 
     jobs = [(line, v) for line in lines for v in voices if v.locale == line.locale]
     if args.redo == "changed":

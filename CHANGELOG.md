@@ -6,7 +6,7 @@ Both packages share one version number and one fixture corpus, so an entry here 
 
 - **Local models:** profiles for Kokoro, Piper, Chatterbox, XTTS v2 and Orpheus (`provider="kokoro"`, `"piper"`, `"chatterbox"`, `"xtts"`, `"orpheus"`), plain text with the limits and quirks each one publishes.
 - **Option `numbers`:** `words` writes every number the other rules left alone out in full, clock times included (`42` → forty-two, `3,500` → three thousand five hundred, `14:30` → two thirty PM, `2019 yılında` → iki bin on dokuz yılında). The default `digits` leaves them to the voice as before. A profile may set it for its model (`options: {numbers: words}` in the YAML, which the five local profiles do); an explicit value from the caller always wins.
-- **Evaluation:** the harness runs local models beside the hosted ones (`eval[local]` installs Kokoro and Piper; Chatterbox, XTTS and Orpheus are picked up when their packages are present), with no keys and no spend. Measured 2026-11-08 with local Whisper: Kokoro misreads 38% of the English corpus as written and 11% after `prepare`; Piper 42% → 12% in English and 43% → 14% in Turkish.
+- **Evaluation:** the harness runs local models beside the hosted ones (`eval[local]` installs Kokoro and Piper; Chatterbox, XTTS and Orpheus are picked up when their packages are present), with no keys and no spend. Measured 2026-11-08 with local Whisper: Kokoro misreads 38% of the English corpus as written and 11% after `prepare`; Piper 42% → 12% in English and 43% → 14% in Turkish; on an RTX 4090, Chatterbox 60% → 27% (English) and 86% → 21% (Turkish), XTTS v2 49% → 25% and 52% → 22%, Orpheus 43% → 8% (English). `eval/gpu/run.sh` reproduces the GPU part on a CUDA machine.
 
 ## 0.3.1 (2026-11-02)
 
