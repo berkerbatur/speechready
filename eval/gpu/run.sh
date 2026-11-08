@@ -32,10 +32,12 @@ if has chatterbox; then
   stamp "chatterbox: synth"; .venv-chatterbox/bin/python -m speechready_eval.run --providers chatterbox --synth-only
 fi
 if has orpheus; then
-  stamp "orpheus: install"; venv orpheus orpheus-speech "vllm==0.7.3"
+  # vLLM 0.7 fails at tokenizer init under transformers 5
+  stamp "orpheus: install"; venv orpheus orpheus-speech "vllm==0.7.3" "transformers>=4.56,<5"
   stamp "orpheus: synth"; .venv-orpheus/bin/python -m speechready_eval.run --providers orpheus --synth-only
 fi
-stamp "main: install"; venv main --system-site-packages coqui-tts "faster-whisper>=1.1"
+# faster-whisper 1.2 opens audio with an av keyword that av 14+ dropped
+stamp "main: install"; venv main --system-site-packages coqui-tts "faster-whisper>=1.1" "av<14"
 if has xtts; then
   stamp "xtts: synth"; .venv-main/bin/python -m speechready_eval.run --providers xtts --synth-only
 fi

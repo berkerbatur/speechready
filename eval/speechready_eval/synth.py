@@ -269,6 +269,8 @@ def xtts(text: str, v: Voice, preprocessed: bool) -> bytes:
 
 # canopylabs gates its weights behind a Hugging Face login; unsloth republishes them openly, same tensors.
 ORPHEUS_REPOS = {"orpheus-3b-0.1-ft": "unsloth/orpheus-3b-0.1-ft"}
+# About 86 audio tokens a second: the package default of 1,200 cuts a clip at 14 s, these allow about 80 s.
+ORPHEUS_CONTEXT, ORPHEUS_MAX_TOKENS = 8192, 7000
 
 
 @lru_cache(maxsize=1)
@@ -279,14 +281,14 @@ def _orpheus(model: str):
     class Engine(OrpheusModel):
         def _setup_engine(self):  # the package takes no engine options; short prompts need neither the 128k context nor 90% of the card
             return AsyncLLMEngine.from_engine_args(AsyncEngineArgs(
-                model=self.model_name, dtype=self.dtype, max_model_len=4096,
+                model=self.model_name, dtype=self.dtype, max_model_len=ORPHEUS_CONTEXT,
                 gpu_memory_utilization=float(os.environ.get("SPEECHREADY_EVAL_VLLM_MEM", "0.8"))))
 
     return Engine(model_name=ORPHEUS_REPOS.get(model, f"canopylabs/{model}"))
 
 
 def orpheus(text: str, v: Voice, preprocessed: bool) -> bytes:
-    pcm = b"".join(_orpheus(v.model).generate_speech(prompt=text, voice=v.voice))
+    pcm = b"".join(_orpheus(v.model).generate_speech(prompt=text, voice=v.voice, max_tokens=ORPHEUS_MAX_TOKENS))
     import numpy as np
 
     return _mp3(_wav_bytes(np.frombuffer(pcm, dtype="<i2"), 24000))
