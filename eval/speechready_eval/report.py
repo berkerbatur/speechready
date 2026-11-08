@@ -57,6 +57,57 @@ def pairs(rows: list[dict]) -> list[tuple[dict, dict]]:
     return [(v["raw"], v["processed"]) for v in by.values() if "raw" in v and "processed" in v]
 
 
+LLM = "llm"
+
+
+def triples(rows: list[dict]) -> list[tuple[dict, dict, dict]]:
+    """(raw, processed, llm) for every line/voice that has all three variants: the pairs on which
+    the "just prompt the LLM" baseline can be compared with the library on the same voice."""
+    by: dict[tuple, dict[str, dict]] = defaultdict(dict)
+    for r in rows:
+        by[(r["provider"], r["model"], r["voice"], r["id"])][r["variant"]] = r
+    return [(v["raw"], v["processed"], v[LLM]) for v in by.values() if {"raw", "processed", LLM} <= v.keys()]
+
+
+def _tstats(ts: list[tuple[dict, dict, dict]]) -> dict:
+    n = len(ts)
+    return {"n": n,
+            **{f"{name}_misreads": sum(1 for t in ts if t[i]["wer"] > MISREAD) for i, name in enumerate(("raw", "proc", "llm"))},
+            **{f"{name}_wer": (sum(t[i]["wer"] for t in ts) / n if n else 0.0) for i, name in enumerate(("raw", "proc", "llm"))}}
+
+
+def llm_markdown(ts: list[tuple[dict, dict, dict]]) -> list[str]:
+    """Tables for the LLM baseline: per provider and per class, main corpus and held-out apart."""
+    if not ts:
+        return []
+    rewriter = ts[0][2].get("rewriter", "an LLM")
+    out = [f"\n## Prompting the LLM instead ({len(ts)} line/voice triples)\n",
+           f"Each line was also rewritten for speech by `{rewriter}` (prompt in `speechready_eval/rewrite.py`) and sent to the same voice. "
+           "Misreads and mean WER for the three versions of the same recording set.\n"]
+    for title, sub_ts in (("Main corpus", [t for t in ts if not t[0]["id"].startswith(HELDOUT)]), ("Held-out LLM answers", [t for t in ts if t[0]["id"].startswith(HELDOUT)])):
+        if not sub_ts:
+            continue
+        g: dict[tuple, list] = defaultdict(list)
+        for t in sub_ts:
+            a = t[0]
+            g[(a["provider"], a["model"], a["locale"])].append(t)
+            g[("all", "all", a["locale"])].append(t)
+            g[("all", "all", "all")].append(t)
+        out += [f"\n### {title}\n", "| Provider | Model | Locale | n | Misreads raw | Misreads speechready | Misreads LLM | Mean WER raw | Mean WER speechready | Mean WER LLM |",
+                "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+        for (p, m, loc), v in sorted(g.items(), key=lambda kv: (kv[0][0] != "all", kv[0])):
+            s = _tstats(v)
+            out.append(f"| {p} | {m} | {loc} | {s['n']} | {s['raw_misreads']} ({_pct(s['raw_misreads'], s['n'])}) | {s['proc_misreads']} ({_pct(s['proc_misreads'], s['n'])}) | {s['llm_misreads']} ({_pct(s['llm_misreads'], s['n'])}) | {s['raw_wer']:.3f} | {s['proc_wer']:.3f} | {s['llm_wer']:.3f} |")
+        gc: dict[tuple, list] = defaultdict(list)
+        for t in sub_ts:
+            gc[(t[0]["locale"], t[0]["cls"])].append(t)
+        out += ["\n| Locale | Class | n | Misreads raw | Misreads speechready | Misreads LLM | Mean WER raw | Mean WER speechready | Mean WER LLM |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+        for (loc, cls), v in sorted(gc.items()):
+            s = _tstats(v)
+            out.append(f"| {loc} | {cls} | {s['n']} | {s['raw_misreads']} | {s['proc_misreads']} | {s['llm_misreads']} | {s['raw_wer']:.3f} | {s['proc_wer']:.3f} | {s['llm_wer']:.3f} |")
+    return out
+
+
 def _stats(ps: list[tuple[dict, dict]]) -> dict:
     n = len(ps)
     raw_mis = sum(1 for a, _ in ps if a["wer"] > MISREAD)
@@ -108,7 +159,7 @@ def _pct(x: int, n: int) -> str:
     return f"{100 * x / n:.0f}%" if n else "-"
 
 
-def markdown(all_pairs: list[tuple[dict, dict]]) -> str:
+def markdown(all_pairs: list[tuple[dict, dict]], ts: list[tuple[dict, dict, dict]] = ()) -> str:
     ps, held = split(all_pairs)
     out = ["# speechready evaluation\n", f"{len(ps)} line/voice pairs. A misread is WER above {MISREAD}.\n"]
     if held:
@@ -122,7 +173,8 @@ def markdown(all_pairs: list[tuple[dict, dict]]) -> str:
             if p == "all":
                 out.append(f"| {loc} | {cls} | {s['n']} | {s['raw_misreads']} | {s['proc_misreads']} | {s['raw_wer']:.3f} | {s['proc_wer']:.3f} | {s['better']} | {s['worse']} |")
         out.append("")
-    out += ["## Per provider\n", "| Provider | Model | Locale | n | Misreads raw | Misreads processed | Mean WER raw | Mean WER processed | Better | Worse |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+    out += llm_markdown(list(ts))
+    out += ["\n## Per provider\n", "| Provider | Model | Locale | n | Misreads raw | Misreads processed | Mean WER raw | Mean WER processed | Better | Worse |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for (p, m, loc), s in sorted(by_provider(ps).items(), key=lambda kv: (kv[0][0] != "all", kv[0])):
         out.append(f"| {p} | {m} | {loc} | {s['n']} | {s['raw_misreads']} ({_pct(s['raw_misreads'], s['n'])}) | {s['proc_misreads']} ({_pct(s['proc_misreads'], s['n'])}) | {s['raw_wer']:.3f} | {s['proc_wer']:.3f} | {s['better']} | {s['worse']} |")
     out += ["\n## Per class (all providers)\n", "| Locale | Class | n | Misreads raw | Misreads processed | Mean WER raw | Mean WER processed | Better | Worse |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
@@ -209,8 +261,9 @@ sel.forEach(s => s.addEventListener('change', apply)); apply();
 
 
 def main() -> int:
-    ps = pairs(load())
-    md = markdown(ps)
+    rows = load()
+    ps = pairs(rows)
+    md = markdown(ps, triples(rows))
     (OUT / "summary.md").write_text(md, encoding="utf-8")
     (OUT / "index.html").write_text(page(ps), encoding="utf-8")
     print(md.split("## Per class")[0])

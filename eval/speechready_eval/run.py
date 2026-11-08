@@ -24,7 +24,7 @@ from pathlib import Path
 
 from speechready import prepare
 
-from . import corpus, metrics, synth, transcribe
+from . import corpus, metrics, rewrite, synth, transcribe
 
 OUT = Path(__file__).resolve().parents[1] / "out"
 
@@ -44,14 +44,19 @@ def _load_done(path: Path) -> set[str]:
     return done
 
 
-def _one(line: corpus.Line, v: synth.Voice, variant: str, text: str, processed, stt: str, synth_only: bool = False) -> dict | None:
+def _one(line: corpus.Line, v: synth.Voice, variant: str, text: str | None, processed, stt: str, synth_only: bool = False,
+         llm_model: str = rewrite.DEFAULT_MODEL) -> dict | None:
     """Synthesize (if the clip is not there yet) and transcribe one variant. With `synth_only`
-    the clip is written and None is returned; a later run without the flag transcribes it."""
+    the clip is written and None is returned; a later run without the flag transcribes it.
+    The `llm` variant's text comes from the rewrite cache or the model, inside the try so a failure is a row."""
     key = _key(line.id, v, variant)
     audio = OUT / "audio" / f"{key}.mp3"
     base = {"key": key, "id": line.id, "locale": line.locale, "cls": line.cls, "variant": variant,
             "provider": v.provider, "model": v.model, "voice": v.voice, "text": text, "intended": line.intended}
     try:
+        if variant == "llm":
+            base["text"] = text = rewrite.rewrite(line.raw, line.locale, llm_model)
+            base["rewriter"] = llm_model
         if not audio.exists():
             if not synth.available(v.provider):
                 raise RuntimeError(f"no clip on disk and the {v.provider} package or key is not available here")
@@ -76,8 +81,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--ids", default=None, help="regex on line ids; only matching lines run (e.g. '^heldout\\.')")
     ap.add_argument("--dry-run", action="store_true", help="print what would be synthesized and exit")
     ap.add_argument("--synth-only", action="store_true", help="write the audio clips and stop; a later run transcribes them (keeps local TTS models and Whisper in separate processes)")
+    ap.add_argument("--variants", default="raw,processed", help="comma list of raw, processed, llm; 'llm' sends the text through a chat model prompted to prepare it for speech instead of through the library")
+    ap.add_argument("--llm-model", default=rewrite.DEFAULT_MODEL, help="chat model for the llm variant")
     ap.add_argument("--redo", default=None, help="'changed' re-synthesizes every processed variant whose text the library now renders differently; otherwise a regex on line ids")
     args = ap.parse_args(argv)
+    variants = tuple(args.variants.split(","))
+    if set(variants) - {"raw", "processed", "llm"}:
+        ap.error("--variants takes raw, processed and llm")
 
     locales = tuple(args.locales.split(","))
     lines = [l for loc in locales for l in corpus.build((loc,), args.limit)]
@@ -103,7 +113,7 @@ def main(argv: list[str] | None = None) -> int:
     # (a --synth-only pass in another environment); it is skipped only when it has nothing to transcribe.
     def has_clips(provider: str) -> bool:
         return any((OUT / "audio" / f"{_key(l.id, v, var)}.mp3").exists()
-                   for l in lines for v in voices if v.provider == provider and v.locale == l.locale for var in ("raw", "processed"))
+                   for l in lines for v in voices if v.provider == provider and v.locale == l.locale for var in variants)
 
     missing = sorted({v.provider for v in voices if not synth.available(v.provider) and not has_clips(v.provider)})
     if missing:
@@ -140,6 +150,14 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{line.id} [{v.provider}/{v.model}] raw={line.raw!r}")
         return 0
 
+    if "llm" in variants:
+        # One rewrite per line, fetched before the provider threads start, so every voice speaks the same rewrite.
+        todo = sorted({(l.raw, l.locale) for l, _ in jobs}, key=lambda t: t[1] + t[0])
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            for i, _ in enumerate(pool.map(lambda t: rewrite.rewrite(t[0], t[1], args.llm_model), todo), 1):
+                if i % 25 == 0 or i == len(todo):
+                    print(f"rewrites ready: {i}/{len(todo)}", file=sys.stderr)
+
     lock = threading.Lock()
     sink = results.open("a", encoding="utf-8")
 
@@ -149,10 +167,10 @@ def main(argv: list[str] | None = None) -> int:
             if v.provider != provider:
                 continue
             processed = prepare(line.raw, provider=v.provider, model=v.model, locale=line.locale)
-            for variant, text in (("raw", line.raw), ("processed", processed.text)):
-                if _key(line.id, v, variant) in done:
+            for variant, text in (("raw", line.raw), ("processed", processed.text), ("llm", None)):
+                if variant not in variants or _key(line.id, v, variant) in done:
                     continue
-                row = _one(line, v, variant, text, processed, args.stt, args.synth_only)
+                row = _one(line, v, variant, text, processed, args.stt, args.synth_only, args.llm_model)
                 if row is None:
                     print(f"{line.id} {v.provider}/{v.model} {variant} synthesized", file=sys.stderr)
                     n += 1
