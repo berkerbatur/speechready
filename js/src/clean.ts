@@ -19,7 +19,7 @@ const STAGE = "clean";
 export interface Options {
   // clean stage
   /** drop | keep | mention (one spoken sentence stands in for the block) */
-  code_blocks: "drop" | "keep" | "mention";
+  code_blocks: "short" | "drop" | "keep" | "mention";
   /** the sentence `mention` speaks; null = the locale's default */
   code_block_mention: string | null;
   tables: "rows" | "drop";
@@ -43,7 +43,7 @@ export interface Options {
 }
 
 export const DEFAULT_OPTIONS: Options = Object.freeze({
-  code_blocks: "drop",
+  code_blocks: "short",
   code_block_mention: null,
   tables: "rows",
   urls: "domain",
@@ -71,6 +71,8 @@ export function options(partial?: Partial<Options> | null): Options {
   return { ...DEFAULT_OPTIONS, ...partial };
 }
 
+// `code_blocks: "short"`: a block of one line up to this long (a command, a path, a value) is spoken; anything longer is dropped
+const SHORT_BLOCK = 80;
 // what `code_blocks: "mention"` says in place of a fenced block, by language
 const MENTION: Record<string, string> = { en: "See the code block.", tr: "Kod bloğuna bakın." };
 
@@ -186,15 +188,24 @@ function splitBlocks(text: string, o: Options, rec: Recorder, locale: string): s
       if (inFence) {
         inFence = false;
         const body = fenceLines.join("\n");
-        if (o.code_blocks === "keep") {
-          blocks.push(...fenceLines.filter((s) => s.trim()));
+        const content = fenceLines.filter((s) => s.trim());
+        let mode: string = o.code_blocks;
+        if (mode === "short") mode = content.length === 1 && content[0].trim().length <= SHORT_BLOCK ? "keep" : "drop";
+        if (mode === "keep") {
+          blocks.push(...content);
           rec.add(STAGE, "clean.markdown.code_block", "```\n" + body + "\n```", body, "kept code block as plain lines");
-        } else if (o.code_blocks === "mention") {
+        } else if (mode === "mention") {
           const said = o.code_block_mention || MENTION[locale.split("-")[0].toLowerCase()] || MENTION.en;
           blocks.push(said);
           rec.add(STAGE, "clean.markdown.code_block", "```\n" + body + "\n```", said, "code block replaced by a mention");
         } else {
           rec.add(STAGE, "clean.markdown.code_block", "```\n" + body + "\n```", "", "dropped code block");
+          const last = blocks.length - 1;
+          if (last >= 0 && blocks[last].endsWith(":")) {
+            // the sentence that introduced the block should not end on a colon with nothing after it
+            blocks[last] = blocks[last].slice(0, -1) + ".";
+            rec.add(STAGE, "clean.markdown.code_block", blocks[last].slice(0, -1) + ":", blocks[last], "colon before a dropped code block made a full stop");
+          }
         }
         fenceLines = [];
       } else {

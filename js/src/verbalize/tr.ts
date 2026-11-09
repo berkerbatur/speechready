@@ -165,6 +165,10 @@ function suffixedNumber(m: Match): string {
 
 const ordinalDot = (m: Match): string => ordinal(parseInt(m[1], 10));
 
+/** `Puan 3.` at the end of a sentence: every voice in the evaluation read the dot as the
+ * ordinal marker (üçüncü), so the number is written out and the dot stays a full stop. */
+const cardinalDot = (m: Match): string => cardinal(parseInt(m[1], 10)) + ".";
+
 const ABBREVIATIONS: Record<string, string> = {
   vb: "ve benzeri", vs: "vesaire", vd: "ve diğerleri", örn: "örneğin", bkz: "bakınız",
   Dr: "Doktor", Prof: "Profesör", Doç: "Doçent", Av: "Avukat", Sn: "Sayın",
@@ -233,6 +237,7 @@ export const RULES: Rule[] = [
   rule("verbalize.decimal", re(String.raw`(?<![${W}.,])(\d+),(\d+)${SUFFIX}(?![${W}]|[.,]\d)`), decimalComma, "decimal comma read as 'virgül'"),
   rule("verbalize.suffix", re(String.raw`${B}(\d+)${APOS}([${LOWER}]+)${B}`), suffixedNumber, "numeral with a suffix read as one word"),
   rule("verbalize.ordinal", re(String.raw`${B}(\d{1,3})\.(?=\s+[${LOWER}])`), ordinalDot, "numeral with a dot before a lowercase word read as an ordinal"),
+  rule("verbalize.number.sentence_end", re(String.raw`(?<=[${LOWER}${UPPER})] )(\d{1,3})\.(?=\s+[${UPPER}]|\s*$)`, "m"), cardinalDot, "number before a sentence end written out, so the dot is not read as an ordinal marker"),
   rule("verbalize.minus", re(String.raw`(?<![${W}.)\-–])[-–](?=\d)`), () => "eksi ", "leading minus read as a word"),
   rule("verbalize.alnum", re(String.raw`${B}(?=[${UPPER}0-9-]*\d)(?=[${UPPER}0-9-]*[${UPPER}])[${UPPER}0-9]+(?:-[${UPPER}0-9]+)*${B}`), alnum, "identifier spelled out"),
   rule("verbalize.number.words", re(String.raw`(?<![${W}.,:/\-])(\d+)(?![${W}'’]|[.,]\d)`), numberWords, "plain number written out (numbers: words)"),

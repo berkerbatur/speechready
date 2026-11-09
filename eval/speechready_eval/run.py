@@ -140,8 +140,17 @@ def main(argv: list[str] | None = None) -> int:
     else:
         redo = set()
     if redo:
+        # A clip newer than its stored row was already made by a --synth-only pass and only needs transcribing.
+        written: dict[str, float] = {}
+        if results.exists():
+            for l in results.read_text(encoding="utf-8").splitlines():
+                if l.strip():
+                    r = json.loads(l)
+                    written[r["key"]] = r.get("ts", 0.0)
         for k in redo:
-            (OUT / "audio" / f"{k}.mp3").unlink(missing_ok=True)
+            clip = OUT / "audio" / f"{k}.mp3"
+            if clip.exists() and clip.stat().st_mtime < written.get(k, 0.0):
+                clip.unlink()
         done -= redo
         print(f"redoing {len(redo)} processed variants", file=sys.stderr)
     print(f"{len(lines)} lines x {len(voices)} voices -> {len(jobs)} line/voice pairs, {len(done)} variants already done", file=sys.stderr)

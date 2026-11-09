@@ -23,7 +23,7 @@ class Options:
     """Everything a caller can change about how text is prepared. Defaults are what the evaluation ran with."""
 
     # clean stage
-    code_blocks: str = "drop"  # drop | keep | mention (one spoken sentence stands in for the block)
+    code_blocks: str = "short"  # short (a one-line block is spoken, a longer one dropped) | drop | keep | mention (one spoken sentence stands in for the block)
     code_block_mention: str | None = None  # the sentence `mention` speaks; None = the locale's default
     tables: str = "rows"  # rows | drop
     urls: str = "domain"  # domain | drop | keep
@@ -45,6 +45,8 @@ CleanOptions = Options  # the earlier name
 
 # what `code_blocks="mention"` says in place of a fenced block, by language
 _MENTION = {"en": "See the code block.", "tr": "Kod bloğuna bakın."}
+# `code_blocks="short"`: a block of one line up to this long (a command, a path, a value) is spoken; anything longer is dropped
+_SHORT_BLOCK = 80
 
 
 _TERMINAL = ".!?…:;,"
@@ -153,15 +155,23 @@ def _blocks(text: str, opts: CleanOptions, rec: Recorder, locale: str = "en-US")
             if in_fence:
                 in_fence = False
                 body = "\n".join(fence_lines)
-                if opts.code_blocks == "keep":
-                    blocks.extend(s for s in fence_lines if s.strip())
+                content = [s for s in fence_lines if s.strip()]
+                mode = opts.code_blocks
+                if mode == "short":
+                    mode = "keep" if len(content) == 1 and len(content[0].strip()) <= _SHORT_BLOCK else "drop"
+                if mode == "keep":
+                    blocks.extend(content)
                     rec.add(STAGE, "clean.markdown.code_block", f"```\n{body}\n```", body, "kept code block as plain lines")
-                elif opts.code_blocks == "mention":
+                elif mode == "mention":
                     said = opts.code_block_mention or _MENTION.get(locale.split("-")[0].lower(), _MENTION["en"])
                     blocks.append(said)
                     rec.add(STAGE, "clean.markdown.code_block", f"```\n{body}\n```", said, "code block replaced by a mention")
                 else:
                     rec.add(STAGE, "clean.markdown.code_block", f"```\n{body}\n```", "", "dropped code block")
+                    if blocks and blocks[-1].endswith(":"):
+                        # the sentence that introduced the block should not end on a colon with nothing after it
+                        blocks[-1] = blocks[-1][:-1] + "."
+                        rec.add(STAGE, "clean.markdown.code_block", blocks[-1][:-1] + ":", blocks[-1], "colon before a dropped code block made a full stop")
                 fence_lines = []
             else:
                 flush()

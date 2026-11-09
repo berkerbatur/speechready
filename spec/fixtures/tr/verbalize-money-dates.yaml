@@ -48,7 +48,7 @@ cases:
     expect: "5 ila 10 dakika sürer."
   - id: abbreviations
     input: "Dr. Ayşe, Prof. Can vb. kişiler geldi, bkz. sayfa 3."
-    expect: "Doktor Ayşe, Profesör Can ve benzeri kişiler geldi, bakınız sayfa 3."
+    expect: "Doktor Ayşe, Profesör Can ve benzeri kişiler geldi, bakınız sayfa üç."
   - id: identifier
     input: "Plaka 34ABC123 ve uçuş TK1923."
     expect: "Plaka üç dört ABC bir iki üç ve uçuş T K bir dokuz iki üç."
@@ -69,7 +69,7 @@ cases:
     expect: "Dışarısı eksi 5 derece."
   - id: university-abbreviations
     input: "İstanbul Üniv. Tıp Fak. Hürriyet Cad. No. 5."
-    expect: "İstanbul Üniversitesi Tıp Fakültesi Hürriyet Caddesi numara 5."
+    expect: "İstanbul Üniversitesi Tıp Fakültesi Hürriyet Caddesi numara beş."
   - id: distributive-suffix
     input: "3'er 3'er sayın, 10'ar kişi."
     expect: "üçer üçer sayın, onar kişi."
@@ -104,7 +104,8 @@ cases:
     expect: "on dörtteki toplantı."
   - id: spaced-minus-in-an-equation
     input: "Adım 1: 72 - 32 = 40, aralık 10-20."
-    expect: "Adım 1: 72 eksi 32 = 40, aralık 10 ila 20."
+    expect: "Adım 1: 72 eksi 32 = 40, aralık 10 ila yirmi."
+    note: the last number stands before a full stop, so it is written out like any other; the voice reads 10 the same either way
   # numbers: words (the default for local models with no text normalizer; see spec/profiles)
   - id: words-plain-numbers-written-out
     options: {numbers: words}
