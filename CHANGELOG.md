@@ -4,7 +4,7 @@ Both packages share one version number and one fixture corpus, so an entry here 
 
 ## Unreleased
 
-- **Evaluation:** a "just prompt the LLM" baseline. `run --variants raw,processed,llm` rewrites every line for speech with a chat model (`--llm-model`, default `gpt-6-luna`; the prompt is in `speechready_eval/rewrite.py`, rewrites are cached) and speaks it with the same voices; `report` shows the three versions side by side. Measured 2026-11-09 on four hosted voices: misreads 34% as written, 7% with speechready, 17% with the rewrite on the main corpus; 10%, 8% and 11% on the held-out answers, where the rewrite also took a median 2.3 seconds per answer.
+- **Evaluation:** a "just prompt the LLM" baseline. `run --variants raw,processed,llm` rewrites every line for speech with a chat model (`--llm-model`, default `gpt-6-luna`; the prompt is in `speechready_eval/rewrite.py`, rewrites are cached) and speaks it with the same voices; `report` shows the three versions side by side. Measured 2026-11-09 on four hosted voices: misreads 34% as written, 7% with speechready, 17% with the rewrite on the main corpus; 10%, 8% and 11% on the held-out answers, where the rewrite also took a median 2.3 seconds per answer. Kokoro and Piper, scored with local Whisper, follow the same pattern (38% / 11% / 17% and 42% / 12% / 18% in English, 43% / 14% / 27% in Turkish).
 
 ## 0.4.0 (2026-11-09)
 
