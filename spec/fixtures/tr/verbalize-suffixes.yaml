@@ -30,7 +30,12 @@ cases:
     expect: "üçüncü madde ve dördüncü bölüm önemli."
   - id: dot-before-capital-is-a-sentence-end
     input: "Puan 3. Sonra bitti."
-    expect: "Puan 3. Sonra bitti."
+    expect: "Puan üç. Sonra bitti."
+    note: not an ordinal, but seven of nine voices read the dot as one; written out, the dot can only be a full stop
+  - id: number-at-text-end
+    input: "Adım 2. Dosyayı kaydedin. Toplam 12"
+    expect: "Adım iki. Dosyayı kaydedin. Toplam 12"
+    note: only a number followed by a dot is at risk; the last one has no dot and stays with the voice
   - id: percent-prefix
     input: "Fiyatlar %50 arttı."
     expect: "Fiyatlar yüzde elli arttı."

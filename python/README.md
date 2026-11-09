@@ -40,7 +40,7 @@ Everything a caller may want to decide differently is an `Options` field, and th
 from speechready import Options, prepare
 
 prepare(text, provider="openai", options=Options(
-    code_blocks="keep",        # drop (default) | keep: read fenced code aloud | mention: one sentence stands in for it
+    code_blocks="keep",        # short (default: a block of one line, up to 80 characters, is spoken; a longer one is dropped) | drop | keep: read every fenced block aloud | mention: one sentence stands in for it
     code_block_mention=None,   # what `mention` says; None = "See the code block." / "Kod bloğuna bakın."
     tables="rows",             # rows (default, each row a comma list) | drop
     urls="domain",             # domain (default) | drop | keep
@@ -101,7 +101,7 @@ from speechready.integrations.pipecat import text_transform
 tts = ElevenLabsTTSService(..., text_transforms=[("*", text_transform(provider="elevenlabs", model="eleven_turbo_v2_5"))])
 ```
 
-Both take the arguments of `prepare` (`provider`, `model`, `locale`, `options`, `lexicon`). Fenced code blocks that arrive over several tokens or pieces are held until the closing fence and handled as one block, so `code_blocks="drop"` and `"mention"` work in streams too. Any other framework can do the same with `Segmenter`:
+Both take the arguments of `prepare` (`provider`, `model`, `locale`, `options`, `lexicon`). Fenced code blocks that arrive over several tokens or pieces are held until the closing fence and handled as one block, so every `code_blocks` setting works in streams too. Any other framework can do the same with `Segmenter`:
 
 ```python
 from speechready import Segmenter

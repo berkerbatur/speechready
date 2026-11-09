@@ -4,6 +4,8 @@ Both packages share one version number and one fixture corpus, so an entry here 
 
 ## Unreleased
 
+- **Code blocks:** the default `code_blocks` is now `short`: a fenced block of one line (up to 80 characters), which in an assistant answer is almost always the command the listener was just told to run, is spoken; a longer block is dropped as before. In the held-out evaluation, 22 of the 47 line/voice pairs where preprocessing lost to the raw text were one-line commands the library dropped while the narration read them. When a block is dropped, a colon that introduced it becomes a full stop, so the sentence before it no longer ends on nothing. `code_blocks="drop"` restores the old behaviour.
+- **Turkish:** a number before a sentence end (`Puan 3.`, `bkz. sayfa 3.`) is written out (`Puan üç.`), since seven of the nine voices in the evaluation read the dot as the ordinal marker. A numbered list item and a number without a dot are not touched.
 - **Evaluation:** a "just prompt the LLM" baseline. `run --variants raw,processed,llm` rewrites every line for speech with a chat model (`--llm-model`, default `gpt-6-luna`; the prompt is in `speechready_eval/rewrite.py`, rewrites are cached) and speaks it with the same voices; `report` shows the three versions side by side. Measured 2026-11-09 on four hosted voices: misreads 34% as written, 7% with speechready, 17% with the rewrite on the main corpus; 10%, 8% and 11% on the held-out answers, where the rewrite also took a median 2.3 seconds per answer. Kokoro and Piper, scored with local Whisper, follow the same pattern (38% / 11% / 17% and 42% / 12% / 18% in English, 43% / 14% / 27% in Turkish).
 
 ## 0.4.0 (2026-11-09)

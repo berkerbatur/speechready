@@ -107,7 +107,7 @@ In a voice agent, drop it between the LLM and the TTS: `speechready.integrations
 
 For Turkish developer vocabulary there is a bundled lexicon: `prepare(text, locale="tr-TR", lexicon="tr-tech")` reads `API` as "ey pi ay" and `JSON` as "ceyson", and refits an apostrophe suffix to the spoken form (`API'yi` → `ey pi ay'ı`).
 
-Everything a caller may want to decide differently is an `Options` field (code blocks dropped, kept or replaced by one spoken sentence; list numbers kept or dropped; fractions spoken or read as a division; URLs reduced to their domain, dropped or kept). The defaults are what the evaluation above ran with. See `python/README.md`.
+Everything a caller may want to decide differently is an `Options` field (code blocks spoken when they are one line, dropped, kept or replaced by one spoken sentence; list numbers kept or dropped; fractions spoken or read as a division; URLs reduced to their domain, dropped or kept). The defaults are what the evaluation above ran with. See `python/README.md`.
 
 ## Status
 

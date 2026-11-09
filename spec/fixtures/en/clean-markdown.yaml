@@ -30,7 +30,17 @@ cases:
     expect: "A cat on a mat."
   - id: code-fence-dropped
     input: "Run this:\n```bash\nnpm i\n```\nThen restart."
-    expect: "Run this:\nThen restart."
+    options: {code_blocks: drop}
+    expect: "Run this.\nThen restart."
+    note: the colon that introduced the block becomes a full stop, so the sentence does not end on nothing
+  - id: code-fence-one-line-spoken
+    input: "Run this:\n```bash\nnpm i\n```\nThen restart."
+    expect: "Run this:\nnpm i.\nThen restart."
+    note: the default `short` speaks a block of one line, which in an assistant answer is almost always the command the listener was told to run
+  - id: code-fence-long-dropped
+    input: "Add this:\n```python\nimport os\nprint(os.getcwd())\n```\nThen run it."
+    expect: "Add this.\nThen run it."
+    note: the default `short` drops a block of more than one line
   - id: code-fence-kept
     input: "Run this:\n```bash\nnpm i\n```\nThen restart."
     options: {code_blocks: keep}

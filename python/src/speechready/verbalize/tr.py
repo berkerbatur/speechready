@@ -200,6 +200,12 @@ def _ordinal_dot(m: re.Match[str], locale: str) -> str | None:
     return ordinal(int(m.group(1)))
 
 
+def _cardinal_dot(m: re.Match[str], locale: str) -> str | None:
+    """`Puan 3.` at the end of a sentence: every voice in the evaluation read the dot as the
+    ordinal marker (üçüncü), so the number is written out and the dot stays a full stop."""
+    return cardinal(int(m.group(1))) + "."
+
+
 _ABBREVIATIONS = {
     "vb": "ve benzeri", "vs": "vesaire", "vd": "ve diğerleri", "örn": "örneğin", "bkz": "bakınız",
     "Dr": "Doktor", "Prof": "Profesör", "Doç": "Doçent", "Av": "Avukat", "Sn": "Sayın",
@@ -267,6 +273,7 @@ RULES: list[Rule] = [
     Rule("verbalize.decimal", re.compile(rf"(?<![\w.,])(\d+),(\d+){_SUFFIX}(?![\w]|[.,]\d)"), _decimal_comma, "decimal comma read as 'virgül'"),
     Rule("verbalize.suffix", re.compile(rf"\b(\d+){_APOS}([{_LOWER}]+)\b"), _suffixed_number, "numeral with a suffix read as one word"),
     Rule("verbalize.ordinal", re.compile(rf"\b(\d{{1,3}})\.(?=\s+[{_LOWER}])"), _ordinal_dot, "numeral with a dot before a lowercase word read as an ordinal"),
+    Rule("verbalize.number.sentence_end", re.compile(rf"(?<=[{_LOWER}{_UPPER})] )(\d{{1,3}})\.(?=\s+[{_UPPER}]|\s*$)", re.MULTILINE), _cardinal_dot, "number before a sentence end written out, so the dot is not read as an ordinal marker"),
     Rule("verbalize.minus", re.compile(r"(?<![\w.)\-–])[-–](?=\d)"), lambda m, loc: "eksi ", "leading minus read as a word"),
     Rule("verbalize.alnum", re.compile(rf"\b(?=[{_UPPER}0-9-]*\d)(?=[{_UPPER}0-9-]*[{_UPPER}])[{_UPPER}0-9]+(?:-[{_UPPER}0-9]+)*\b"), _alnum, "identifier spelled out"),
     Rule("verbalize.number.words", re.compile(rf"(?<![\w.,:/\-])(\d+)(?![\w'’]|[.,]\d)"), _number_words, "plain number written out (numbers: words)"),

@@ -29,7 +29,7 @@ async function collect(readable) {
 }
 
 const TEXT = "**Step 1:** run `npm install`. [pause 1s] Then:\n```bash\nnpm start\n```\nRead https://example.com/docs. Done";
-const EXPECTED = ["Step 1: run npm install.", '<break time="1s" /> Then:', "Read example.com.", "Done."].map((s) => s + " ");
+const EXPECTED = ["Step 1: run npm install.", '<break time="1s" /> Then:', "npm start.", "Read example.com.", "Done."].map((s) => s + " ");
 
 test("a ReadableStream is spoken sentence by sentence in provider syntax, as a ReadableStream", async () => {
   const out = await collect(textTransform({ provider: "elevenlabs", model: "eleven_multilingual_v2" })(stream(TEXT)));
@@ -41,9 +41,11 @@ test("an async iterable is accepted as input too", async () => {
   assert.deepEqual(out, EXPECTED);
 });
 
-test("code block is dropped by default and mentioned on request", async () => {
+test("a one-line code block is spoken by default, dropped or mentioned on request", async () => {
   const joined = (await collect(textTransform({ provider: "openai" })(stream(TEXT)))).join("");
-  assert.ok(!joined.includes("npm start"));
+  assert.ok(joined.includes("npm start."));
+  const dropped = (await collect(textTransform({ provider: "openai", options: { code_blocks: "drop" } })(stream(TEXT)))).join("");
+  assert.ok(!dropped.includes("npm start"));
   const mentioned = (await collect(textTransform({ provider: "openai", options: { code_blocks: "mention" } })(stream(TEXT)))).join("");
   assert.ok(mentioned.includes("See the code block."));
 });

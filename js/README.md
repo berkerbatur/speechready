@@ -31,7 +31,7 @@ Everything a caller may want to decide differently is an option. The names are t
 
 ```js
 prepare(text, { provider: "openai", options: {
-  code_blocks: "mention",     // drop (default) | keep | mention: one sentence stands in for a fenced block
+  code_blocks: "mention",     // short (default: a block of one line, up to 80 characters, is spoken; a longer one is dropped) | drop | keep | mention: one sentence stands in for a fenced block
   code_block_mention: null,   // what `mention` says; null = "See the code block." / "Kod bloğuna bakın."
   tables: "rows",             // rows (default, each row a comma list) | drop
   urls: "domain",             // domain (default) | drop | keep
