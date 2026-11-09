@@ -77,6 +77,21 @@ Every voice improved and the control prose did not regress. Cartesia's Turkish i
 
 Local models fail on the same inputs as the hosted voices, more often: a raw ISO date, a markdown table or an inline code span comes out as noise, and written-out text fixes most of it. What remains after preprocessing for Chatterbox and XTTS is largely the model itself: given a very short sentence, both tend to keep talking past the end of the text, and the transcript then carries a few seconds of invented words. Orpheus is a streaming model that expects a sentence at a time; the harness sends whole lines, and its package stops a clip after 14 seconds unless told otherwise, which the harness now does. The held-out assistant answers behaved as they did for the hosted voices (Kokoro 3% misread either way, Piper 10% as written and 13% processed, Chatterbox 30% and 17%, XTTS 17% and 13%, Orpheus 20% and 10%, each over 60 pairs or 30 for the English-only models; the differences are mostly code blocks the library drops). Their pairs are in the listening page under their own headings.
 
+**Prompting the LLM instead.** The question every reader asks: why not tell the language model to write for speech? Measured on 2026-11-09: every line of the corpus was rewritten by gpt-6-luna with the prompt a careful developer would write without a library (strip markdown, say only a site's name for a URL, leave out code blocks, write every number, date, time, price, phone number, identifier, unit and acronym out as a native speaker would, keep everything else; the prompt is in `eval/speechready_eval/rewrite.py`), then spoken by the same four hosted voices as the held-out check (transcribed with gpt-4o-transcribe) and by Kokoro and Piper on a laptop (local Whisper), so the three versions of each line are scored on the same voice.
+
+| | Pairs | Misread as written | Misread with speechready | Misread with the LLM rewrite |
+| --- | --- | --- | --- | --- |
+| Four hosted voices, main corpus | 608 | 34% | 7% | 17% |
+| English | 356 | 30% | 6% | 13% |
+| Turkish | 252 | 38% | 9% | 23% |
+| Four hosted voices, held-out answers | 240 | 10% | 8% | 11% |
+| Kokoro, main corpus (English) | 89 | 38% | 11% | 17% |
+| Piper, main corpus, English | 89 | 42% | 12% | 18% |
+| Piper, main corpus, Turkish | 63 | 43% | 14% | 27% |
+| Kokoro and Piper, held-out answers | 90 | 8% | 10% | 6% |
+
+About half of the rewrite's misreads on the main corpus are readings the reference does not accept but a listener would not mind ("example dot com" for a link, "twenty U.S. dollars", "dört buçuk" for `4,5`). The other half are real: the model spoke a hidden `<think>` block aloud, read a code block it was told to leave out, narrated checkbox markup as "Checked: done. Unchecked: to do", and read an order number as "forty-eight million two hundred nineteen thousand". On the held-out answers the rewrite changed nothing on the hosted voices (mean WER identical to the raw text) and the three versions are within a few pairs of each other on the local ones, while it did find one thing the rules leave alone: a lone number before a sentence end (`Puan 3.`) that the voices read as an ordinal. It also costs a model call on every turn: in this run the rewrite took a median 2.3 seconds per answer with gpt-6-luna and 1.2 seconds with gpt-4.1-mini before the first byte of audio could be requested, against microseconds for the library, and no prompt can put a break tag in for ElevenLabs and a comma for OpenAI. The full tables are in `summary.md` under "Prompting the LLM instead".
+
 - **Listen:** [berkerbatur.github.io/speechready](https://berkerbatur.github.io/speechready/) plays the clearest before/after pairs for every voice, with what the speech-to-text model heard under each.
 - **Try your own text:** [berkerbatur.github.io/speechready/play](https://berkerbatur.github.io/speechready/play/) runs the JavaScript package in your browser (35 kB) and shows the output, the chunks and every rewrite. Nothing you type leaves the page.
 - **Reproduce:** `eval/README.md` explains the keys, the scorer and the commands. The results in this table are also in `eval/out/summary.md` after a run.

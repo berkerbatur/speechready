@@ -67,7 +67,14 @@ Scoring: word error rate against the intended words. The transcript is normalize
 python -m speechready_eval.report            # summary.md: per provider, per class, per rule family; index.html: every pair with audio
 python -m speechready_eval.showcase --site ../docs   # out/showcase/ plus a standalone copy in docs/, which GitHub Pages serves
 python -m speechready_eval.run --redo REGEX  # re-synthesize the processed variant of lines a library change affected
+python -m speechready_eval.run --variants raw,processed,llm --stt openai --voice openai:gpt-4o-mini-tts:alloy:en-US   # the "just prompt the LLM" baseline
 ```
+
+## The "just prompt the LLM" baseline
+
+`--variants raw,processed,llm` adds a third version of every line: the raw text rewritten for speech by a chat model (`--llm-model`, default `gpt-6-luna`) with the prompt in `rewrite.py`, the one a careful developer would write without a library: strip markdown, say only the site name of a URL, leave out code blocks, write numbers, dates, times, prices, phones, identifiers, units and acronyms out as a native speaker would, keep everything else. The prompt knows nothing about the provider, since no prompt can put a break tag in for ElevenLabs and a comma for OpenAI. Rewrites are cached in `eval/out/rewrites.jsonl` and fetched once before the provider threads start, so every voice speaks the same rewrite and a second run or a second voice costs no model calls. `report` adds a "Prompting the LLM instead" section with the three versions side by side, main corpus and held-out apart, for every line/voice that has all three.
+
+Read the main-corpus column with care: the reference text of a fixture line encodes the library's own reading (anchor text for a link, a code block left out, "twenty dollars" for `20 USD`), so a model that says "example dot com" or "twenty U.S. dollars" is counted as a misread there although a listener would not mind. The held-out section has no such bias: its reference was written independently of both. The run on 2026-11-09 is described in the top-level README.
 
 ## What success looks like
 
