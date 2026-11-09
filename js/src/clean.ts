@@ -39,6 +39,12 @@ export interface Options {
   foreign_acronyms: boolean;
   /** digits: leave plain numbers to the voice | words: write every remaining number out | null: the profile's choice, else digits */
   numbers: "digits" | "words" | null;
+  /** Turkish number ranges: ila ("5 ila 10") | ile ("5 ile 10") */
+  range_word: "ila" | "ile";
+  /** Turkish: how ₺, TL and TRY are said: lira ("yüz lira") | türk lirası ("yüz Türk lirası") | tl ("yüz te le") */
+  lira: "lira" | "türk lirası" | "tl";
+  /** Turkish: digits ("dört virgül beş", "dokuz otuz") | buçuk ("dört buçuk", "dokuz buçuk") */
+  half: "digits" | "buçuk";
   extra: Record<string, unknown>;
 }
 
@@ -57,6 +63,9 @@ export const DEFAULT_OPTIONS: Options = Object.freeze({
   fractions: "spoken",
   foreign_acronyms: true,
   numbers: null,
+  range_word: "ila",
+  lira: "lira",
+  half: "digits",
   extra: {},
 }) as Options;
 

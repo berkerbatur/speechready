@@ -70,11 +70,34 @@ def _digit_groups(m: re.Match[str], locale: str) -> str | None:
     return ", ".join(spoken)
 
 
+def _half() -> bool:
+    """`half: buçuk`: x,5 and half past the hour said with "buçuk"."""
+    return option("half", "digits") == "buçuk"
+
+
+def _dec(whole: str, frac: str | None) -> str:
+    if frac == "5" and _half():
+        return f"{cardinal(int(whole.replace('.', '')))} buçuk"
+    return decimal(whole, frac)
+
+
+def _fit(word: str, suffix: str) -> str:
+    """Attach a suffix the writer harmonised for the numeral to a spoken word: vowels re-harmonised,
+    a d devoiced after a voiceless consonant (buçuk + daki -> buçuktaki)."""
+    suffix, ki = (suffix[:-2], "ki") if suffix.endswith("ki") else (suffix, "")  # -ki never harmonises
+    suffix = reharmonize(word, suffix)
+    if suffix and suffix[0] == "d" and word[-1] in "çfhkpsşt":
+        suffix = "t" + suffix[1:]
+    return attach(word, suffix) + ki
+
+
 def _time_words(hh: str, mm: str) -> str:
     h, minute = int(hh), int(mm)
     hour = cardinal(h)
     if minute == 0:
         return f"{hour} sıfır sıfır"
+    if minute == 30 and _half():
+        return f"{hour} buçuk"
     return f"{hour} {cardinal(minute) if mm[0] != '0' else 'sıfır ' + cardinal(minute)}"
 
 
@@ -82,7 +105,10 @@ def _time(m: re.Match[str], locale: str) -> str | None:
     suffix = m.group(3) or ""
     if suffix and int(m.group(2)) == 0:
         return attach(cardinal(int(m.group(1))), suffix)  # 14.00'teki -> on dörtteki, as the writer harmonised it
-    return attach(_time_words(m.group(1), m.group(2)), suffix)
+    words = _time_words(m.group(1), m.group(2))
+    if words.endswith("buçuk"):
+        return _fit(words, suffix)
+    return attach(words, suffix)
 
 
 def _minus(m: re.Match[str], locale: str) -> str | None:
@@ -93,11 +119,22 @@ def _time_range(m: re.Match[str], locale: str) -> str | None:
     return f"{_time_words(m.group(1), m.group(2))} ile {_time_words(m.group(3), m.group(4))}"
 
 
+_MATH = {"÷": "bölü", "×": "çarpı", "=": "eşittir", "+": "artı", "≈": "yaklaşık", "−": "eksi"}
+
+
+def _math(m: re.Match[str], locale: str) -> str | None:
+    return f" {_MATH[m.group(1)]} "
+
+
+def _range_word() -> str:
+    return option("range_word", "ila")
+
+
 def _currency_postfix(m: re.Match[str], locale: str) -> str | None:
     whole, _, frac = m.group(1).partition(",")
     scale = f" {m.group(2)}" if m.group(2) else ""
-    unit, _ = _CURRENCY[m.group(3)]
-    return f"{decimal(whole, frac or None)}{scale} {attach(unit, reharmonize(unit, m.group(4) or ''))}"
+    unit, _ = _unit_of(m.group(3))
+    return f"{_dec(whole, frac or None)}{scale} {_with_suffix(unit, m.group(4) or '')}"
 
 
 _CURRENCY = {
@@ -108,14 +145,36 @@ _CURRENCY = {
 }
 
 
-def _money(symbol: str, whole: str, frac: str | None, suffix: str = "") -> str:
+# `lira`: how ₺, TL and TRY are said
+_LIRA = {"lira": "lira", "türk lirası": "Türk lirası", "tl": "te le"}
+# a case suffix after the possessive in "Türk lirası" takes a pronominal n: lirasına, lirasında
+_POSSESSIVE_CASES = {"a": "na", "ı": "nı", "da": "nda", "ta": "nda", "dan": "ndan", "tan": "ndan", "ın": "nın", "la": "yla"}
+
+
+def _unit_of(symbol: str) -> tuple[str, str]:
     unit, sub = _CURRENCY[symbol]
+    if unit == "lira":
+        unit = _LIRA.get(str(option("lira", "lira")).lower(), "lira")
+    return unit, sub
+
+
+def _with_suffix(unit: str, suffix: str) -> str:
+    if unit == "Türk lirası" and suffix:
+        s = reharmonize("lirası", suffix)
+        core = s[1:] if s[0] in "yn" and len(s) > 1 and s[1] in "aı" else s
+        if core in _POSSESSIVE_CASES:
+            return unit + _POSSESSIVE_CASES[core]
+    return attach(unit, reharmonize(unit, suffix))
+
+
+def _money(symbol: str, whole: str, frac: str | None, suffix: str = "") -> str:
+    unit, sub = _unit_of(symbol)
     amount = cardinal(int(whole.replace(".", "")))
     if frac:
         cents = int(frac.ljust(2, "0")[:2])
         if cents:
-            return f"{amount} {unit} {cardinal(cents)} {attach(sub, reharmonize(sub, suffix))}"
-    return f"{amount} {attach(unit, reharmonize(unit, suffix))}"
+            return f"{amount} {unit} {cardinal(cents)} {_fit(sub, suffix)}"
+    return f"{amount} {_with_suffix(unit, suffix)}"
 
 
 def _currency_prefix(m: re.Match[str], locale: str) -> str | None:
@@ -126,12 +185,29 @@ def _currency_suffix(m: re.Match[str], locale: str) -> str | None:
     return _money(m.group(3).upper(), m.group(1), m.group(2), m.group(4) or "")
 
 
+def _currency_range(m: re.Match[str], locale: str) -> str | None:
+    """30-35 TL, ₺30-35: the first number is a bare cardinal, the second carries the unit and the suffix."""
+    if m.group(1):
+        symbol, a, b, suffix = m.group(1), m.group(2), m.group(3), m.group(4) or ""
+    else:
+        a, b, symbol, suffix = m.group(5), m.group(6), m.group(7).upper(), m.group(8) or ""
+    return f"{cardinal(int(a))} {_range_word()} {_money(symbol, b, None, suffix)}"
+
+
+def _pct_words(number: str) -> str:
+    whole, _, frac = re.sub(r"[.]", ",", number).partition(",")
+    return _dec(whole, frac or None)
+
+
 def _percent(m: re.Match[str], locale: str) -> str | None:
     number = m.group(1) or m.group(3)
     suffix = m.group(2) or m.group(4) or ""
-    whole, _, frac = number.partition(",")
-    words = decimal(whole, frac or None)
-    return "yüzde " + attach(words, suffix)
+    return "yüzde " + attach(_pct_words(number), suffix)
+
+
+def _percent_range(m: re.Match[str], locale: str) -> str | None:
+    a, b, suffix = (m.group(1), m.group(2), m.group(3)) if m.group(1) else (m.group(4), m.group(5), m.group(6))
+    return f"yüzde {_pct_words(a)} {_range_word()} {attach(_pct_words(b), suffix or '')}"
 
 
 _UNITS = {
@@ -169,16 +245,16 @@ def _range(m: re.Match[str], locale: str) -> str | None:
     a, b = m.group(1), m.group(2)
     if len(a) > 4 or len(b) > 4:
         return None
-    return f"{a} ila {b}"
+    return f"{a} {_range_word()} {b}"
 
 
 def _thousands(m: re.Match[str], locale: str) -> str | None:
     whole, frac, suffix = m.group(1), m.group(2), m.group(3) or ""
-    return attach(decimal(whole, frac), suffix)
+    return attach(_dec(whole, frac), suffix)
 
 
 def _decimal_comma(m: re.Match[str], locale: str) -> str | None:
-    return attach(decimal(m.group(1), m.group(2)), m.group(3) or "")
+    return attach(_dec(m.group(1), m.group(2)), m.group(3) or "")
 
 
 def _suffixed_number(m: re.Match[str], locale: str) -> str | None:
@@ -243,6 +319,7 @@ def _alnum(m: re.Match[str], locale: str) -> str | None:
 
 _SEP = r"(?:[ \-]|\.(?!\s))"
 _SUFFIX = rf"(?:{_APOS}([{_LOWER}]+))?"
+_PCT = r"\d+(?:,\d+|\.\d{1,2})?"  # a percentage, with a Turkish or an English decimal mark
 
 RULES: list[Rule] = [
     Rule("verbalize.abbreviation", re.compile(rf"(?<![\w.])({_ABBR_ALTERNATION})\.(?![{_LOWER}{_UPPER}])"), _abbreviation, "abbreviation read in full"),
@@ -262,10 +339,13 @@ RULES: list[Rule] = [
     # Turkish also writes times with a dot (saat 14.00); taken as a time only after "saat" or with a suffix, since 22.22 may be a decimal
     Rule("verbalize.time.dotted", re.compile(rf"(?:(?<=[Ss]aat )|(?=[0-2]?\d\.[0-5]\d{_APOS}))\b([01]?\d|2[0-3])\.([0-5]\d)\b(?![.,]\d){_SUFFIX}"), _time, "dotted clock time read as hours and minutes"),
     Rule("verbalize.minus", re.compile(r"(?<![\w.,\-/:])(\d+(?:,\d+)?) - (\d+(?:,\d+)?)(?=\s*=)"), _minus, "spaced minus in an equation read as 'eksi'"),
+    Rule("verbalize.math", re.compile(r"(?<=[\w)]) ([÷×=+≈−]) (?=[\w(])"), _math, "spaced operator in an equation read as a word"),
+    Rule("verbalize.currency.range", re.compile(rf"([₺$€£])\s?(\d+)\s?[-–]\s?(\d+){_SUFFIX}(?![\w]|[.,]\d)|(?<![\w.,])(\d+)\s?[-–]\s?(\d+)\s?(TL|TRY|USD|EUR|GBP|₺|\$|€|£){_SUFFIX}(?![\w])"), _currency_range, "currency range read as words"),
     Rule("verbalize.currency.postfix", re.compile(rf"(?<![\w.,])(\d+(?:,\d+)?)\s?(bin|milyon|milyar)?\s?([₺$€£]){_SUFFIX}(?![\w])"), _currency_postfix, "currency symbol after the amount read as words"),
     Rule("verbalize.currency", re.compile(rf"([₺$€£])\s?(\d{{1,3}}(?:\.\d{{3}})*|\d+)(?:,(\d{{1,2}}))?{_SUFFIX}(?![\w]|[.,]\d)"), _currency_prefix, "currency amount read as words"),
     Rule("verbalize.currency.code", re.compile(rf"(?<![\w.,])(\d{{1,3}}(?:\.\d{{3}})*|\d+)(?:,(\d{{1,2}}))?\s?(TL|TRY|USD|EUR|GBP)\b{_SUFFIX}"), _currency_suffix, "currency code read as words"),
-    Rule("verbalize.percent", re.compile(rf"%\s?(\d+(?:,\d+)?){_SUFFIX}|(?<![\w.])(\d+(?:,\d+)?)\s?%{_SUFFIX}"), _percent, "percent read as 'yüzde'"),
+    Rule("verbalize.percent.range", re.compile(rf"%\s?({_PCT})\s?[-–]\s?({_PCT}){_SUFFIX}|(?<![\w.])({_PCT})\s?[-–]\s?({_PCT})\s?%{_SUFFIX}"), _percent_range, "percent range read as words"),
+    Rule("verbalize.percent", re.compile(rf"%\s?({_PCT}){_SUFFIX}|(?<![\w.])({_PCT})\s?%{_SUFFIX}"), _percent, "percent read as 'yüzde'"),
     Rule("verbalize.unit", re.compile(rf"(?<![\w.,])(\d+(?:,\d+)?)\s?({_UNIT_ALTERNATION}){_SUFFIX}(?![\w/])"), _unit, "unit abbreviation read as a word"),
     Rule("verbalize.fraction", re.compile(rf"(?<![\d/])([1-9])/([2-9]|10){_SUFFIX}(?![\d/])"), _fraction, "fraction read as words"),
     Rule("verbalize.range", re.compile(r"(?<![\w.,\-/:])(\d+)\s?[-–]\s?(\d+)(?![\w\-/:]|[.,]\d)"), _range, "number range read with 'ila'"),

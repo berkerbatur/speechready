@@ -102,9 +102,42 @@ cases:
   - id: colon-time-on-the-hour-with-suffix
     input: "14:00'teki toplantı."
     expect: "on dörtteki toplantı."
+  - id: percent-with-dotted-decimal
+    input: "Komisyon %0.5 alınır."
+    expect: "Komisyon yüzde sıfır virgül beş alınır."
+  - id: percent-range-with-suffix
+    input: "Bahşiş %5-10'u arasında, komisyon %0.5-3."
+    expect: "Bahşiş yüzde beş ila onu arasında, komisyon yüzde sıfır virgül beş ila üç."
+  - id: currency-range
+    input: "Ücret 30-35 TL civarında, ₺30-35 arası, 1-2 Euro."
+    expect: "Ücret otuz ila otuz beş lira civarında, otuz ila otuz beş lira arası, 1 ila 2 Euro."
+  - id: subunit-suffix-devoiced
+    input: "149,90 TL'den başlıyor."
+    expect: "yüz kırk dokuz lira doksan kuruştan başlıyor."
+  - id: equation-operators
+    input: "Kıst ücret 3000 ÷ 30 × 10 = 1000 TL olur, sonuç ≈ 22,2°C."
+    expect: "Kıst ücret 3000 bölü 30 çarpı 10 eşittir bin lira olur, sonuç yaklaşık yirmi iki virgül iki derece."
+  - id: range-word-ile
+    input: "5-10 dakika sürer, %5-10 arası."
+    options: {range_word: ile}
+    expect: "5 ile 10 dakika sürer, yüzde beş ile on arası."
+    note: the narration of the held-out answers said "ile" in every range; the default stays "ila"
+  - id: lira-turk-lirasi
+    input: "Fiyat 100 TL, 20 TL'ye düştü, 149,90 TL'den başlıyor, ₺5'in yarısı."
+    options: {lira: türk lirası}
+    expect: "Fiyat yüz Türk lirası, yirmi Türk lirasına düştü, yüz kırk dokuz Türk lirası doksan kuruştan başlıyor, beş Türk lirasının yarısı."
+    note: a case suffix after the possessive takes the pronominal n
+  - id: lira-tl
+    input: "Fiyat 100 TL, 20 TL'ye düştü."
+    options: {lira: tl}
+    expect: "Fiyat yüz te le, yirmi te leye düştü."
+  - id: half-bucuk
+    input: "Notu 4,5; randevu 9.30'daki, %2,5 arttı, 14:30'da, 2,5 milyar $."
+    options: {half: buçuk}
+    expect: "Notu dört buçuk; randevu dokuz buçuktaki, yüzde iki buçuk arttı, on dört buçukta, iki buçuk milyar dolar."
   - id: spaced-minus-in-an-equation
     input: "Adım 1: 72 - 32 = 40, aralık 10-20."
-    expect: "Adım 1: 72 eksi 32 = 40, aralık 10 ila yirmi."
+    expect: "Adım 1: 72 eksi 32 eşittir 40, aralık 10 ila yirmi."
     note: the last number stands before a full stop, so it is written out like any other; the voice reads 10 the same either way
   # numbers: words (the default for local models with no text normalizer; see spec/profiles)
   - id: words-plain-numbers-written-out

@@ -38,6 +38,9 @@ class Options:
     fractions: str = "spoken"  # spoken ("one half", "yarım") | division ("one over two", "bir bölü iki")
     foreign_acronyms: bool = True  # Turkish: lowercase vowel-less tokens like npm, css read with English letter names
     numbers: str | None = None  # digits (leave plain numbers to the voice) | words (write every remaining number out); None = the profile's choice, else digits
+    range_word: str = "ila"  # Turkish number ranges: ila ("5 ila 10") | ile ("5 ile 10")
+    lira: str = "lira"  # Turkish: lira | türk lirası | tl, how ₺, TL and TRY are said ("yüz lira", "yüz Türk lirası", "yüz te le")
+    half: str = "digits"  # Turkish: digits ("dört virgül beş", "dokuz otuz") | buçuk ("dört buçuk", "dokuz buçuk")
     extra: dict = field(default_factory=dict)
 
 

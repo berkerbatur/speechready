@@ -56,4 +56,4 @@ def test_pipecat_fence_split_across_pieces_is_one_block():
 def test_pipecat_dropped_block_returns_empty():
     transform = pipecat.text_transform(provider="openai")
     assert asyncio.run(transform("```\nx = 1\ny = 2\n```", "sentence")) == ""
-    assert asyncio.run(transform("```\nx = 1\n```", "sentence")) == "x = 1."  # a one-line block is spoken by default
+    assert asyncio.run(transform("```\nx = 1\n```", "sentence")) == "x equals 1."  # a one-line block is spoken by default

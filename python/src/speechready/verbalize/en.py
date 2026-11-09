@@ -209,6 +209,13 @@ def _minus(m: re.Match[str], locale: str) -> str | None:
     return f"{m.group(1)} minus {m.group(2)}"
 
 
+_MATH = {"÷": "divided by", "×": "times", "=": "equals", "+": "plus", "≈": "about", "−": "minus"}
+
+
+def _math(m: re.Match[str], locale: str) -> str | None:
+    return f" {_MATH[m.group(1)]} "
+
+
 def _range(m: re.Match[str], locale: str) -> str | None:
     a, b = m.group(1), m.group(2)
     short = len(a.replace(".", "")) <= 3 and len(b.replace(".", "")) <= 3
@@ -301,7 +308,7 @@ RULES: list[Rule] = [
     Rule("verbalize.currency.range", re.compile(r"([$€£¥₺])\s?(\d[\d,]*)\s?[-–]\s?[$€£¥₺]?\s?(\d[\d,]*)(?![\d]|[.,]\d)"), _currency_range, "currency range read as words"),
     Rule(
         "verbalize.currency",
-        re.compile(r"([$€£¥₺])\s?(\d[\d,]*)(?:\.(\d{1,2}))?\s?(k|K|m|M|bn|B|thousand|million|billion)?(?![\w]|[.,]\d)"),
+        re.compile(r"([$€£¥₺])\s?(\d[\d,]*)(?:\.(\d{1,2}))?(?:\s?(k|K|m|M|bn|B|thousand|million|billion))?(?![\w]|[.,]\d)"),
         _currency_prefix,
         "currency amount read as words",
     ),
@@ -316,6 +323,7 @@ RULES: list[Rule] = [
     Rule("verbalize.unit", re.compile(rf"(?<![\w.])(\d+(?:\.\d+)?)\s?({_UNIT_ALTERNATION})(?![\w/])"), _unit, "unit abbreviation read as a word"),
     Rule("verbalize.fraction", re.compile(r"(?<![\d/])([1-9])/([2-9]|10)(?![\d/])"), _fraction, "fraction read as words"),
     Rule("verbalize.minus", re.compile(r"(?<![\w.,\-/:])(\d+(?:\.\d+)?) - (\d+(?:\.\d+)?)(?=\s*=)"), _minus, "spaced minus in an equation read as 'minus'"),
+    Rule("verbalize.math", re.compile(r"(?<=[\w)]) ([÷×=+≈−]) (?=[\w(])"), _math, "spaced operator in an equation read as a word"),
     Rule("verbalize.range", re.compile(r"(?<![\w.,\-/:])(\d+(?:\.\d+)?)\s?[-–]\s?(\d+(?:\.\d+)?)(?![\w\-/:]|[.,]\d)"), _range, "number range read with 'to'"),
     Rule("verbalize.year", re.compile(r"\b(in|In|since|Since|by|from|until|till|before|after|during|circa|year|est\.|©)\s+(1[1-9]\d\d|20\d\d)\b(?![\w.,]?\d)"), _year_in_context, "year read as a year"),
     Rule("verbalize.decade", re.compile(r"\b(1[1-9]\d0|20\d0)s\b"), _decade, "decade read as a year"),

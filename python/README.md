@@ -51,6 +51,9 @@ prepare(text, provider="openai", options=Options(
     fractions="spoken",        # spoken (default: "one half", "yarım") | division ("one over two", "bir bölü iki")
     foreign_acronyms=True,     # Turkish: npm, css, sql read with English letter names (en pi em)
     numbers=None,              # digits (leave plain numbers to the voice) | words (write every remaining number and clock time out); None = the profile decides, else digits
+    range_word="ila",          # Turkish number ranges: ila (default, "5 ila 10") | ile ("5 ile 10")
+    lira="lira",               # Turkish: how ₺, TL and TRY are said: lira (default, "yüz lira") | türk lirası ("yüz Türk lirası") | tl ("yüz te le")
+    half="digits",             # Turkish: digits (default, "dört virgül beş", "dokuz otuz") | buçuk ("dört buçuk", "dokuz buçuk")
     terminal_punctuation=".",  # added to a block that ends without one
 ))
 ```
