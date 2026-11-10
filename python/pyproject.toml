@@ -25,6 +25,9 @@ Documentation = "https://berkerbatur.github.io/speechready/"
 Changelog = "https://github.com/berkerbatur/speechready/blob/main/CHANGELOG.md"
 Issues = "https://github.com/berkerbatur/speechready/issues"
 
+[project.scripts]
+speechready = "speechready.cli:main"
+
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 
