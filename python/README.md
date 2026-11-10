@@ -88,6 +88,21 @@ prepare("API'yi JSON ile çağır.", locale="tr-TR", lexicon="tr-tech").text
 lex = load_lexicon("tr-tech")                        # a Lexicon you can extend before passing it
 ```
 
+### Drafting a lexicon for your own vocabulary
+
+The `speechready` command (installed with the package) builds one offline, once, from a glossary. The library itself never calls a network; this command does, at development time, and writes a file you review and ship:
+
+```
+speechready lexicon scan transcripts/*.txt > glossary.txt           # candidates: acronyms, mixed-case names, Node.js, C++
+speechready lexicon build glossary.txt --locale tr-TR -o lexicon.yaml   # one model call; OPENAI_API_KEY
+speechready lexicon check lexicon.yaml                               # every entry through the pipeline
+speechready lexicon export lexicon.yaml --profile elevenlabs-v2      # the vendor's upload file
+```
+
+The glossary is one word per line, optionally a tab and a hint that settles ambiguous cases (`Nginx<TAB>web server, said engine-x`). The model (`gpt-4.1-mini` by default; `--model`, `--provider anthropic` with `ANTHROPIC_API_KEY`, or `OPENAI_BASE_URL` for a compatible local server) answers for every word how speakers of the locale say it, as a respelling in that alphabet, or that the voice reads it fine as written, in which case no entry is made. `--ipa` asks for a transcription too, for the vendors that take phoneme tags. Rerunning on a grown glossary asks only for the new words and shows the model the file's existing entries as its conventions. `check` flags a respelling with digits, symbols or letters the alphabet lacks, and a word the pipeline does not replace.
+
+Drafted against the hand-written `tr-tech` lexicon, `gpt-4.1-mini` agreed on 60 of its 71 entries; the rest were letter-name variants ("iks em el" for XML) and three wrong ones (JSON, Wi-Fi spelled with a w, `IT` kept as written). That is why the output is a draft to review, not a result, and why it is made once rather than at request time.
+
 ## Voice agents
 
 Two frameworks take a text transform between the LLM and the TTS. Both hooks are plain callables, so they need nothing beyond `speechready`:

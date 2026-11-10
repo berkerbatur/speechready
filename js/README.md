@@ -92,7 +92,7 @@ lex.toGoogleJson();   // Google Cloud TTS custom pronunciations
 await Lexicon.load("lexicon.json");   // Node only; .yaml files need the optional `yaml` package
 ```
 
-One lexicon is bundled: `tr-tech`, foreign tech acronyms and names as Turkish developers say them (`API` → ey pi ay, `JSON` → ceyson). In Turkish an apostrophe suffix is refitted to the spoken form, so `API'yi` becomes `ey pi ay'ı`.
+One lexicon is bundled: `tr-tech`, foreign tech acronyms and names as Turkish developers say them (`API` → ey pi ay, `JSON` → ceyson). In Turkish an apostrophe suffix is refitted to the spoken form, so `API'yi` becomes `ey pi ay'ı`. To draft a lexicon for your own vocabulary, the Python package's `speechready lexicon build` command asks a model once, offline, and writes a file this package loads with `Lexicon.load`.
 
 ```js
 import { loadLexicon, prepare } from "speechready";

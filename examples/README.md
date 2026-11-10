@@ -7,7 +7,7 @@ Runnable agents that put speechready between the LLM and the TTS, one per framew
 | `livekit_agent.py` | LiveKit Agents 1.8+ (Python) | `tts_text_transforms=[speechready.integrations.livekit.text_transform(...)]` on an `AgentSession`; `console` mode talks from the terminal. |
 | `livekit_agent.mjs` | LiveKit Agents 1.9+ (Node) | The same with `speechready/livekit`, which returns the `ReadableStream` transform the SDK chains. |
 | `pipecat_bot.py` | Pipecat 1.15+ | `text_transforms=[("sentence", speechready.integrations.pipecat.text_transform(...))]` on the ElevenLabs TTS service, served to a browser at `localhost:7860`. |
-| `lexicon.en.yaml` | any | A pronunciation lexicon with `ipa`, `say` and `spell` entries, for `Lexicon.load()` or `prepare(..., lexicon="examples/lexicon.en.yaml")`. |
+| `lexicon.en.yaml` | any | A pronunciation lexicon with `ipa`, `say` and `spell` entries, for `Lexicon.load()` or `prepare(..., lexicon="examples/lexicon.en.yaml")`. `speechready lexicon build` drafts one like it from a glossary. |
 
 Two details the examples get right that are easy to miss:
 
