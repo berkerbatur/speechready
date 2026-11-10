@@ -50,6 +50,10 @@ cases:
   - id: number-sign-before-long-id
     input: "Order #48219930 shipped."
     expect: "Order number four eight two one nine nine three zero shipped."
+  - id: equation-operators
+    input: "Pay is 3000 ÷ 30 × 10 = 1000 dollars, $10 ÷ 3 = $3.33, x + y = z."
+    expect: "Pay is 3000 divided by 30 times 10 equals 1000 dollars, ten dollars divided by 3 equals three dollars and thirty-three cents, x plus y equals z."
+    note: the currency rule used to swallow the space before the operator
   - id: spaced-minus-in-an-equation
     input: "Step 1: 72 - 32 = 40, range 10-20."
-    expect: "Step 1: 72 minus 32 = 40, range 10 to 20."
+    expect: "Step 1: 72 minus 32 equals 40, range 10 to 20."

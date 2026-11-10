@@ -176,6 +176,8 @@ function fraction(m: Match): string | null {
 const YEAR_LIKE = re(String.raw`(19|20)\d\d`);
 
 const minus = (m: Match): string => `${m[1]} minus ${m[2]}`;
+const MATH: Record<string, string> = { "÷": "divided by", "×": "times", "=": "equals", "+": "plus", "≈": "about", "−": "minus" };
+const math = (m: Match): string => ` ${MATH[m[1]]} `;
 
 function range(m: Match): string | null {
   const a = m[1];
@@ -263,7 +265,7 @@ export const RULES: Rule[] = [
   rule("verbalize.currency.range", re(String.raw`([$€£¥₺])\s?(\d[\d,]*)\s?[-–]\s?[$€£¥₺]?\s?(\d[\d,]*)(?![\d]|[.,]\d)`), currencyRange, "currency range read as words"),
   rule(
     "verbalize.currency",
-    re(String.raw`([$€£¥₺])\s?(\d[\d,]*)(?:\.(\d{1,2}))?\s?(k|K|m|M|bn|B|thousand|million|billion)?(?![${W}]|[.,]\d)`),
+    re(String.raw`([$€£¥₺])\s?(\d[\d,]*)(?:\.(\d{1,2}))?(?:\s?(k|K|m|M|bn|B|thousand|million|billion))?(?![${W}]|[.,]\d)`),
     currencyPrefix,
     "currency amount read as words",
   ),
@@ -278,6 +280,7 @@ export const RULES: Rule[] = [
   rule("verbalize.unit", re(String.raw`(?<![${W}.])(\d+(?:\.\d+)?)\s?(${UNIT_ALTERNATION})(?![${W}/])`), unit, "unit abbreviation read as a word"),
   rule("verbalize.fraction", re(String.raw`(?<![\d/])([1-9])/([2-9]|10)(?![\d/])`), fraction, "fraction read as words"),
   rule("verbalize.minus", re(String.raw`(?<![${W}.,\-/:])(\d+(?:\.\d+)?) - (\d+(?:\.\d+)?)(?=\s*=)`), minus, "spaced minus in an equation read as 'minus'"),
+  rule("verbalize.math", re(String.raw`(?<=[${W})]) ([÷×=+≈−]) (?=[${W}(])`), math, "spaced operator in an equation read as a word"),
   rule("verbalize.range", re(String.raw`(?<![${W}.,\-/:])(\d+(?:\.\d+)?)\s?[-–]\s?(\d+(?:\.\d+)?)(?![${W}\-/:]|[.,]\d)`), range, "number range read with 'to'"),
   rule("verbalize.year", re(String.raw`${B}(in|In|since|Since|by|from|until|till|before|after|during|circa|year|est\.|©)\s+(1[1-9]\d\d|20\d\d)${B}(?![${W}.,]?\d)`), yearInContext, "year read as a year"),
   rule("verbalize.decade", re(String.raw`${B}(1[1-9]\d0|20\d0)s${B}`), decade, "decade read as a year"),

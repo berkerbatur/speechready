@@ -64,21 +64,44 @@ function digitGroups(m: Match): string | null {
   return spoken.join(", ");
 }
 
+/** `half: buçuk`: x,5 and half past the hour said with "buçuk". */
+const half = (): boolean => option("half", "digits") === "buçuk";
+
+function dec(whole: string, frac: string | null | undefined): string {
+  if (frac === "5" && half()) return `${cardinal(parseInt(whole.replace(/\./g, ""), 10))} buçuk`;
+  return decimal(whole, frac);
+}
+
+/** Attach a suffix the writer harmonised for the numeral to a spoken word: vowels re-harmonised,
+ * a d devoiced after a voiceless consonant (buçuk + daki -> buçuktaki). */
+function fit(word: string, suffix: string): string {
+  const ki = suffix.endsWith("ki") ? "ki" : ""; // -ki never harmonises
+  let s = reharmonize(word, ki ? suffix.slice(0, -2) : suffix);
+  if (s && s[0] === "d" && "çfhkpsşt".includes(word[word.length - 1])) s = "t" + s.slice(1);
+  return attach(word, s) + ki;
+}
+
 function timeWords(hh: string, mm: string): string {
   const h = parseInt(hh, 10);
   const minute = parseInt(mm, 10);
   const hour = cardinal(h);
   if (minute === 0) return `${hour} sıfır sıfır`;
+  if (minute === 30 && half()) return `${hour} buçuk`;
   return `${hour} ${mm[0] !== "0" ? cardinal(minute) : "sıfır " + cardinal(minute)}`;
 }
 
 function time(m: Match): string {
   const suffix = group(m, 3) ?? "";
   if (suffix && parseInt(m[2], 10) === 0) return attach(cardinal(parseInt(m[1], 10)), suffix); // 14.00'teki -> on dörtteki
-  return attach(timeWords(m[1], m[2]), suffix);
+  const words = timeWords(m[1], m[2]);
+  return words.endsWith("buçuk") ? fit(words, suffix) : attach(words, suffix);
 }
 const minus = (m: Match): string => `${m[1]} eksi ${m[2]}`;
 const timeRange = (m: Match): string => `${timeWords(m[1], m[2])} ile ${timeWords(m[3], m[4])}`;
+
+const MATH: Record<string, string> = { "÷": "bölü", "×": "çarpı", "=": "eşittir", "+": "artı", "≈": "yaklaşık", "−": "eksi" };
+const math = (m: Match): string => ` ${MATH[m[1]]} `;
+const rangeWord = (): string => String(option("range_word", "ila"));
 
 const CURRENCY: Record<string, [string, string]> = {
   "₺": ["lira", "kuruş"], TL: ["lira", "kuruş"], TRY: ["lira", "kuruş"],
@@ -87,32 +110,68 @@ const CURRENCY: Record<string, [string, string]> = {
   "£": ["sterlin", "peni"], GBP: ["sterlin", "peni"],
 };
 
+// `lira`: how ₺, TL and TRY are said
+const LIRA: Record<string, string> = { lira: "lira", "türk lirası": "Türk lirası", tl: "te le" };
+// a case suffix after the possessive in "Türk lirası" takes a pronominal n: lirasına, lirasında
+const POSSESSIVE_CASES: Record<string, string> = { a: "na", ı: "nı", da: "nda", ta: "nda", dan: "ndan", tan: "ndan", ın: "nın", la: "yla" };
+
+function unitOf(symbol: string): [string, string] {
+  const [unitWord, subWord] = CURRENCY[symbol];
+  if (unitWord === "lira") return [LIRA[String(option("lira", "lira")).toLowerCase()] ?? "lira", subWord];
+  return [unitWord, subWord];
+}
+
+function withSuffix(unitWord: string, suffix: string): string {
+  if (unitWord === "Türk lirası" && suffix) {
+    const s = reharmonize("lirası", suffix);
+    const core = "yn".includes(s[0]) && s.length > 1 && "aı".includes(s[1]) ? s.slice(1) : s;
+    if (POSSESSIVE_CASES[core]) return unitWord + POSSESSIVE_CASES[core];
+  }
+  return attach(unitWord, reharmonize(unitWord, suffix));
+}
+
 function currencyPostfix(m: Match): string {
   const [whole, , frac] = partition(m[1], ",");
   const scale = group(m, 2) ? ` ${m[2]}` : "";
-  const [unitWord] = CURRENCY[m[3]];
-  return `${decimal(whole, frac || null)}${scale} ${attach(unitWord, reharmonize(unitWord, group(m, 4) ?? ""))}`;
+  const [unitWord] = unitOf(m[3]);
+  return `${dec(whole, frac || null)}${scale} ${withSuffix(unitWord, group(m, 4) ?? "")}`;
 }
 
 function money(symbol: string, whole: string, frac: string | undefined, suffix = ""): string {
-  const [unitWord, subWord] = CURRENCY[symbol];
+  const [unitWord, subWord] = unitOf(symbol);
   const amount = cardinal(parseInt(whole.replace(/\./g, ""), 10));
   if (frac) {
     const cents = parseInt(frac.padEnd(2, "0").slice(0, 2), 10);
-    if (cents) return `${amount} ${unitWord} ${cardinal(cents)} ${attach(subWord, reharmonize(subWord, suffix))}`;
+    if (cents) return `${amount} ${unitWord} ${cardinal(cents)} ${fit(subWord, suffix)}`;
   }
-  return `${amount} ${attach(unitWord, reharmonize(unitWord, suffix))}`;
+  return `${amount} ${withSuffix(unitWord, suffix)}`;
 }
 
 const currencyPrefix = (m: Match): string => money(m[1], m[2], group(m, 3), group(m, 4) ?? "");
 const currencySuffix = (m: Match): string => money(m[3].toUpperCase(), m[1], group(m, 2), group(m, 4) ?? "");
 
+/** 30-35 TL, ₺30-35: the first number is a bare cardinal, the second carries the unit and the suffix. */
+function currencyRange(m: Match): string {
+  const [symbol, a, b, suffix] = m[1]
+    ? [m[1], m[2], m[3], group(m, 4) ?? ""]
+    : [m[7].toUpperCase(), m[5], m[6], group(m, 8) ?? ""];
+  return `${cardinal(parseInt(a, 10))} ${rangeWord()} ${money(symbol, b, undefined, suffix)}`;
+}
+
+function pctWords(number: string): string {
+  const [whole, , frac] = partition(number.replace(".", ","), ",");
+  return dec(whole, frac || null);
+}
+
 function percent(m: Match): string {
   const number = group(m, 1) ?? group(m, 3) ?? "";
   const suffix = group(m, 2) ?? group(m, 4) ?? "";
-  const [whole, , frac] = partition(number, ",");
-  const words = decimal(whole, frac || null);
-  return "yüzde " + attach(words, suffix);
+  return "yüzde " + attach(pctWords(number), suffix);
+}
+
+function percentRange(m: Match): string {
+  const [a, b, suffix] = m[1] ? [m[1], m[2], group(m, 3) ?? ""] : [m[4], m[5], group(m, 6) ?? ""];
+  return `yüzde ${pctWords(a)} ${rangeWord()} ${attach(pctWords(b), suffix)}`;
 }
 
 const UNITS: Record<string, string> = {
@@ -148,11 +207,11 @@ function range(m: Match): string | null {
   const a = m[1];
   const b = m[2];
   if (a.length > 4 || b.length > 4) return null;
-  return `${a} ila ${b}`;
+  return `${a} ${rangeWord()} ${b}`;
 }
 
-const thousands = (m: Match): string => attach(decimal(m[1], group(m, 2)), group(m, 3) ?? "");
-const decimalComma = (m: Match): string => attach(decimal(m[1], m[2]), group(m, 3) ?? "");
+const thousands = (m: Match): string => attach(dec(m[1], group(m, 2)), group(m, 3) ?? "");
+const decimalComma = (m: Match): string => attach(dec(m[1], m[2]), group(m, 3) ?? "");
 
 const ORDINAL_SUFFIX = re("(?:[ıiuü]nc[ıiuü]|nc[ıiuü])");
 
@@ -200,6 +259,7 @@ function alnum(m: Match): string | null {
 
 const SEP = String.raw`(?:[ \-]|\.(?!\s))`;
 const SUFFIX = `(?:${APOS}([${LOWER}]+))?`;
+const PCT = String.raw`\d+(?:,\d+|\.\d{1,2})?`; // a percentage, with a Turkish or an English decimal mark
 
 /** `numbers: words`: a plain number the other rules left alone, written out. */
 function numberWords(m: Match): string | null {
@@ -226,10 +286,13 @@ export const RULES: Rule[] = [
   // Turkish also writes times with a dot (saat 14.00); taken as a time only after "saat" or with a suffix, since 22.22 may be a decimal
   rule("verbalize.time.dotted", re(String.raw`(?:(?<=[Ss]aat )|(?=[0-2]?\d\.[0-5]\d${APOS}))${B}([01]?\d|2[0-3])\.([0-5]\d)${B}(?![.,]\d)${SUFFIX}`), time, "dotted clock time read as hours and minutes"),
   rule("verbalize.minus", re(String.raw`(?<![${W}.,\-/:])(\d+(?:,\d+)?) - (\d+(?:,\d+)?)(?=\s*=)`), minus, "spaced minus in an equation read as 'eksi'"),
+  rule("verbalize.math", re(String.raw`(?<=[${W})]) ([÷×=+≈−]) (?=[${W}(])`), math, "spaced operator in an equation read as a word"),
+  rule("verbalize.currency.range", re(String.raw`([₺$€£])\s?(\d+)\s?[-–]\s?(\d+)${SUFFIX}(?![${W}]|[.,]\d)|(?<![${W}.,])(\d+)\s?[-–]\s?(\d+)\s?(TL|TRY|USD|EUR|GBP|₺|\$|€|£)${SUFFIX}(?![${W}])`), currencyRange, "currency range read as words"),
   rule("verbalize.currency.postfix", re(String.raw`(?<![${W}.,])(\d+(?:,\d+)?)\s?(bin|milyon|milyar)?\s?([₺$€£])${SUFFIX}(?![${W}])`), currencyPostfix, "currency symbol after the amount read as words"),
   rule("verbalize.currency", re(String.raw`([₺$€£])\s?(\d{1,3}(?:\.\d{3})*|\d+)(?:,(\d{1,2}))?${SUFFIX}(?![${W}]|[.,]\d)`), currencyPrefix, "currency amount read as words"),
   rule("verbalize.currency.code", re(String.raw`(?<![${W}.,])(\d{1,3}(?:\.\d{3})*|\d+)(?:,(\d{1,2}))?\s?(TL|TRY|USD|EUR|GBP)${B}${SUFFIX}`), currencySuffix, "currency code read as words"),
-  rule("verbalize.percent", re(String.raw`%\s?(\d+(?:,\d+)?)${SUFFIX}|(?<![${W}.])(\d+(?:,\d+)?)\s?%${SUFFIX}`), percent, "percent read as 'yüzde'"),
+  rule("verbalize.percent.range", re(String.raw`%\s?(${PCT})\s?[-–]\s?(${PCT})${SUFFIX}|(?<![${W}.])(${PCT})\s?[-–]\s?(${PCT})\s?%${SUFFIX}`), percentRange, "percent range read as words"),
+  rule("verbalize.percent", re(String.raw`%\s?(${PCT})${SUFFIX}|(?<![${W}.])(${PCT})\s?%${SUFFIX}`), percent, "percent read as 'yüzde'"),
   rule("verbalize.unit", re(String.raw`(?<![${W}.,])(\d+(?:,\d+)?)\s?(${UNIT_ALTERNATION})${SUFFIX}(?![${W}/])`), unit, "unit abbreviation read as a word"),
   rule("verbalize.fraction", re(String.raw`(?<![\d/])([1-9])/([2-9]|10)${SUFFIX}(?![\d/])`), fraction, "fraction read as words"),
   rule("verbalize.range", re(String.raw`(?<![${W}.,\-/:])(\d+)\s?[-–]\s?(\d+)(?![${W}\-/:]|[.,]\d)`), range, "number range read with 'ila'"),

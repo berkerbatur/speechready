@@ -89,6 +89,7 @@ def _pre(text: str, locale: str, letter_names: bool = False) -> str:
     text = _PUNCT.sub(" ", text)
     if lang == "tr":
         text = text.replace("I", "ı").replace("İ", "i").lower().replace("ı", "i")  # fold dotted/dotless i
+        text = re.sub(r"\bila\b", "ile", text)  # a range said with either word is the same range
     else:
         text = text.lower()
         text = re.sub(r"\b([ap]) m\b", r"\1m", text)  # a m / p m -> am / pm
